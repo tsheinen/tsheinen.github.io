@@ -1,5 +1,6 @@
 # The URL the site will be built for
 base_url = "https://teddyheinen.com"
+title = "Teddy Heinen"
 
 # Whether to automatically compile all Sass files in the sass directory
 compile_sass = true
@@ -21,7 +22,6 @@ taxonomies = [
 # Put all your custom variables here
 anpu_date_format="%e %B %Y"
 anpu_menu_links = [
-    { url = "$BASE_URL/", name = "Home" },
     { url = "$BASE_URL/about/", name = "About" },
     { url = "$BASE_URL/tags/", name = "Tags" },
 ]
