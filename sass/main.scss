@@ -11,7 +11,7 @@ html {
 
 $background-color: #2D283E;
 $highlight-color: #DEC1FF;
-$highlight-color-darker: #871FFF;
+$highlight-color-alt: #ED254E;
 $foreground-color: #D1D7E0;
 
 body {
@@ -75,18 +75,18 @@ a:hover {
 
 a:hover,
 a:focus {
-    color: $highlight-color-darker;
-    border-bottom: 1px solid $highlight-color-darker;
+    color: $highlight-color-alt;
+    border-bottom: 1px solid $highlight-color-alt;
 }
 
 a:active {
-    color: $highlight-color-darker;
+    color: $highlight-color-alt;
     opacity: 0.9;
-    border-bottom: 1px solid $highlight-color-darker;
+    border-bottom: 1px solid $highlight-color-alt;
 }
 
 a.active {
-    color: $highlight-color-darker;
+    color: $highlight-color-alt;
 }
 
 a.skip-main {
@@ -254,7 +254,7 @@ article header h1 a {
 }
 
 .article-info a:hover {
-    color: $highlight-color-darker;
+    color: $highlight-color-alt;
 }
 
 .post-short-list .article-info {
