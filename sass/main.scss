@@ -75,8 +75,8 @@ a:hover {
 
 a:hover,
 a:focus {
-    color: $highlight-color-alt;
-    border-bottom: 1px solid $highlight-color-alt;
+    color: $foreground-color;
+    border-bottom: 1px solid $foreground-color;
 }
 
 a:active {
@@ -355,7 +355,7 @@ article img {
 }
 
 .pagination-item a:hover, .pagination-item   a:focus {
-    color: #a31d1d;
+    color: $foreground-color;
     border-bottom: 0;
 }
 
