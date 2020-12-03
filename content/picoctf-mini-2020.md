@@ -18,7 +18,7 @@ Let's check that your internet connection is working. This flag is 'in-the-clear
 
 Not much to see here -- the flag is in the downloadable flag file.  
 
-flag: `picoCTF{c0ngr4ts_0n_y0ur_$@|\|1-|-L|}`
+flag: picoCTF{c0ngr4ts_0n_y0ur_$@|\|1-|-L|}
 
 
 # Pitter, Patter, Platters
@@ -65,7 +65,7 @@ That sure looks promising.  We can filter out the null bytes and reverse it with
 ```bash
 python -c "print(''.join(reversed('}.8.3.4.6.0.c.a.e._.3.<._.|.L.m._.1.1.1.t.5._.3.b.{.F.T.C.o.c.i.p'.split('.'))))" 
 ```
-flag: `picoCTF{b3_5t111_mL|_<3_eac06438}`
+flag: picoCTF{b3_5t111_mL|_<3_eac06438}
 
 
 # Web Gauntlet
@@ -479,7 +479,7 @@ p.sendline("cat flag.txt;exit;")
 print(re.search("(picoCTF{.*?})",p.recvall().decode()).group(1))
 ```
 
-flag: `picoCTF{p0p_r0p_4nd_dr0p_1t_506b81e98597929e}`
+flag: picoCTF{p0p_r0p_4nd_dr0p_1t_506b81e98597929e}
 
 # OTP Implementation
 
@@ -551,4 +551,4 @@ for i in range(100):
 print("key:", ''.join(key))
 print("flag:", xors(unhexlify(''.join(key)),unhexlify(flag)))
 ```
-flag: `picoCTF{cust0m_jumbl3s_4r3nt_4_g0Od_1d3A_ca692500}`
+flag: picoCTF{cust0m_jumbl3s_4r3nt_4_g0Od_1d3A_ca692500}
