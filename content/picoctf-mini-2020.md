@@ -479,8 +479,10 @@ p.sendline("cat flag.txt;exit;")
 print(re.search("(picoCTF{.*?})",p.recvall().decode()).group(1))
 ```
 
-flag: picoCTF{p0p_r0p_4nd_dr0p_1t_506b81e98597929e}
-
+flag: 
+```text
+picoCTF{p0p_r0p_4nd_dr0p_1t_506b81e98597929e}
+```
 # OTP Implementation
 
 
@@ -551,4 +553,7 @@ for i in range(100):
 print("key:", ''.join(key))
 print("flag:", xors(unhexlify(''.join(key)),unhexlify(flag)))
 ```
-flag: picoCTF{cust0m_jumbl3s_4r3nt_4_g0Od_1d3A_ca692500}
+flag: 
+```text
+picoCTF{cust0m_jumbl3s_4r3nt_4_g0Od_1d3A_ca692500}
+```
