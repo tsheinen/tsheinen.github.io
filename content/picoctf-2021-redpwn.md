@@ -1,10 +1,11 @@
 +++
 title = "picoMini by redpwn"
-date = 2021-5-9
+date = 2021-05-09
 
 [taxonomies]
 tags = ["ctf-writeups"]
 +++
+
 
 I competed in picoCTF's 2021 mini-competition with the Texas A&M Cybersecurity Club as [ret2rev](https://ctftime.org/team/154567) and we placed in sixth place. I worked on the binary exploitation challenges and solved five of the six total. Fun challenges, glad I competed. Writeups are below. 
 
