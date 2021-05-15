@@ -1,0 +1,1 @@
+picoCTF{f0ll0w_th3_m4p_t0_g3t_th3_fl4g}
