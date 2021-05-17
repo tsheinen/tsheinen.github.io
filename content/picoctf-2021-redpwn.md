@@ -1336,4 +1336,4 @@ if __name__ == "__main__":
     main()
 ```
 
-Neat challenge!  I'm stilling rather new to complex heap challenges so this fucked me up, but I had a good time working on it!  
+Neat challenge!  I'm still rather new to complex heap challenges so this fucked me up, but I had a good time working on it!  
