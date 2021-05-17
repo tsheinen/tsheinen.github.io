@@ -20,7 +20,7 @@ Clutter, clutter everywhere and not a byte to use.
 nc mars.picoctf.net 31890
 ```
 
-We're provided [source](/ctf/picomini-by-redpwn/clutter-overflow/chall.c) and a [binary](picomini-by-redpwn/clutter-overflow/chall). Source isn't super useful here because it's trivially reversible. 
+We're provided [source](/ctf/picomini-by-redpwn/clutter-overflow/chall.c) and a [binary](/ctf/picomini-by-redpwn/clutter-overflow/chall). Source isn't super useful here because it's trivially reversible. 
 
 ```c
 undefined8 main(void)
