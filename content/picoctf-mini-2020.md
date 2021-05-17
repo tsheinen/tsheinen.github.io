@@ -232,7 +232,7 @@ I looked around the binary and did some research and eventually found the functi
 │           0x004808b8      648b00         mov eax, dword fs:[rax]
 └           0x004808bb      c3             ret
 ```
-So: `_dl_make_stack_executable` takes a single argument, wraps `mprotect` and changes the memory protection to `__stack_prot`.  `__stack_prot` happens to be writable so we can change that to 7 (PROT_READ|PROT_EXEC|PROT_WRITE) and then call `_dl_make_stack_executable` with an argument of `__libc_stack_end`.  After that it's essentially over - we can put our shellcode on the stack and then ROP to it.  
+So: `_dl_make_stack_executable` takes a single argument, wraps `mprotect` and changes the memory protection to `__stack_prot`.  `__stack_prot` happens to be writable so we can change that to 7 (rwx) and then call `_dl_make_stack_executable` with an argument of `__libc_stack_end`.  After that it's essentially over - we can put our shellcode on the stack and then ROP to it.  
 
 ```python
 from pwn import *
