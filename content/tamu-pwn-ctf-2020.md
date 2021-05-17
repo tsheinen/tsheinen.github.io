@@ -201,7 +201,7 @@ We don't get challenge sources on pwn3 so its time to learn to love reversing.  
     PIE:      No PIE (0x8048000)
 ```
 
-![](pwn3_functions_list.png)
+![](/ctf/tamu-pwn-ctf-2020/pwn3_functions_list.png)
 
 Well, that sure looks suspicious.  We have a read_flag function which we should keep note of but also `unlock_one`, `unlock_two`, and `unlock_three`.  
 

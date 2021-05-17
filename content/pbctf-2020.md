@@ -20,7 +20,7 @@ By: Corb3nik
 
 ## initial review
 
-![entry page to sploosh](/pbctf-2020/sploosh_intro.png)
+![entry page to sploosh](/ctf/pbctf-2020/sploosh_intro.png)
 
 Nothing particularly interesting here -- it will scrape a website and tell you the viewport geometry.  We're provided source code so i'm not going to bother looking harder at this.  
 
@@ -142,7 +142,7 @@ Update: The challenge.py was updated at 01:00 UTC, 6th Dec. Please redownload if
 By: sampriti & rbtree
 ```
 
-[find_rbtree.py](/pbctf-2020/find_rbtree.py)
+[find_rbtree.py](/ctf/pbctf-2020/find_rbtree.py)
 
 ## initial review
 

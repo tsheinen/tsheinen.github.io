@@ -20,7 +20,7 @@ Clutter, clutter everywhere and not a byte to use.
 nc mars.picoctf.net 31890
 ```
 
-We're provided [source](picomini-by-redpwn/clutter-overflow/chall.c) and a [binary](picomini-by-redpwn/clutter-overflow/chall). Source isn't super useful here because it's trivially reversible. 
+We're provided [source](/ctf/picomini-by-redpwn/clutter-overflow/chall.c) and a [binary](picomini-by-redpwn/clutter-overflow/chall). Source isn't super useful here because it's trivially reversible. 
 
 ```c
 undefined8 main(void)
@@ -133,7 +133,7 @@ Fermat's last theorem solver as a service.
 nc mars.picoctf.net 31929
 ```
 
-We're provided [source](picomini-by-redpwn/fermat-strings/chall.c), a [binary](picomini-by-redpwn/fermat-strings/chall), and the executing [Dockerfile](picomini-by-redpwn/fermat-strings/Dockerfile). 
+We're provided [source](/ctf/picomini-by-redpwn/fermat-strings/chall.c), a [binary](/ctf/picomini-by-redpwn/fermat-strings/chall), and the executing [Dockerfile](/ctf/picomini-by-redpwn/fermat-strings/Dockerfile). 
 
 ## setup
 
@@ -382,7 +382,7 @@ Shellcode as a Service runs any assembly code you give it! For extra safety, you
 nc mars.picoctf.net 31021
 ```
 
-Again, we're provided [source](picomini-by-redpwn/saas/chall.c), [binary](picomini-by-redpwn/saas/chall), and [Dockerfile](picomini-by-redpwn/saas/Dockerfile). 
+Again, we're provided [source](/ctf/picomini-by-redpwn/saas/chall.c), [binary](/ctf/picomini-by-redpwn/saas/chall), and [Dockerfile](/ctf/picomini-by-redpwn/saas/Dockerfile). 
 
 ```text
 ❯ checksec chall
@@ -563,7 +563,7 @@ Flag is in the current directory. seccomp-tools might be helpful.
 nc mars.picoctf.net 31809
 ```
 
-We're provided a [binary](picomini-by-redpwn/lockdown-horses/horse) and a [Dockerfile](picomini-by-redpwn/lockdown-horses/Dockerfile) . 
+We're provided a [binary](/ctf/picomini-by-redpwn/lockdown-horses/horse) and a [Dockerfile](/ctf/picomini-by-redpwn/lockdown-horses/Dockerfile) . 
 
 ## analysis
 
@@ -798,9 +798,9 @@ nc mars.picoctf.net 31638
 
 I gotta say, big fan of getting Dockerfiles provided. It's quite nice to not need to worry if your exploit will run on remote because your testing environment is identical. 
 
-[chall](picomini-by-redpwn/vr-school/chall) 
-[chall](picomini-by-redpwn/vr-school/Dockerfile) 
-[chall.patch](picomini-by-redpwn/vr-school/chall.patch) (not provided, has stubbed alarm) 
+[chall](/ctf/picomini-by-redpwn/vr-school/chall) 
+[chall](/ctf/picomini-by-redpwn/vr-school/Dockerfile) 
+[chall.patch](/ctf/picomini-by-redpwn/vr-school/chall.patch) (not provided, has stubbed alarm) 
 
 ## analysis
 

@@ -26,7 +26,7 @@ flag: picoCTF{c0ngr4ts_0n_y0ur_$@|\|1-|-L|}
 ```text
 'Suspicious' is written all over this disk image. Download suspicious.dd.sda1
 ```
-[suspicious.dd.sda1](/picoctf-mini-2020/pitter_patter_platters/suspicious.dd.sda1)
+[suspicious.dd.sda1](/ctf/picoctf-mini-2020/pitter_patter_platters/suspicious.dd.sda1)
 
 
 Well, okay, let's mount it. `sudo mount -o loop suspicious.dd.sda1 fs`
@@ -114,7 +114,7 @@ I spent far too long trying to find another way to union without union and then 
 I made a simple game to show off my programming skills. See if you can beat it! vuln vuln.c Makefile nc jupiter.challenges.picoctf.org 28951
 ```
 
-[vuln](/picoctf-mini-2020/guessing_game_1/vuln)
+[vuln](/ctf/picoctf-mini-2020/guessing_game_1/vuln)
 
 
 ```makefile
@@ -280,7 +280,7 @@ print(re.search("(picoCTF{.*?})",p.recvall().decode()).group(1))
 
 # guessing game 2
 
-[vuln](/picoctf-mini-2020/guessing_game_2/vuln)
+[vuln](/ctf/picoctf-mini-2020/guessing_game_2/vuln)
 
 ```makefile
 all:
@@ -490,7 +490,7 @@ picoCTF{p0p_r0p_4nd_dr0p_1t_506b81e98597929e}
 Yay reversing! Relevant files: otp flag.txt
 ```
 
-[otp](/picoctf-mini-2020/otp/otp)
+[otp](/ctf/picoctf-mini-2020/otp/otp)
 
 
 ![main function](/picoctf-mini-2020/otp/main1.png)
