@@ -65,7 +65,7 @@ That sure looks promising.  We can filter out the null bytes and reverse it with
 ```bash
 python -c "print(''.join(reversed('}.8.3.4.6.0.c.a.e._.3.<._.|.L.m._.1.1.1.t.5._.3.b.{.F.T.C.o.c.i.p'.split('.'))))" 
 ```
-flag: picoCTF{b3_5t111_mL|_<3_eac06438}
+flag: picoCTF{b3_5t111_mL|\_<3_eac06438}
 
 
 # Web Gauntlet
@@ -493,8 +493,8 @@ Yay reversing! Relevant files: otp flag.txt
 [otp](/ctf/picoctf-mini-2020/otp/otp)
 
 
-![main function](/picoctf-mini-2020/otp/main1.png)
-![valid_char function, returns true if it is a valid char in a hex string](/picoctf-mini-2020/otp/valid_char.png)
+![main function](/ctf/picoctf-mini-2020/otp/main1.png)
+![valid_char function, returns true if it is a valid char in a hex string](/ctf/picoctf-mini-2020/otp/valid_char.png)
 
 So to summarize:
 1. It copies 100 chars from the first argument
