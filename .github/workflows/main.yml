@@ -1,4 +1,4 @@
-on: push
+on: [push, repository_dispatch]
 name: Build and deploy on push
 jobs:
   build:
