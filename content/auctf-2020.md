@@ -20,7 +20,7 @@ Also.. once you think you've got it I think you should try to connect to challen
 ```
 
 
-```
+```text
 ...
 │           0x0000137b      e8a0fdffff     call sym.imp.fgets          ; char *fgets(char *s, int size, FILE *stream)
 │           0x00001380      488d85f0dfff.  lea rax, [var_2010h]
@@ -69,7 +69,7 @@ Also.. once you think you've got it I think you should try to connect to challen
 ```
 As can be seen from this excerpt of the check function, the binary will ask for three strings and give us the flag if they are all correct.  
 
-```
+```text
 [0x00001180]> pdf@sym.check_1
             ; CALL XREF from sym.check @ 0x1399
 ┌ 105: sym.check_1 (char *arg1);
@@ -134,7 +134,7 @@ flag: auctf{i0s_r3v3rs1ng_1s_1nt3r3st1ng}
 
 # sora
 
-```
+```text
 This obnoxious kid with spiky hair keeps telling me his key can open all doors.
 
 Can you generate a key to open this program before he does?
@@ -144,7 +144,7 @@ Connect to challenges.auctf.com 30004
 
 I opened up the binary with radare2 to determine the key length and target location and then solved it with angr.  We can see from this excerpt of the main function that it reads in 0x1e bytes from stdin and the program calls print_flag at 0x12aa
 
-```
+```text
 ...
 │           0x0000126d      488945c8       mov qword [var_38h], rax
 │           0x00001271      488d3da10d00.  lea rdi, str.Give_me_a_key  ; 0x2019 ; "Give me a key!" ; const char *s
