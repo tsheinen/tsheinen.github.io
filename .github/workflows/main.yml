@@ -2,13 +2,14 @@ on: push
 name: Build and deploy on push
 jobs:
   build:
-    name: shalzz/zola-deploy-action
+    name: Deploy Website
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
     - name: Download artifact
       uses: dawidd6/action-download-artifact@v2
       with:
+        workflow: ci.yml
         repo: tcheinen/resume
         path: static
     - name: shalzz/zola-deploy-action
