@@ -11,7 +11,7 @@ jobs:
       with:
         workflow: ci.yml
         repo: tcheinen/resume
-        path: static
+        path: .
     - name: shalzz/zola-deploy-action
       uses: shalzz/zola-deploy-action@master
       env:
