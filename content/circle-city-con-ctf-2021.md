@@ -11,7 +11,7 @@ I competed with ret2rev, finishing in 7th place. Writeups aren't complete; I sta
 <!-- more -->
 
 
-# fawn cdn
+# fawn cdn (pwn)
 
 ```text
 I'm starting a modern internet business! That means I need my own Content Delivery Network! Check it out and see what you think, I wrote it at a hackathon!
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     main()
 ```
 
-# worm
+# worm (pwn)
 
 ```text
 Write a worm and pwn my system :)
@@ -135,7 +135,7 @@ print(p.stdout)
 print(p.stderr)
 ```
 
-# little mountain
+# little mountain (rev)
 
 ```text
 Climb this mountain and score some points :)
@@ -256,7 +256,7 @@ if __name__ == "__main__":
 flag{b4bys73p5upt3hm0un741n}
 ```
 
-# angrbox
+# angrbox (misc)
 
 ```text
 Write me a program that:
@@ -294,7 +294,7 @@ CCC{p4th_3pl0s10n_4s_a_tr4pd00r_funct10n?_0r_d1d_y0u_ch33s3_1t}
 
 I think I can safely say this is cheese :)
 
-# artform
+# artform (rev)
 
 ```text
 Anything can be a form of art. Even this challenge description is a form of art if I find a gallery with no standards!
@@ -333,7 +333,7 @@ This gives me big big flag vibes. I can retrieve this with Ghidra, but it's fast
 CCC{1_l1k3_t0_b34t_th3_bru5h}
 ```
 
-# guardian
+# guardian (rev)
 
 ```text
 We have a really cool owl mascot, but there's no really cool owl themed movies....well actually....there's one.
@@ -424,7 +424,7 @@ if __name__ == "__main__":
 CCC{let_m3_thr0ugh!_let_me_p4ss!_d0_y0u_th1nk_y0u_c4n_h3lp_h3r?}
 ```
 
-# weird rop
+# weird rop (pwn)
 
 ```text
 I put my ROP Gadgets through the wash with my nice sweater and they all came out pink. I hope they still.
@@ -571,7 +571,7 @@ Volatility Foundation Volatility Framework 2.6.1
 C C C { d 0 c k 3 r _ i n _ a _ V M }
 ```
 
-# casino
+# casino (web)
 
 ```text
 Can you make $1000 off Casino#4970? (say !help to view commands) 
@@ -608,7 +608,7 @@ After that you can just get the flag by way of $flag.
 CCC{maybe_1_sh0uldv3d_us3d_P0ST_in5t3ad_of_G3T}
 ```
 
-# imgfiltrate
+# imgfiltrate (web)
 
 ```text
 Can you yoink an image from the admin page?
@@ -644,7 +644,7 @@ window.onload = (event) => {
 CCC{c4nvas_b64}
 ```
 
-# puppet
+# puppet (web)
 
 ```text
 The flag has a random name in ~/Documents/. Pwn my browser:
