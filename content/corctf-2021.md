@@ -1,5 +1,5 @@
 +++
-title = "COR CTF 2021"
+title = "corCTF 2021"
 date = 2021-08-22
 
 [taxonomies]
