@@ -14,14 +14,23 @@ $highlight-color: #DEC1FF;
 $highlight-color-alt: #ED254E;
 $foreground-color: #D1D7E0;
 
+.theme-dark {
+    --background-color: #2D283E;
+    --highlight-color: #DEC1FF;
+    --highlight-color-alt: #ED254E;
+    --foreground-color: #D1D7E0;
+}
+
 body {
     margin: 0;
-    background: $background-color;
-    color: $foreground-color;
+    background: var(--background-color, $background-color);
+    color: var(--foreground-color, $foreground-color);
     font-size: 18px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
 }
+
+
 
 article,
 aside,
@@ -37,7 +46,7 @@ nav,
 section,
 summary {
     display: block;
-}	
+}   
 
 .container {
     max-width: 42em;
@@ -64,7 +73,7 @@ h3 {
 /* Links */
 
 a {
-    color: $highlight-color;
+    color: var(--highlight-color, $highlight-color);
     text-decoration: none;
 }
 
@@ -75,18 +84,18 @@ a:hover {
 
 a:hover,
 a:focus {
-    color: $foreground-color;
-    border-bottom: 1px solid $foreground-color;
+    color: var(--foreground-color, $foreground-color);
+    border-bottom: 1px solid var(--foreground-color, $foreground-color);
 }
 
 a:active {
-    color: $highlight-color-alt;
+    color: var(--highlight-color-alt, $highlight-color-alt);
     opacity: 0.9;
-    border-bottom: 1px solid $highlight-color-alt;
+    border-bottom: 1px solid var(--highlight-color-alt, $highlight-color-alt);
 }
 
 a.active {
-    color: $highlight-color-alt;
+    color: var(--highlight-color-alt, $highlight-color-alt);
 }
 
 a.skip-main {
@@ -207,7 +216,7 @@ header nav a {
 }
 
 header a {
-    color: $highlight-color;
+    color: var(--highlight-color, $highlight-color);
 }
 
 .site-header {
@@ -245,7 +254,7 @@ article header h1 {
 article header h1 a {
     border: none;
     text-decoration: none;
-    color: $highlight-color;
+    color: var(--highlight-color, $highlight-color);
 }
 
 .article-info {
@@ -259,7 +268,7 @@ article header h1 a {
 }
 
 .article-info a:hover {
-    color: $highlight-color-alt;
+    color: var(--highlight-color-alt, $highlight-color-alt);
 }
 
 .post-short-list .article-info {
@@ -360,7 +369,7 @@ article img {
 }
 
 .pagination-item a:hover, .pagination-item   a:focus {
-    color: $foreground-color;
+    color: var(--foreground-color, $foreground-color);
     border-bottom: 0;
 }
 
