@@ -11,7 +11,7 @@
     <meta name="description" content="{{ config.description }}">
 
     <link rel="stylesheet" href="{{ get_url(path="main.css", trailing_slash=false) }}">
-
+    
     {% if config.generate_feed %}
         <link rel="alternate" type={% if config.feed_filename == "atom.xml" %}"application/atom+xml"{% else %}"application/rss+xml"{% endif %} title="RSS" href="{{ get_url(path=config.feed_filename) | safe }}">
     {% endif %}
@@ -69,6 +69,25 @@
             {% endblock footer %}
         </footer>
     </div>
+
+
+
+    <details data-popover="up" class="switcher">
+      <summary>
+        <img class="lightbulb" src="/images/lightbulb-solid.svg"></img>
+      </summary>
+      <div class="swatch-container">
+          {% for theme in ["dark", "light"] %}
+              <div data-theme={{theme}} class="swatch" onclick="setTheme('{{theme}}')">
+                <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+              </div>
+          {% endfor %}
+      </div>
+    </details>
+
     <!-- Cloudflare Web Analytics -->
     <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
     <!-- End Cloudflare Web Analytics -->
