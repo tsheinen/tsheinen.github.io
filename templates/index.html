@@ -21,12 +21,19 @@
 </head>
 <body data-theme="dark">
     <script defer>
-        var preference = localStorage.getItem('theme')
-        if (!preference) {
-            preference = 'dark';
-            localStorage.setItem('theme', 'dark');
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
         }
-        document.body.dataset['theme'] = preference;
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+
+
     </script>
     <a class="skip-main" href="#main">Skip to content</a>
     <div class="container">
