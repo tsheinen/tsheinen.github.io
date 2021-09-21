@@ -20,6 +20,14 @@
     {% endblock extra_head %}
 </head>
 <body data-theme="dark">
+    <script defer>
+        var preference = localStorage.getItem('theme')
+        if (!preference) {
+            preference = 'dark';
+            localStorage.setItem('theme', 'dark');
+        }
+        document.body.dataset['theme'] = preference;
+    </script>
     <a class="skip-main" href="#main">Skip to content</a>
     <div class="container">
         <header> 
