@@ -21,6 +21,14 @@ $foreground-color: #D1D7E0;
     --foreground-color: #D1D7E0;
 }
 
+[data-theme="light"] {
+    
+    --background-color: #E0F5CC;
+    --highlight-color: #D8315B;
+    --highlight-color-alt: #B3C2F2;
+    --foreground-color: #3B413C;
+}
+
 body {
     margin: 0;
     background: var(--background-color, $background-color);
