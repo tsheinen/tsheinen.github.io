@@ -1,5 +1,6 @@
 /* Basic */
 @import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap');
+
 html {
     font-family: -apple-system, BlinkMacSystemFont, 'Montserrat', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     /* 1 */
@@ -14,6 +15,12 @@ $highlight-color: #DEC1FF;
 $highlight-color-alt: #ED254E;
 $foreground-color: #D1D7E0;
 
+.transition {
+    -webkit-transition: background-color 500ms linear;
+    -ms-transition: background-color 500ms linear;
+    transition: background-color 500ms linear;
+}
+
 [data-theme="dark"] {
     --background-color: #2D283E;
     --highlight-color: #DEC1FF;
@@ -27,6 +34,7 @@ $foreground-color: #D1D7E0;
     --highlight-color: #D8315B;
     --highlight-color-alt: #B3C2F2;
     --foreground-color: #3B413C;
+
 }
 
 body {
@@ -35,6 +43,7 @@ body {
     color: var(--foreground-color, $foreground-color);
     font-size: 18px;
     line-height: 1.5;
+
     -webkit-font-smoothing: antialiased;
 }
 
@@ -248,7 +257,7 @@ main h1 {
 
 
 article:not(:last-of-type) {
-    border-bottom: thin solid #f1f1f1;
+    border-bottom: thin solid var(--foreground-color, $foreground-color);
     padding-bottom: 2em;
 }
 
@@ -330,7 +339,7 @@ article img {
     display: block;
     height: 1px;
     border: 0;
-    border-top: thin solid #f1f1f1;
+    border-top: thin solid var(--foreground-color, $foreground-color);
     width: 25%;
     margin: 1em auto;
 }
@@ -364,7 +373,7 @@ article img {
 }
 
 .pagination-item {
-    background: #fafafa;
+    background: var(--foreground-color, $foreground-color);
     padding: 0.75em 0.75em;
 }
 
@@ -373,11 +382,11 @@ article img {
 }
 
 .pagination-item a {
-    color: #333333;
+    color: var(--background-color, $background-color);
 }
 
 .pagination-item a:hover, .pagination-item   a:focus {
-    color: var(--foreground-color, $foreground-color);
+    color: var(--highlight-color-alt, $highlight-color-alt);
     border-bottom: 0;
 }
 
@@ -447,4 +456,48 @@ ul.language-select > li {
 
 ul.toc {
     list-style: none;
+}
+
+
+
+
+details[data-popover] > summary:focus {
+  outline: none;
+}
+details[data-popover] > summary::-webkit-details-marker {
+  display: none;
+}
+details[data-popover] > summary {
+  list-style: none;
+}
+
+details[data-popover="up"] > summary + * {
+  right: calc(1rem + 100%);
+  bottom: 0px;
+  position: absolute;
+}
+
+details[data-popover] {
+  position: fixed;
+}
+details[data-popover] > summary + * {
+  position: absolute;
+}
+
+.swatch {
+    height: 40px;
+    width: 40px;
+    display: flex;
+    margin: 5px;
+}
+
+.swatch-container {
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
+    background-color: var(--foreground-color, $foreground-color);
+}
+.lightbulb {
+    height:30px;
+    fill: var(--foreground-color, $foreground-color);
 }
