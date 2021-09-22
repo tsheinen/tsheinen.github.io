@@ -16,9 +16,9 @@ $highlight-color-alt: #ED254E;
 $foreground-color: #D1D7E0;
 
 .transition {
-    -webkit-transition: background-color 500ms linear;
-    -ms-transition: background-color 500ms linear;
-    transition: background-color 500ms linear;
+    -webkit-transition: background-color 300ms linear;
+    -ms-transition: background-color 300ms linear;
+    transition: background-color 300ms linear;
 }
 
 [data-theme="dark"] {

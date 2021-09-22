@@ -32,7 +32,7 @@
             }
         }, false);
         setTheme(localStorage.getItem('theme') || 'dark');
-
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
     </script>
     <a class="skip-main" href="#main">Skip to content</a>
     <div class="container">
