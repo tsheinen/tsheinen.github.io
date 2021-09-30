@@ -21,22 +21,6 @@ $foreground-color: #D1D7E0;
     transition: background-color 300ms linear;
 }
 
-[data-theme="dark"] {
-    --background-color: #2D283E;
-    --highlight-color: #DEC1FF;
-    --highlight-color-alt: #ED254E;
-    --foreground-color: #D1D7E0;
-}
-
-[data-theme="light"] {
-    
-    --background-color: #E0F5CC;
-    --highlight-color: #D8315B;
-    --highlight-color-alt: #B3C2F2;
-    --foreground-color: #3B413C;
-
-}
-
 body {
     margin: 0;
     background: var(--background-color, $background-color);

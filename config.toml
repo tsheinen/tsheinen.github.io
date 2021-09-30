@@ -22,3 +22,7 @@ anpu_menu_links = [
     { url = "$BASE_URL/about/", name = "About" },
     { url = "$BASE_URL/tags/", name = "Tags" },
 ]
+
+[extra.themes]
+dark = {background = "#2D283E", highlight = "#DEC1FF", highlight_alt = "#ED254E", foreground = "#D1D7E0" }
+light = {background = "#E0F5CC", highlight = "#D8315B", highlight_alt = "#B3C2F2", foreground = "#3B413C" }
