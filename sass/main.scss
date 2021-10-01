@@ -476,8 +476,8 @@ details[data-popover] > summary + * {
 }
 
 .swatch-container {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     border-radius: 5px;
     background-color: var(--foreground-color, $foreground-color);
 }
