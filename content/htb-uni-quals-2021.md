@@ -1,6 +1,6 @@
 +++
 title = "HTB University Quals 2021"
-date = 2021-11-14
+date = 2021-11-22
 
 [taxonomies]
 tags = ["ctf-writeups"]
