@@ -326,7 +326,7 @@ e8390000000000000000000000000000000000000000000000000000000000000000000000000000
 
 God, fuck, windows :(
 
-I wasn't gonna do this but then I found a lovely paragraph on the [Qiling](https://qiling.io/z) documentation. 
+I wasn't gonna do this but then I found a lovely paragraph on the [Qiling](https://docs.qiling.io/en/latest/) documentation. 
 
 ```text
 Not only working cross-architecture, Qiling is also cross-platform, so for example you can run Linux ELF file on top of Windows. In contrast, Qemu usermode only run binary of the same OS, such as Linux ELF on Linux, due to the way it forwards syscall from emulated code to native OS
