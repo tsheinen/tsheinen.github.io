@@ -12,6 +12,13 @@ jobs:
         workflow: ci.yml
         repo: tcheinen/resume
         path: .
+    - name: fetch writeups!
+      run: git clone https://github.com/tcheinen/ctf-writeups
+    - name: build writeups
+      run: |
+        wget https://github.com/tcheinen/writeup-export/releases/download/v0.1.0/writeup-export
+        chmod +x writeup-export
+        ./writeup-export -i ctf-writeups -o content
     - name: shalzz/zola-deploy-action
       uses: shalzz/zola-deploy-action@master
       env:
