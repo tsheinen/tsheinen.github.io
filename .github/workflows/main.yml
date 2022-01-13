@@ -23,7 +23,7 @@ jobs:
     - name: build writeups
       run: |
         chmod +x writeup-export
-        ./writeup-export -i ctf-writeups -o content
+        .writeup-export/writeup-export -i ctf-writeups -o content
     - name: shalzz/zola-deploy-action
       uses: shalzz/zola-deploy-action@master
       env:
