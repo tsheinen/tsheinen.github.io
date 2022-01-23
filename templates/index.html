@@ -20,6 +20,7 @@
         {% for name, theme in config.extra.themes %}
         [data-theme="{{ name }}"] {   
             --background-color: {{theme.background}};
+            --background-alt-color: {{theme.background_alt}};
             --highlight-color: {{theme.highlight}};
             --highlight-color-alt: {{theme.highlight_alt}};
             --foreground-color: {{theme.foreground}};
@@ -57,6 +58,13 @@
                 {% set link_url = menu_link.url | replace(from="$BASE_URL", to=config.base_url) %}
                 <a {% if current_url and current_url == link_url %}class="active"{% endif %} href="{{ link_url }}">{{menu_link.name}}</a>
                 {% endfor %}
+                <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div>
                 {% endblock sidebar_nav %}
             </nav>
         </header>
@@ -106,5 +114,9 @@
     <!-- Cloudflare Web Analytics -->
     <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
     <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="{{ get_url(path="elasticlunr.min.js") }}"></script>
+    <script type="text/javascript" src="{{ get_url(path="search_index.en.js") }}"></script>
+    <script type="text/javascript" src="{{ get_url(path="js/search.js") }}"></script>
 </body>
 </html>

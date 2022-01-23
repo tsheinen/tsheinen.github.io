@@ -24,5 +24,5 @@ anpu_menu_links = [
 ]
 
 [extra.themes]
-Dark = {background = "#2D283E", highlight = "#DEC1FF", highlight_alt = "#ED254E", foreground = "#D1D7E0" }
-Light = {background = "#E0F5CC", highlight = "#D8315B", highlight_alt = "#0197F6", foreground = "#3B413C" }
+Dark = {background = "#2D283E", background_alt = "#36304B", highlight = "#DEC1FF", highlight_alt = "#ED254E", foreground = "#D1D7E0" }
+Light = {background = "#E0F5CC", background_alt = "#EAF8DD", highlight = "#D8315B", highlight_alt = "#0197F6", foreground = "#3B413C" }
