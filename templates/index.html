@@ -58,13 +58,13 @@
                 {% set link_url = menu_link.url | replace(from="$BASE_URL", to=config.base_url) %}
                 <a {% if current_url and current_url == link_url %}class="active"{% endif %} href="{{ link_url }}">{{menu_link.name}}</a>
                 {% endfor %}
-                <div class="search-container">
+<!--                 <div class="search-container">
                     <input id="search" type="search" placeholder="🧐 Search!">
 
                     <div class="search-results">
                         <div class="search-results__items"></div>
                     </div>
-                </div>
+                </div> -->
                 {% endblock sidebar_nav %}
             </nav>
         </header>
