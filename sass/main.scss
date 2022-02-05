@@ -441,6 +441,9 @@ ul.language-select > li {
 
 .toc {
   position: fixed;
+  @media screen and (max-width: 768px) {
+    position: static;
+  }
   left: 3em;
   top: 5em;
   padding: 1em;
