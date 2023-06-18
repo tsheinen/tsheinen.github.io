@@ -6,18 +6,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - name: Download artifact
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        workflow: ci.yml
-        repo: tcheinen/resume
-        path: .
-    - name: Download writeup-export
-      uses: dawidd6/action-download-artifact@v2
-      with:
-        workflow: rust.yml
-        repo: tcheinen/writeup-export
-        path: .
+    - uses: robinraju/release-downloader@v1.8
+      with: 
+        repository: "tsheinen/resume"
+        latest: true
+        fileName: "resume.pdf"
+    - uses: robinraju/release-downloader@v1.8
+      with: 
+        repository: "tsheinen/writeup-export"
+        latest: true
+        fileName: "writeup-export"
     - name: fetch writeups!
       run: git clone https://github.com/tcheinen/ctf-writeups
     - name: build writeups
