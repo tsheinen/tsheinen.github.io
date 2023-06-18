@@ -21,8 +21,8 @@ jobs:
     - name: build writeups
       run: |
         git config --global --add safe.directory /github/workspace
-        chmod +x ./writeup-export/writeup-export
-        ./writeup-export/writeup-export -i ctf-writeups -o content
+        chmod +x ./writeup-export
+        ./writeup-export -i ctf-writeups -o content
     - name: tcheinen/zola-deploy-action
       uses: tcheinen/zola-deploy-action@master
       env:
