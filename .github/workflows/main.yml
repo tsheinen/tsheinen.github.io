@@ -9,12 +9,12 @@ jobs:
     - uses: robinraju/release-downloader@v1.8
       with: 
         repository: "tsheinen/resume"
-        latest: true
+        tag: "latest"
         fileName: "resume.pdf"
     - uses: robinraju/release-downloader@v1.8
       with: 
         repository: "tsheinen/writeup-export"
-        latest: true
+        tag: "latest"
         fileName: "writeup-export"
     - name: fetch writeups!
       run: git clone https://github.com/tcheinen/ctf-writeups
