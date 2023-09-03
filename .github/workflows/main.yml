@@ -8,12 +8,6 @@ jobs:
     - uses: actions/checkout@master
     - uses: robinraju/release-downloader@v1.8
       with: 
-        repository: "tsheinen/resume"
-        tag: "latest"
-        fileName: "resume.pdf"
-        out-file-path: "static"
-    - uses: robinraju/release-downloader@v1.8
-      with: 
         repository: "tsheinen/writeup-export"
         tag: "latest"
         fileName: "writeup-export"
