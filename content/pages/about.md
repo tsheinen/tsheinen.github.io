@@ -4,7 +4,7 @@ path = "about"
 template = "page.html"
 +++
 
-Howdy!  I'm Thea "Teddy" Heinen (they/them or she/her)!  You can find me on [GitHub](https://github.com/tsheinen) or [Twitter](https://twitter.com/theinen_), and I'm reachable by email at [me@heinen.dev](mailto:me@heinen.dev).
+Howdy!  I'm Thea "Teddy" Heinen (they/them or she/her)!  You can find me on [GitHub](https://github.com/tsheinen) or [Mastodon](https://infosec.exchange/@theinen), and I'm reachable by email at [me@heinen.dev](mailto:me@heinen.dev).
 
 I CTF with [idek](https://ctftime.org/team/157039/) and mostly do binary exploitation. 
 
