@@ -1,0 +1,17 @@
+POST /index.php HTTP/1.1
+Host: jupiter.challenges.picoctf.org:28955
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 20
+Origin: http://jupiter.challenges.picoctf.org:28955
+Connection: keep-alive
+Referer: http://jupiter.challenges.picoctf.org:28955/index.php
+Cookie: sessionid=xlne35ljxe9nmybeobn7p8t4i74r4nbi; PHPSESSID=5ss0t0qpkkc0hf85on1b3hrt9s
+Upgrade-Insecure-Requests: 1
+DNT: 1
+Sec-GPC: 1
+
+user=admin&pass=test
