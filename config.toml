@@ -1,7 +1,7 @@
 # The URL the site will be built for
 base_url = "https://heinen.dev"
 title = "Teddy Heinen"
-generate_feeds = true
+generate_feeds = false
 
 compile_sass = true
 build_search_index = true
