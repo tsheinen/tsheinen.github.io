@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>4096</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/corctf-2021/4096/#source-py">source.py</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/corctf-2021/4096/#output-txt">output.txt</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>4096</h1>
+    </header>
+
+    <div class="content">
+        <pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>I heard 4096 bit RSA is secure, so I encrypted the flag with it.
+</span></code></pre>
+<p>Well, it sure should be secure -- let's take a look at the provided files.</p>
+<h3 id="source-py">source.py</h3>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>Crypto</span><span style="color:#f29e74;">.</span><span>Util</span><span style="color:#f29e74;">.</span><span>number </span><span style="color:#ffa759;">import </span><span>getPrime</span><span style="color:#ccc9c2cc;">, </span><span>bytes_to_long
+</span><span style="color:#ffa759;">from </span><span>private </span><span style="color:#ffa759;">import </span><span>flag
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">prod</span><span>(</span><span style="color:#ffcc66;">lst</span><span>):
+</span><span>	ret </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1
+</span><span>	</span><span style="color:#ffa759;">for </span><span>num </span><span style="color:#ffa759;">in </span><span>lst:
+</span><span>		ret </span><span style="color:#f29e74;">*= </span><span>num
+</span><span>	</span><span style="color:#ffa759;">return </span><span>ret
+</span><span>m </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">bytes_to_long</span><span>(flag)
+</span><span>primes </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffd580;">getPrime</span><span>(</span><span style="color:#ffcc66;">32</span><span>) </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">128</span><span>)]
+</span><span>n </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">prod</span><span>(primes)
+</span><span>e </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">65537
+</span><span style="color:#f28779;">print</span><span>(n)
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#f28779;">pow</span><span>(m</span><span style="color:#ccc9c2cc;">, </span><span>e</span><span style="color:#ccc9c2cc;">, </span><span>n))
+</span></code></pre>
+<h3 id="output-txt">output.txt</h3>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>50630448182626893495464810670525602771527685838257974610483435332349728792396826591558947027657819590790590829841808151825744184405725893984330719835572507419517069974612006826542638447886105625739026433810851259760829112944769101557865474935245672310638931107468523492780934936765177674292815155262435831801499197874311121773797041186075024766460977392150443756520782067581277504082923534736776769428755807994035936082391356053079235986552374148782993815118221184577434597115748782910244569004818550079464590913826457003648367784164127206743005342001738754989548942975587267990706541155643222851974488533666334645686774107285018775831028090338485586011974337654011592698463713316522811656340001557779270632991105803230612916547576906583473846558419296181503108603192226769399675726201078322763163049259981181392937623116600712403297821389573627700886912737873588300406211047759637045071918185425658854059386338495534747471846997768166929630988406668430381834420429162324755162023168406793544828390933856260762963763336528787421503582319435368755435181752783296341241853932276334886271511786779019664786845658323166852266264286516275919963650402345264649287569303300048733672208950281055894539145902913252578285197293
+</span><span>15640629897212089539145769625632189125456455778939633021487666539864477884226491831177051620671080345905237001384943044362508550274499601386018436774667054082051013986880044122234840762034425906802733285008515019104201964058459074727958015931524254616901569333808897189148422139163755426336008738228206905929505993240834181441728434782721945966055987934053102520300610949003828413057299830995512963516437591775582556040505553674525293788223483574494286570201177694289787659662521910225641898762643794474678297891552856073420478752076393386273627970575228665003851968484998550564390747988844710818619836079384152470450659391941581654509659766292902961171668168368723759124230712832393447719252348647172524453163783833358048230752476923663730556409340711188698221222770394308685941050292404627088273158846156984693358388590950279445736394513497524120008211955634017212917792675498853686681402944487402749561864649175474956913910853930952329280207751998559039169086898605565528308806524495500398924972480453453358088625940892246551961178561037313833306804342494449584581485895266308393917067830433039476096285467849735814999851855709235986958845331235439845410800486470278105793922000390078444089105955677711315740050638
+</span></code></pre>
+<p>The issue, here, is that while it is indeed 4096 bits, it isn't a very well chosen 4096 bits. Direct factorization isn't usually useful when breaking RSA because the numbers involved are so large, but in this case we know that they aren't large -- every factor is bounded by 32 bits.  I used a neat tool called <a href="https://github.com/DarkenCode/yafu">yafu</a> to factor it.</p>
+<details>
+<summary>Primes</summary>
+<pre lang="text">
+<code>
+P10 = 4098491081
+P10 = 4135004413
+P10 = 3279018511
+P10 = 2230630973
+P10 = 3180301633
+P10 = 2148630611
+P10 = 4056085883
+P10 = 2216411683
+P10 = 2647129697
+P10 = 3278196319
+P10 = 2959325459
+P10 = 2752963847
+P10 = 2719924183
+P10 = 2657405087
+P10 = 2963383867
+P10 = 3130133681
+P10 = 3335574511
+P10 = 3539958743
+P10 = 3648309311
+P10 = 3012495907
+P10 = 4235456317
+P10 = 2240170147
+P10 = 2293226687
+P10 = 3716991893
+P10 = 3035438359
+P10 = 4152726959
+P10 = 3961738709
+P10 = 2223202649
+P10 = 2424270803
+P10 = 3398567593
+P10 = 3959814431
+P10 = 2459187103
+P10 = 2371079143
+P10 = 2575495753
+P10 = 2932152359
+P10 = 3865448239
+P10 = 4205028467
+P10 = 2733527227
+P10 = 3991834969
+P10 = 4140261491
+P10 = 4252196909
+P10 = 3646337561
+P10 = 4218138251
+P10 = 3854175641
+P10 = 2491570349
+P10 = 4091945483
+P10 = 2322142411
+P10 = 3943871257
+P10 = 3522596999
+P10 = 3346647649
+P10 = 3760232953
+P10 = 4227099257
+P10 = 3013564231
+P10 = 2525697263
+P10 = 3684423151
+P10 = 3083881387
+P10 = 3978832967
+P10 = 3589083991
+P10 = 3625437121
+P10 = 4045323871
+P10 = 2710524571
+P10 = 2444333767
+P10 = 2695978183
+P10 = 3380851417
+P10 = 2602521199
+P10 = 2944751701
+P10 = 2572542211
+P10 = 2753147143
+P10 = 3638373857
+P10 = 3789253133
+P10 = 2661720221
+P10 = 3488338697
+P10 = 2858807113
+P10 = 3833824031
+P10 = 3464370241
+P10 = 2682518317
+P10 = 3923208001
+P10 = 2772696307
+P10 = 2746638019
+P10 = 2724658201
+P10 = 3291377941
+P10 = 3303691121
+P10 = 3686523713
+P10 = 3417563069
+P10 = 3994425601
+P10 = 2824169389
+P10 = 3200434847
+P10 = 3721186793
+P10 = 3359249393
+P10 = 2436598001
+P10 = 2278427881
+P10 = 2707095227
+P10 = 2949007619
+P10 = 2510750149
+P10 = 3057815377
+P10 = 2703629041
+P10 = 4141964923
+P10 = 2388797093
+P10 = 2365186141
+P10 = 4276173893
+P10 = 2854321391
+P10 = 3177943303
+P10 = 3487902133
+P10 = 3174322859
+P10 = 2841115943
+P10 = 3860554891
+P10 = 3285444073
+P10 = 2636069911
+P10 = 3319529377
+P10 = 3411506629
+P10 = 2672301743
+P10 = 3238771411
+P10 = 3833706949
+P10 = 3811207403
+P10 = 4073647147
+P10 = 3623581037
+P10 = 3453863503
+P10 = 3056689019
+P10 = 3861767519
+P10 = 3986329331
+P10 = 3941016503
+P10 = 3789746923
+P10 = 3228764447
+P10 = 4198942673
+P10 = 4270521797
+P10 = 4006267823
+P10 = 2157385673
+P10 = 2944722127
+</code>
+</pre>
+</details>
+<p>With the primes in hand, we can just decrypt it as usual. Originally I used sympy.totient to solve for the totient (took a couple minutes but worked), but I realized after that the constant calculation we use in RSA with two primes <code>(P-1)(Q-1)</code> is correct for the product of any number of primes, so I used that in my final solution.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>gmpy
+</span><span style="color:#ffa759;">from </span><span>Crypto</span><span style="color:#f29e74;">.</span><span>Util</span><span style="color:#f29e74;">.</span><span>number </span><span style="color:#ffa759;">import </span><span>getPrime</span><span style="color:#ccc9c2cc;">, </span><span>bytes_to_long</span><span style="color:#ccc9c2cc;">, </span><span>long_to_bytes
+</span><span>N </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">50630448182626893495464810670525602771527685838257974610483435332349728792396826591558947027657819590790590829841808151825744184405725893984330719835572507419517069974612006826542638447886105625739026433810851259760829112944769101557865474935245672310638931107468523492780934936765177674292815155262435831801499197874311121773797041186075024766460977392150443756520782067581277504082923534736776769428755807994035936082391356053079235986552374148782993815118221184577434597115748782910244569004818550079464590913826457003648367784164127206743005342001738754989548942975587267990706541155643222851974488533666334645686774107285018775831028090338485586011974337654011592698463713316522811656340001557779270632991105803230612916547576906583473846558419296181503108603192226769399675726201078322763163049259981181392937623116600712403297821389573627700886912737873588300406211047759637045071918185425658854059386338495534747471846997768166929630988406668430381834420429162324755162023168406793544828390933856260762963763336528787421503582319435368755435181752783296341241853932276334886271511786779019664786845658323166852266264286516275919963650402345264649287569303300048733672208950281055894539145902913252578285197293
+</span><span>c </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">15640629897212089539145769625632189125456455778939633021487666539864477884226491831177051620671080345905237001384943044362508550274499601386018436774667054082051013986880044122234840762034425906802733285008515019104201964058459074727958015931524254616901569333808897189148422139163755426336008738228206905929505993240834181441728434782721945966055987934053102520300610949003828413057299830995512963516437591775582556040505553674525293788223483574494286570201177694289787659662521910225641898762643794474678297891552856073420478752076393386273627970575228665003851968484998550564390747988844710818619836079384152470450659391941581654509659766292902961171668168368723759124230712832393447719252348647172524453163783833358048230752476923663730556409340711188698221222770394308685941050292404627088273158846156984693358388590950279445736394513497524120008211955634017212917792675498853686681402944487402749561864649175474956913910853930952329280207751998559039169086898605565528308806524495500398924972480453453358088625940892246551961178561037313833306804342494449584581485895266308393917067830433039476096285467849735814999851855709235986958845331235439845410800486470278105793922000390078444089105955677711315740050638
+</span><span>primes </span><span style="color:#f29e74;">= </span><span>[</span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(x</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&quot; = &quot;</span><span>)[</span><span style="color:#ffcc66;">1</span><span>]) </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;primes.txt&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;r&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">read</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)]
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">prod</span><span>(</span><span style="color:#ffcc66;">lst</span><span>):
+</span><span>	ret </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1
+</span><span>	</span><span style="color:#ffa759;">for </span><span>num </span><span style="color:#ffa759;">in </span><span>lst:
+</span><span>		ret </span><span style="color:#f29e74;">*= </span><span>num
+</span><span>	</span><span style="color:#ffa759;">return </span><span>ret
+</span><span>phi </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">prod</span><span>([x</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1 </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span>primes])
+</span><span>d </span><span style="color:#f29e74;">= </span><span>gmpy</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">invert</span><span>(</span><span style="color:#ffcc66;">65537</span><span style="color:#ccc9c2cc;">, </span><span>phi)
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#ffd580;">long_to_bytes</span><span>(</span><span style="color:#f28779;">pow</span><span>(c</span><span style="color:#ccc9c2cc;">, </span><span>d</span><span style="color:#ccc9c2cc;">, </span><span>N)))
+</span></code></pre>
+<p>Running that gives us the flag corctf{to0_m4ny_pr1m3s55_63aeea37a6b3b22f}</p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">22 August 2021</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/crypto/">#crypto</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

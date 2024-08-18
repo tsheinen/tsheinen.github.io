@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>Imports</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>Imports</h1>
+    </header>
+
+    <div class="content">
+        <pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Find the only Win API function called by the shellcode.
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>e839000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019622f7defaaed2b15a8be281ec0001000081e400ffffff648b0d3000000085c90f84c4010000807902000f85210000008b490c85c90f84af0100008b591485db0f84a401000083c1143bcb0f8499010000ff7328e8a500000083c40452e85100000083c4043b42310f840f0000008b1b3bcb0f8472010000e9d4ffffff8b5b100fb64a308bfa83c73103f903f903f903f98b375653e88e00000083c40889074983f9000f85dbffffffe82b010000e937010000558bec608b4d0833d233c00fbe3185f60f841b00000003f28bfec1e705c1e70503fe8bd7c1ea05d1ea33d741e9daffffff8d04d28bc8c1e90b33c88bc1c1e00f03c18944241c618be55dc3558bec608b750833c9668b066685c00f840d0000000c20880283c60242e9e7ffffffc60200618be55dc3558bec6083ec188b7d0885ff0f84910000008b550c8b4f3c8b44397885c00f847f000000837c397c000f84740000008d0c38890c248b4c381c03cf894c24048b4c382003cf894c24088b4c382403cf894c240c8b0424837818000f844300000033db8b4424088b0c98803c39000f842a0000008d043950e80fffffff83c4043bc20f85160000008b44240c0fb70c588b4424048b048803c7e90800000043e9bfffffff33c083c4188944241c618be55dc3558bec6052ff52358944241c618be55dc39090909090909090
+</span></code></pre>
+<p>God, fuck, windows :(</p>
+<p>I wasn't gonna do this but then I found a lovely paragraph on the <a href="https://docs.qiling.io/en/latest/">Qiling</a> documentation.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Not only working cross-architecture, Qiling is also cross-platform, so for example you can run Linux ELF file on top of Windows. In contrast, Qemu usermode only run binary of the same OS, such as Linux ELF on Linux, due to the way it forwards syscall from emulated code to native OS
+</span></code></pre>
+<p>Fuck yeah I'm never gonna use windows again.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>sys
+</span><span style="color:#ffa759;">from </span><span>qiling </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">from </span><span>unicorn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">from </span><span>unicorn</span><span style="color:#f29e74;">.</span><span>x86_const </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">from </span><span>qiling</span><span style="color:#f29e74;">.</span><span>os</span><span style="color:#f29e74;">.</span><span>posix</span><span style="color:#f29e74;">.</span><span>stat </span><span style="color:#ffa759;">import </span><span>Fstat
+</span><span style="color:#ffa759;">import </span><span>capstone</span><span style="color:#f29e74;">.</span><span>x86_const
+</span><span style="color:#ffa759;">from </span><span>binascii </span><span style="color:#ffa759;">import </span><span>hexlify
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">code_hook</span><span>(</span><span style="color:#ffcc66;">ql</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">address</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">size</span><span>):
+</span><span>    </span><span style="color:#ffa759;">global </span><span>dump
+</span><span>    buf </span><span style="color:#f29e74;">= </span><span>ql</span><span style="color:#f29e74;">.</span><span>mem</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">read</span><span>(address</span><span style="color:#ccc9c2cc;">, </span><span>size)
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span>md</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">disasm</span><span>(buf</span><span style="color:#ccc9c2cc;">, </span><span>address):
+</span><span>        </span><span style="color:#ffa759;">if </span><span>i</span><span style="color:#f29e74;">.</span><span>mnemonic </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;call&quot; </span><span style="color:#f29e74;">and </span><span>i</span><span style="color:#f29e74;">.</span><span>op_str </span><span style="color:#f29e74;">!= </span><span style="color:#bae67e;">&quot;0x400e9&quot; </span><span>:
+</span><span>        	</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;[*] 0x</span><span style="color:#ffcc66;">{:08x}</span><span style="color:#bae67e;">: </span><span style="color:#ffcc66;">{} {}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(i</span><span style="color:#f29e74;">.</span><span>address</span><span style="color:#ccc9c2cc;">, </span><span>i</span><span style="color:#f29e74;">.</span><span>mnemonic</span><span style="color:#ccc9c2cc;">, </span><span>i</span><span style="color:#f29e74;">.</span><span>op_str))
+</span><span>        </span><span style="color:#ffa759;">if </span><span>address </span><span style="color:#f29e74;">==</span><span style="color:#ffcc66;">0x0004004d</span><span>:
+</span><span>        	ql</span><span style="color:#f29e74;">.</span><span>reg</span><span style="color:#f29e74;">.</span><span>esp </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0xfffe0000
+</span><span>code </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">bytes</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">fromhex</span><span>(</span><span style="color:#bae67e;">&quot;e839000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000019622f7defaaed2b15a8be281ec0001000081e400ffffff648b0d3000000085c90f84c4010000807902000f85210000008b490c85c90f84af0100008b591485db0f84a401000083c1143bcb0f8499010000ff7328e8a500000083c40452e85100000083c4043b42310f840f0000008b1b3bcb0f8472010000e9d4ffffff8b5b100fb64a308bfa83c73103f903f903f903f98b375653e88e00000083c40889074983f9000f85dbffffffe82b010000e937010000558bec608b4d0833d233c00fbe3185f60f841b00000003f28bfec1e705c1e70503fe8bd7c1ea05d1ea33d741e9daffffff8d04d28bc8c1e90b33c88bc1c1e00f03c18944241c618be55dc3558bec608b750833c9668b066685c00f840d0000000c20880283c60242e9e7ffffffc60200618be55dc3558bec6083ec188b7d0885ff0f84910000008b550c8b4f3c8b44397885c00f847f000000837c397c000f84740000008d0c38890c248b4c381c03cf894c24048b4c382003cf894c24088b4c382403cf894c240c8b0424837818000f844300000033db8b4424088b0c98803c39000f842a0000008d043950e80fffffff83c4043bc20f85160000008b44240c0fb70c588b4424048b048803c7e90800000043e9bfffffff33c083c4188944241c618be55dc3558bec6052ff52358944241c618be55dc39090909090909090&quot;</span><span>)
+</span><span>ql </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Qiling</span><span>(</span><span style="color:#ffcc66;">shellcoder</span><span style="color:#f29e74;">=</span><span>code</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">ostype</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;windows&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">rootfs</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;/home/sky/tools/qiling/examples/rootfs/x86_windows&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">archtype</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;x86&quot;</span><span>)
+</span><span>ql</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">hook_code</span><span>(code_hook)
+</span><span>md </span><span style="color:#f29e74;">= </span><span>ql</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">create_disassembler</span><span>()
+</span><span>md</span><span style="color:#f29e74;">.</span><span>detail </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">True
+</span><span>ql</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">run</span><span>()
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ python solve.py
+</span><span>[=]	Initiate stack address at 0xfffdd000 
+</span><span>[=]	TEB addr is 0x6000
+</span><span>[=]	PEB addr is 0x6044
+</span><span>[=]	Loading /home/sky/tools/qiling/examples/rootfs/x86_windows/Windows/System32/ntdll.dll ...
+</span><span>[!]	Warnings while loading /home/sky/tools/qiling/examples/rootfs/x86_windows/Windows/System32/ntdll.dll:
+</span><span>[!]	- SizeOfHeaders is smaller than AddressOfEntryPoint: this file cannot run under Windows 8.
+</span><span>[!]	- AddressOfEntryPoint lies outside the sections&#39; boundaries. AddressOfEntryPoint: 0x0
+</span><span>[=]	Done with loading /home/sky/tools/qiling/examples/rootfs/x86_windows/Windows/System32/ntdll.dll
+</span><span>[=]	Loading /home/sky/tools/qiling/examples/rootfs/x86_windows/Windows/System32/kernel32.dll ...
+</span><span>[=]	Done with loading /home/sky/tools/qiling/examples/rootfs/x86_windows/Windows/System32/kernel32.dll
+</span><span>[=]	Loading /home/sky/tools/qiling/examples/rootfs/x86_windows/Windows/System32/user32.dll ...
+</span><span>[=]	Done with loading /home/sky/tools/qiling/examples/rootfs/x86_windows/Windows/System32/user32.dll
+</span><span>56
+</span><span>[*] 0x00040000: call 0x4003e
+</span><span>[*] 0x0004008a: call 0x40134
+</span><span>[*] 0x0004008a: call 0x40134
+</span><span>[*] 0x0004008a: call 0x40134
+</span><span>[*] 0x000400cb: call 0x4015e
+</span><span>[*] 0x000400df: call 0x4020f
+</span><span>[*] 0x00040214: call dword ptr [edx + 0x35]
+</span><span>[!]	api GetKeyboardLayoutNameA is not implemented
+</span><span>[*] 0x69e88825: call dword ptr [0x69ea37b4]
+</span></code></pre>
+<p>Haha sweet I didn't need to do anything because Qiling kindly told me that they didn't implement the function which got called. I was confused for a little bit but then we got an announcement clarifying the flag format; take the function and wrap it in flag{}</p>
+<p>flag: flag{GetKeyboardLayoutNameA}</p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">14 November 2021</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/reversing/">#reversing</a></li>
+                    
+                    <li><a href="https://tsheinen.github.io/tags/windows/">#windows</a></li>
+                    
+                    <li><a href="https://tsheinen.github.io/tags/qiling/">#qiling</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

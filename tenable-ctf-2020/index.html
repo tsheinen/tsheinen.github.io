@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>Tenable CTF 2020</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/tenable-ctf-2020/#code">code</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tenable-ctf-2020/#short-and-sweet">short and sweet</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tenable-ctf-2020/#hello">hello $</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tenable-ctf-2020/#print-n-lowest-numbers">print N lowest numbers</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tenable-ctf-2020/#parsey-mcparser">parsey mcparser</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tenable-ctf-2020/#random-encryption">random encryption</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tenable-ctf-2020/#random-encryption-fixed">random encryption fixed</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tenable-ctf-2020/#find-largest-triangle">find largest triangle</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tenable-ctf-2020/#we-need-an-emulator">we need an emulator</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>Tenable CTF 2020</h1>
+    </header>
+
+    <div class="content">
+        <p>Tenable (the company who makes Nessus) ran a capture the flag over the weekend of February 19th.  I played for a few hours saturday night and pretty much cleared out the code category.  I've been a little starved for programming recently so I went straight for it haha.  Overall I'd say it was a pretty solid CTF -- I didn't devote the time needed to scope out every challenge but I had a fun time while I was playing.</p>
+<span id="continue-reading"></span><h2 id="code">code</h2>
+<h3 id="short-and-sweet">short and sweet</h3>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">def </span><span style="color:#ffd580;">AreNumbersEven</span><span>(</span><span style="color:#ffcc66;">numbers</span><span>):
+</span><span>  </span><span style="color:#ffa759;">return </span><span>[x </span><span style="color:#f29e74;">% </span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0 </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span>numbers]
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># Read space delimited integers from stdin and 
+</span><span style="font-style:italic;color:#5c6773;"># pass a list of them to AreNumbersEven()
+</span><span>numbers </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">raw_input</span><span>()
+</span><span>integer_list </span><span style="color:#f29e74;">= </span><span>[</span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(i) </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span>numbers</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&#39; &#39;</span><span>)]
+</span><span>even_odd_boolean_list </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">AreNumbersEven</span><span>(integer_list)
+</span><span style="color:#ffa759;">print </span><span>even_odd_boolean_list 
+</span></code></pre>
+<h3 id="hello">hello $</h3>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdio.h&gt;
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">main</span><span>()
+</span><span>{
+</span><span>	</span><span style="color:#ffa759;">char</span><span> buf[</span><span style="color:#ffcc66;">32</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">fgets</span><span>(buf</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">32</span><span style="color:#ccc9c2cc;">,</span><span>stdin)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Hello </span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span> buf)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<h3 id="print-n-lowest-numbers">print N lowest numbers</h3>
+<pre data-lang="c++" style="background-color:#212733;color:#ccc9c2;" class="language-c++ "><code class="language-c++" data-lang="c++"><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;iostream&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;algorithm&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;vector&gt;
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">PrintNLowestNumbers</span><span>(</span><span style="color:#ffa759;">int </span><span style="color:#ffcc66;">arr</span><span>[]</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">unsigned int </span><span style="color:#ffcc66;">length</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">unsigned short </span><span style="color:#ffcc66;">nLowest</span><span>)
+</span><span>{
+</span><span>	std</span><span style="color:#f29e74;">::</span><span>vector&lt;</span><span style="color:#ffa759;">int</span><span>&gt; </span><span style="color:#ffd580;">vec</span><span>(arr</span><span style="color:#ccc9c2cc;">,</span><span> arr </span><span style="color:#f29e74;">+</span><span> length)</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>	std</span><span style="color:#f29e74;">::</span><span style="color:#ffd580;">sort</span><span>(vec</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">begin</span><span>()</span><span style="color:#ccc9c2cc;">,</span><span>vec</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">end</span><span>())</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">int</span><span> i </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">for</span><span>(</span><span style="color:#ccc9c2cc;">;</span><span> i </span><span style="color:#f29e74;">&lt;</span><span> nLowest </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;</span><span> i</span><span style="color:#f29e74;">++</span><span>) {
+</span><span>		std</span><span style="color:#f29e74;">::</span><span>cout </span><span style="color:#f29e74;">&lt;&lt;</span><span> vec[i] </span><span style="color:#f29e74;">&lt;&lt; </span><span style="color:#bae67e;">&quot; &quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>	std</span><span style="color:#f29e74;">::</span><span>cout </span><span style="color:#f29e74;">&lt;&lt;</span><span> vec[i]</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">main</span><span>()
+</span><span>{
+</span><span>	</span><span style="color:#ffa759;">char</span><span> input[</span><span style="color:#ffcc66;">0x100</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">int</span><span> integerList[</span><span style="color:#ffcc66;">0x100</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">unsigned int</span><span> length</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">unsigned short</span><span> nLowest</span><span style="color:#ccc9c2cc;">;
+</span><span>	std</span><span style="color:#f29e74;">::</span><span>cin </span><span style="color:#f29e74;">&gt;&gt;</span><span> nLowest</span><span style="color:#ccc9c2cc;">;
+</span><span>	std</span><span style="color:#f29e74;">::</span><span>cin </span><span style="color:#f29e74;">&gt;&gt;</span><span> length</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">for </span><span>(</span><span style="color:#ffa759;">int</span><span> i</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;</span><span>i</span><span style="color:#f29e74;">&lt;</span><span>length</span><span style="color:#ccc9c2cc;">;</span><span>i</span><span style="color:#f29e74;">++</span><span>)
+</span><span>		 std</span><span style="color:#f29e74;">::</span><span>cin </span><span style="color:#f29e74;">&gt;&gt;</span><span> integerList[i]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">PrintNLowestNumbers</span><span>(integerList</span><span style="color:#ccc9c2cc;">,</span><span> length</span><span style="color:#ccc9c2cc;">,</span><span> nLowest)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<h3 id="parsey-mcparser">parsey mcparser</h3>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>re
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">&#39;&#39;&#39;
+</span><span style="font-style:italic;color:#5c6773;">:param blob: blob of data to parse through (string)
+</span><span style="font-style:italic;color:#5c6773;">:param group_name: A single Group name (&quot;Green&quot;, &quot;Red&quot;, or &quot;Yellow&quot;,etc...)
+</span><span style="font-style:italic;color:#5c6773;">
+</span><span style="font-style:italic;color:#5c6773;">:return: A list of all user names that are part of a given Group
+</span><span style="font-style:italic;color:#5c6773;">&#39;&#39;&#39;
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">ParseNamesByGroup</span><span>(</span><span style="color:#ffcc66;">blob</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">group_name</span><span>):
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># print(group_name)
+</span><span>    matches </span><span style="color:#f29e74;">= </span><span>re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">findall</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="background-color:#ffa759;color:#ffffff;">\[</span><span style="color:#bae67e;">(.*?)</span><span style="background-color:#ffa759;color:#ffffff;">\]</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span>blob)
+</span><span>    </span><span style="color:#ffa759;">return </span><span>[x[</span><span style="color:#bae67e;">&#39;user_name&#39;</span><span>] </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span>[</span><span style="color:#f28779;">eval</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">{{</span><span style="color:#ffcc66;">{}</span><span style="color:#95e6cb;">}}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(i)) </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span>matches] </span><span style="color:#ffa759;">if </span><span>x[</span><span style="color:#bae67e;">&#39;Group&#39;</span><span>] </span><span style="color:#f29e74;">== </span><span>group_name]
+</span><span>    
+</span><span>data </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">raw_input</span><span>()
+</span><span>group_name </span><span style="color:#f29e74;">= </span><span>data</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&#39;|&#39;</span><span>)[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span>blob </span><span style="color:#f29e74;">= </span><span>data</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&#39;|&#39;</span><span>)[</span><span style="color:#ffcc66;">1</span><span>]
+</span><span>result_names_list </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ParseNamesByGroup</span><span>(blob</span><span style="color:#ccc9c2cc;">, </span><span>group_name)
+</span><span style="color:#f28779;">print</span><span>(result_names_list)
+</span></code></pre>
+<h3 id="random-encryption">random encryption</h3>
+<p>lmao it was in the provided source code hate to see it</p>
+<p>flag: flag{n0t_that_r4ndom}</p>
+<h3 id="random-encryption-fixed">random encryption fixed</h3>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>random
+</span><span style="font-style:italic;color:#5c6773;"># flag = &quot;flag{not_the_flag}&quot;
+</span><span>res </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffcc66;">184</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">161</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">235</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">97</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">140</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">111</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">84</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">182</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">162</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">135</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">76</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">10</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">69</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">246</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">195</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">152</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">133</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">88</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">229</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">104</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">111</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">22</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">39</span><span>]
+</span><span>seeds </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffcc66;">9925</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">8861</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5738</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1649</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2696</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">6926</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1839</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7825</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">6434</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9699</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">227</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7379</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9024</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">817</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4022</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7129</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1096</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4149</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">6147</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2966</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1027</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4350</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4272</span><span>]
+</span><span>
+</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">len</span><span>(res)):
+</span><span>    random</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">seed</span><span>(seeds[i])
+</span><span>    rands </span><span style="color:#f29e74;">= </span><span>[]
+</span><span>    </span><span style="color:#ffa759;">for </span><span>j </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">4</span><span>):
+</span><span>        rands</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>(random</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">randint</span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">255</span><span>))
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#f28779;">chr</span><span>(rands[i</span><span style="color:#f29e74;">%</span><span style="color:#ffcc66;">4</span><span>] </span><span style="color:#f29e74;">^ </span><span>res[i])</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">end</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;&quot;</span><span>)
+</span></code></pre>
+<h3 id="find-largest-triangle">find largest triangle</h3>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#determinant of matrix a
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">det</span><span>(</span><span style="color:#ffcc66;">a</span><span>):
+</span><span>    </span><span style="color:#ffa759;">return </span><span>a[</span><span style="color:#ffcc66;">0</span><span>][</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#f29e74;">*</span><span>a[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#f29e74;">*</span><span>a[</span><span style="color:#ffcc66;">2</span><span>][</span><span style="color:#ffcc66;">2</span><span>] </span><span style="color:#f29e74;">+ </span><span>a[</span><span style="color:#ffcc66;">0</span><span>][</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#f29e74;">*</span><span>a[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ffcc66;">2</span><span>]</span><span style="color:#f29e74;">*</span><span>a[</span><span style="color:#ffcc66;">2</span><span>][</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">+ </span><span>a[</span><span style="color:#ffcc66;">0</span><span>][</span><span style="color:#ffcc66;">2</span><span>]</span><span style="color:#f29e74;">*</span><span>a[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#f29e74;">*</span><span>a[</span><span style="color:#ffcc66;">2</span><span>][</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">- </span><span>a[</span><span style="color:#ffcc66;">0</span><span>][</span><span style="color:#ffcc66;">2</span><span>]</span><span style="color:#f29e74;">*</span><span>a[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#f29e74;">*</span><span>a[</span><span style="color:#ffcc66;">2</span><span>][</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">- </span><span>a[</span><span style="color:#ffcc66;">0</span><span>][</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#f29e74;">*</span><span>a[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#f29e74;">*</span><span>a[</span><span style="color:#ffcc66;">2</span><span>][</span><span style="color:#ffcc66;">2</span><span>] </span><span style="color:#f29e74;">- </span><span>a[</span><span style="color:#ffcc66;">0</span><span>][</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#f29e74;">*</span><span>a[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ffcc66;">2</span><span>]</span><span style="color:#f29e74;">*</span><span>a[</span><span style="color:#ffcc66;">2</span><span>][</span><span style="color:#ffcc66;">1</span><span>]
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">#unit normal vector of plane defined by points a, b, and c
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">unit_normal</span><span>(</span><span style="color:#ffcc66;">a</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">b</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">c</span><span>):
+</span><span>    x </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">det</span><span>([[</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,</span><span>a[</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span>a[</span><span style="color:#ffcc66;">2</span><span>]]</span><span style="color:#ccc9c2cc;">,
+</span><span>             [</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,</span><span>b[</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span>b[</span><span style="color:#ffcc66;">2</span><span>]]</span><span style="color:#ccc9c2cc;">,
+</span><span>             [</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,</span><span>c[</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span>c[</span><span style="color:#ffcc66;">2</span><span>]]])
+</span><span>    y </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">det</span><span>([[a[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,</span><span>a[</span><span style="color:#ffcc66;">2</span><span>]]</span><span style="color:#ccc9c2cc;">,
+</span><span>             [b[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,</span><span>b[</span><span style="color:#ffcc66;">2</span><span>]]</span><span style="color:#ccc9c2cc;">,
+</span><span>             [c[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,</span><span>c[</span><span style="color:#ffcc66;">2</span><span>]]])
+</span><span>    z </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">det</span><span>([[a[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span>a[</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#ccc9c2cc;">,
+</span><span>             [b[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span>b[</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#ccc9c2cc;">,
+</span><span>             [c[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span>c[</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span>]])
+</span><span>    magnitude </span><span style="color:#f29e74;">= </span><span>(x</span><span style="color:#f29e74;">**</span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">+ </span><span>y</span><span style="color:#f29e74;">**</span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">+ </span><span>z</span><span style="color:#f29e74;">**</span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#f29e74;">**</span><span style="color:#ccc9c2cc;">.</span><span style="color:#ffcc66;">5
+</span><span>    </span><span style="color:#ffa759;">return </span><span>(x</span><span style="color:#f29e74;">/</span><span>magnitude</span><span style="color:#ccc9c2cc;">, </span><span>y</span><span style="color:#f29e74;">/</span><span>magnitude</span><span style="color:#ccc9c2cc;">, </span><span>z</span><span style="color:#f29e74;">/</span><span>magnitude)
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">#dot product of vectors a and b
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">dot</span><span>(</span><span style="color:#ffcc66;">a</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">b</span><span>):
+</span><span>    </span><span style="color:#ffa759;">return </span><span>a[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#f29e74;">*</span><span>b[</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">+ </span><span>a[</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#f29e74;">*</span><span>b[</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">+ </span><span>a[</span><span style="color:#ffcc66;">2</span><span>]</span><span style="color:#f29e74;">*</span><span>b[</span><span style="color:#ffcc66;">2</span><span>]
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">#cross product of vectors a and b
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">cross</span><span>(</span><span style="color:#ffcc66;">a</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">b</span><span>):
+</span><span>    x </span><span style="color:#f29e74;">= </span><span>a[</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">* </span><span>b[</span><span style="color:#ffcc66;">2</span><span>] </span><span style="color:#f29e74;">- </span><span>a[</span><span style="color:#ffcc66;">2</span><span>] </span><span style="color:#f29e74;">* </span><span>b[</span><span style="color:#ffcc66;">1</span><span>]
+</span><span>    y </span><span style="color:#f29e74;">= </span><span>a[</span><span style="color:#ffcc66;">2</span><span>] </span><span style="color:#f29e74;">* </span><span>b[</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">- </span><span>a[</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">* </span><span>b[</span><span style="color:#ffcc66;">2</span><span>]
+</span><span>    z </span><span style="color:#f29e74;">= </span><span>a[</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">* </span><span>b[</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">- </span><span>a[</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">* </span><span>b[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span>    </span><span style="color:#ffa759;">return </span><span>(x</span><span style="color:#ccc9c2cc;">, </span><span>y</span><span style="color:#ccc9c2cc;">, </span><span>z)
+</span><span>
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">#area of polygon poly
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">area</span><span>(</span><span style="color:#ffcc66;">poly</span><span>):
+</span><span>    </span><span style="color:#ffa759;">if </span><span style="color:#f28779;">len</span><span>(poly) </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">3</span><span>: </span><span style="font-style:italic;color:#5c6773;"># not a plane - no area
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0
+</span><span>
+</span><span>    total </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>]
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#f28779;">len</span><span>(poly)):
+</span><span>        vi1 </span><span style="color:#f29e74;">= </span><span>poly[i]
+</span><span>        </span><span style="color:#ffa759;">if </span><span>i </span><span style="color:#f29e74;">is </span><span style="color:#f28779;">len</span><span>(poly)</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>:
+</span><span>            vi2 </span><span style="color:#f29e74;">= </span><span>poly[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span>        </span><span style="color:#ffa759;">else</span><span>:
+</span><span>            vi2 </span><span style="color:#f29e74;">= </span><span>poly[i</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1</span><span>]
+</span><span>        prod </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">cross</span><span>(vi1</span><span style="color:#ccc9c2cc;">, </span><span>vi2)
+</span><span>        total[</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">+= </span><span>prod[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span>        total[</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">+= </span><span>prod[</span><span style="color:#ffcc66;">1</span><span>]
+</span><span>        total[</span><span style="color:#ffcc66;">2</span><span>] </span><span style="color:#f29e74;">+= </span><span>prod[</span><span style="color:#ffcc66;">2</span><span>]
+</span><span>    result </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">dot</span><span>(total</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffd580;">unit_normal</span><span>(poly[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#ccc9c2cc;">, </span><span>poly[</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#ccc9c2cc;">, </span><span>poly[</span><span style="color:#ffcc66;">2</span><span>]))
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#f28779;">abs</span><span>(result</span><span style="color:#f29e74;">/</span><span style="color:#ffcc66;">2</span><span>)
+</span><span style="color:#ffa759;">from </span><span>itertools </span><span style="color:#ffa759;">import </span><span>combinations
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># points is a list of 3D points
+</span><span style="font-style:italic;color:#5c6773;"># ie: [[2, 9, -15], [0, 33, -20], ...]
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">FindLargestTriangleArea</span><span>(</span><span style="color:#ffcc66;">points</span><span>):
+</span><span>  </span><span style="font-style:italic;color:#5c6773;"># return largest area
+</span><span>  </span><span style="color:#ffa759;">return </span><span style="color:#f28779;">max</span><span>([</span><span style="color:#ffd580;">area</span><span>(x) </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#ffd580;">combinations</span><span>(points</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">3</span><span>)])
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># Reading space delimited points from stdin
+</span><span style="font-style:italic;color:#5c6773;"># and building list of 3D points
+</span><span style="font-style:italic;color:#5c6773;"># points_data = &quot;-21,59,-93 -4,91,-2 1,61,2, 0,44,1&quot;
+</span><span>points_data </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">raw_input</span><span>()
+</span><span>points </span><span style="color:#f29e74;">= </span><span>[]
+</span><span style="color:#ffa759;">for </span><span>point </span><span style="color:#ffa759;">in </span><span>points_data</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&#39; &#39;</span><span>):
+</span><span>  point_xyz </span><span style="color:#f29e74;">= </span><span>point</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&#39;,&#39;</span><span>)
+</span><span>  points</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>([</span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(point_xyz[</span><span style="color:#ffcc66;">0</span><span>])</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(point_xyz[</span><span style="color:#ffcc66;">1</span><span>])</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(point_xyz[</span><span style="color:#ffcc66;">2</span><span>])])
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># Compute Largest Triangle and Print Area rounded to nearest whole number
+</span><span>area </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">FindLargestTriangleArea</span><span>(points)
+</span><span style="color:#f28779;">print</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(</span><span style="color:#f28779;">round</span><span>(area)))
+</span></code></pre>
+<h3 id="we-need-an-emulator">we need an emulator</h3>
+<pre data-lang="rust" style="background-color:#212733;color:#ccc9c2;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="font-style:italic;color:#5c6773;">/*
+</span><span style="font-style:italic;color:#5c6773;">[package]
+</span><span style="font-style:italic;color:#5c6773;">name = &quot;tenable-emu&quot;
+</span><span style="font-style:italic;color:#5c6773;">version = &quot;0.1.0&quot;
+</span><span style="font-style:italic;color:#5c6773;">authors = [&quot;Teddy Heinen &lt;teddy@heinen.dev&gt;&quot;]
+</span><span style="font-style:italic;color:#5c6773;">edition = &quot;2018&quot;
+</span><span style="font-style:italic;color:#5c6773;">
+</span><span style="font-style:italic;color:#5c6773;"># See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+</span><span style="font-style:italic;color:#5c6773;">
+</span><span style="font-style:italic;color:#5c6773;">[dependencies]
+</span><span style="font-style:italic;color:#5c6773;">nom = &quot;6.1.2&quot;
+</span><span style="font-style:italic;color:#5c6773;">*/
+</span><span>
+</span><span style="color:#ffa759;">use </span><span>nom</span><span style="color:#f29e74;">::</span><span>branch</span><span style="color:#f29e74;">::</span><span>alt</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>nom</span><span style="color:#f29e74;">::</span><span>bytes</span><span style="color:#f29e74;">::</span><span>complete</span><span style="color:#f29e74;">::</span><span>{tag</span><span style="color:#ccc9c2cc;">,</span><span> take_until}</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>nom</span><span style="color:#f29e74;">::</span><span>combinator</span><span style="color:#f29e74;">::</span><span>opt</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>nom</span><span style="color:#f29e74;">::</span><span>multi</span><span style="color:#f29e74;">::</span><span>many1</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>nom</span><span style="color:#f29e74;">::</span><span>{Finish</span><span style="color:#ccc9c2cc;">,</span><span> IResult}</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>std</span><span style="color:#f29e74;">::</span><span>collections</span><span style="color:#f29e74;">::</span><span>HashMap</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">derive</span><span>(Debug</span><span style="color:#ccc9c2cc;">,</span><span> Copy</span><span style="color:#ccc9c2cc;">,</span><span> Clone</span><span style="color:#ccc9c2cc;">,</span><span> Hash</span><span style="color:#ccc9c2cc;">,</span><span> Eq</span><span style="color:#ccc9c2cc;">,</span><span> PartialEq)]
+</span><span style="color:#ffa759;">enum </span><span style="color:#73d0ff;">Register </span><span>{
+</span><span>    Trx</span><span style="color:#ccc9c2cc;">,
+</span><span>    Drx</span><span style="color:#ccc9c2cc;">,
+</span><span>}
+</span><span>
+</span><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">derive</span><span>(Debug</span><span style="color:#ccc9c2cc;">,</span><span> Clone)]
+</span><span style="color:#ffa759;">enum </span><span style="color:#73d0ff;">Instruction </span><span>{
+</span><span>    Xor(Register</span><span style="color:#ccc9c2cc;">,</span><span> Register)</span><span style="color:#ccc9c2cc;">,
+</span><span>    MovL(Register</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5ccfe6;">String</span><span>)</span><span style="color:#ccc9c2cc;">,
+</span><span>    Mov(Register</span><span style="color:#ccc9c2cc;">,</span><span> Register)</span><span style="color:#ccc9c2cc;">,
+</span><span>    Reverse(Register)</span><span style="color:#ccc9c2cc;">,
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">instruction</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>) </span><span style="color:#ccc9c2cc;">-&gt; </span><span>IResult&lt;</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>, Instruction&gt; {
+</span><span>    </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">register</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>) </span><span style="color:#ccc9c2cc;">-&gt; </span><span>IResult&lt;</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>, Register&gt; {
+</span><span>        </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">trx</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>) </span><span style="color:#ccc9c2cc;">-&gt; </span><span>IResult&lt;</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>, Register&gt; {
+</span><span>            </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot;TRX&quot;</span><span>)(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">Ok</span><span>((input</span><span style="color:#ccc9c2cc;">, </span><span>Register</span><span style="color:#f29e74;">::</span><span>Trx))
+</span><span>        }
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">drx</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>) </span><span style="color:#ccc9c2cc;">-&gt; </span><span>IResult&lt;</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>, Register&gt; {
+</span><span>            </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot;DRX&quot;</span><span>)(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">Ok</span><span>((input</span><span style="color:#ccc9c2cc;">, </span><span>Register</span><span style="color:#f29e74;">::</span><span>Drx))
+</span><span>        }
+</span><span>        </span><span style="color:#f28779;">alt</span><span>((trx</span><span style="color:#ccc9c2cc;">,</span><span> drx))(input)
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">xor</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>) </span><span style="color:#ccc9c2cc;">-&gt; </span><span>IResult&lt;</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>, Instruction&gt; {
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot;XOR &quot;</span><span>)(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">,</span><span> lhs) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">register</span><span>(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot; &quot;</span><span>)(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">,</span><span> rhs) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">register</span><span>(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">opt</span><span>(</span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\r\n</span><span style="color:#bae67e;">&quot;</span><span>))(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">Ok</span><span>((input</span><span style="color:#ccc9c2cc;">, </span><span>Instruction</span><span style="color:#f29e74;">::</span><span>Xor(lhs</span><span style="color:#ccc9c2cc;">,</span><span> rhs)))
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">movl</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>) </span><span style="color:#ccc9c2cc;">-&gt; </span><span>IResult&lt;</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>, Instruction&gt; {
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot;MOV &quot;</span><span>)(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">,</span><span> lhs) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">register</span><span>(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot; </span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">&quot;</span><span>)(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">,</span><span> rhs) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">take_until</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">&quot;</span><span>)(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">&quot;</span><span>)(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">opt</span><span>(</span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\r\n</span><span style="color:#bae67e;">&quot;</span><span>))(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">Ok</span><span>((input</span><span style="color:#ccc9c2cc;">, </span><span>Instruction</span><span style="color:#f29e74;">::</span><span>MovL(lhs</span><span style="color:#ccc9c2cc;">,</span><span> rhs</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">to_string</span><span>())))
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">mov</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>) </span><span style="color:#ccc9c2cc;">-&gt; </span><span>IResult&lt;</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>, Instruction&gt; {
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot;MOV &quot;</span><span>)(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">,</span><span> lhs) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">register</span><span>(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot; &quot;</span><span>)(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">,</span><span> rhs) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">register</span><span>(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">opt</span><span>(</span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\r\n</span><span style="color:#bae67e;">&quot;</span><span>))(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">Ok</span><span>((input</span><span style="color:#ccc9c2cc;">, </span><span>Instruction</span><span style="color:#f29e74;">::</span><span>Mov(lhs</span><span style="color:#ccc9c2cc;">,</span><span> rhs)))
+</span><span>    }
+</span><span>    </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">reverse</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>) </span><span style="color:#ccc9c2cc;">-&gt; </span><span>IResult&lt;</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>, Instruction&gt; {
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot;REVERSE &quot;</span><span>)(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">,</span><span> lhs) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">register</span><span>(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let </span><span>(input</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">opt</span><span>(</span><span style="color:#f28779;">tag</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\r\n</span><span style="color:#bae67e;">&quot;</span><span>))(input)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">Ok</span><span>((input</span><span style="color:#ccc9c2cc;">, </span><span>Instruction</span><span style="color:#f29e74;">::</span><span>Reverse(lhs)))
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#f28779;">alt</span><span>((xor</span><span style="color:#ccc9c2cc;">,</span><span> movl</span><span style="color:#ccc9c2cc;">,</span><span> mov</span><span style="color:#ccc9c2cc;">,</span><span> reverse))(input)
+</span><span>}
+</span><span>
+</span><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">derive</span><span>(Debug</span><span style="color:#ccc9c2cc;">,</span><span> Default</span><span style="color:#ccc9c2cc;">,</span><span> Clone)]
+</span><span style="color:#ffa759;">struct </span><span style="color:#73d0ff;">State </span><span>{
+</span><span>    registers</span><span style="color:#ccc9c2cc;">: </span><span>HashMap&lt;Register, </span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;</span><span style="color:#ffa759;">u8</span><span>&gt;&gt;,
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">impl </span><span style="color:#73d0ff;">State </span><span>{
+</span><span>    </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">apply</span><span>(</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">mut </span><span style="color:#ffcc66;">self</span><span>, </span><span style="color:#ffcc66;">instr</span><span style="color:#ccc9c2cc;">:</span><span> Instruction) </span><span style="color:#ccc9c2cc;">-&gt; </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">mut Self </span><span>{
+</span><span>        </span><span style="color:#ffa759;">match</span><span> instr {
+</span><span>            Instruction</span><span style="color:#f29e74;">::</span><span>Xor(lhs</span><span style="color:#ccc9c2cc;">,</span><span> rhs) </span><span style="color:#f29e74;">=&gt; </span><span>{
+</span><span>                </span><span style="color:#ffa759;">let</span><span> lhs_reg </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>registers</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">get</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>lhs)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">clone</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>                </span><span style="color:#ffa759;">let</span><span> rhs_reg </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>registers</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">get</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>rhs)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">clone</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>                </span><span style="color:#ffa759;">let</span><span> new_val </span><span style="color:#f29e74;">=</span><span> lhs_reg
+</span><span>                    </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">into_iter</span><span>()
+</span><span>                    </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">enumerate</span><span>()
+</span><span>                    </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">map</span><span>(|(</span><span style="color:#ffcc66;">index</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">x</span><span>)| x </span><span style="color:#f29e74;">^</span><span> rhs_reg</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">get</span><span>(index)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap_or</span><span>(</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffcc66;">0</span><span style="color:#ffa759;">u8</span><span>))
+</span><span>                    </span><span style="color:#f29e74;">.</span><span>collect</span><span style="color:#f29e74;">::</span><span>&lt;</span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;</span><span style="color:#f29e74;">_</span><span>&gt;&gt;()</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>                </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>registers</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">insert</span><span>(lhs</span><span style="color:#ccc9c2cc;">,</span><span> new_val)</span><span style="color:#ccc9c2cc;">;
+</span><span>            }
+</span><span>            Instruction</span><span style="color:#f29e74;">::</span><span>MovL(lhs</span><span style="color:#ccc9c2cc;">,</span><span> rhs) </span><span style="color:#f29e74;">=&gt; </span><span>{
+</span><span>                </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>registers</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">insert</span><span>(lhs</span><span style="color:#ccc9c2cc;">,</span><span> rhs</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">bytes</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">collect</span><span>())</span><span style="color:#ccc9c2cc;">;
+</span><span>            }
+</span><span>            Instruction</span><span style="color:#f29e74;">::</span><span>Mov(lhs</span><span style="color:#ccc9c2cc;">,</span><span> rhs) </span><span style="color:#f29e74;">=&gt; </span><span>{
+</span><span>                </span><span style="color:#ffa759;">let</span><span> rhs_reg </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>registers</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">get</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>rhs)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">clone</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>                </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>registers</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">insert</span><span>(lhs</span><span style="color:#ccc9c2cc;">,</span><span> rhs_reg)</span><span style="color:#ccc9c2cc;">;
+</span><span>            }
+</span><span>            Instruction</span><span style="color:#f29e74;">::</span><span>Reverse(lhs) </span><span style="color:#f29e74;">=&gt; </span><span>{
+</span><span>                </span><span style="color:#ffa759;">let</span><span> lhs_reg </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>registers</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">get</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>lhs)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">clone</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>                </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>registers
+</span><span>                    </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">insert</span><span>(lhs</span><span style="color:#ccc9c2cc;">,</span><span> lhs_reg</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">iter</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">cloned</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">rev</span><span>()</span><span style="color:#f29e74;">.</span><span>collect</span><span style="color:#f29e74;">::</span><span>&lt;</span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;</span><span style="color:#f29e74;">_</span><span>&gt;&gt;())</span><span style="color:#ccc9c2cc;">;
+</span><span>            }
+</span><span>        }</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">main</span><span>() {
+</span><span>    </span><span style="color:#ffa759;">let</span><span> crypto </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">include_str!</span><span>(</span><span style="color:#bae67e;">&quot;../../Crypto.asm&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">let </span><span>(</span><span style="color:#f29e74;">_</span><span style="color:#ccc9c2cc;">,</span><span> instructions) </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">many1</span><span>(instruction)(crypto)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">finish</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">let mut</span><span> state </span><span style="color:#f29e74;">= </span><span>State</span><span style="color:#f29e74;">::</span><span>default()</span><span style="color:#ccc9c2cc;">;
+</span><span>    state
+</span><span>        </span><span style="color:#f29e74;">.</span><span>registers
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">insert</span><span>(Register</span><span style="color:#f29e74;">::</span><span>Trx</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;GED</span><span style="color:#95e6cb;">\x03</span><span style="color:#bae67e;">hG</span><span style="color:#95e6cb;">\x15</span><span style="color:#bae67e;">&amp;Ka =;</span><span style="color:#95e6cb;">\x0c\x1a</span><span style="color:#bae67e;">31o*5M&quot;</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">to_vec</span><span>())</span><span style="color:#ccc9c2cc;">;
+</span><span>    state</span><span style="color:#f29e74;">.</span><span>registers</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">insert</span><span>(Register</span><span style="color:#f29e74;">::</span><span>Drx</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">to_vec</span><span>())</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f28779;">println!</span><span>(
+</span><span>        </span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">{:?}</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">String</span><span style="color:#f29e74;">::</span><span>from_utf8_lossy(
+</span><span>            </span><span style="color:#f29e74;">&amp;</span><span>instructions
+</span><span>                </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">into_iter</span><span>()
+</span><span>                </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">fold</span><span>(</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">mut</span><span> state</span><span style="color:#ccc9c2cc;">, </span><span>|</span><span style="color:#ffcc66;">st</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">instr</span><span>| st</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">apply</span><span>(instr))
+</span><span>                </span><span style="color:#f29e74;">.</span><span>registers
+</span><span>                </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">get</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>Register</span><span style="color:#f29e74;">::</span><span>Trx)
+</span><span>                </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()
+</span><span>                </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">clone</span><span>()
+</span><span>        )
+</span><span>    )</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">20 February 2021</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

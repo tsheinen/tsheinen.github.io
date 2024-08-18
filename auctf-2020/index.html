@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>AUCTF 2020</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/auctf-2020/#cracker-barrel">Cracker Barrel</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/auctf-2020/#mobile0">mobile0</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/auctf-2020/#mobile1">mobile1</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/auctf-2020/#sora">sora</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/auctf-2020/#dont-break-me">dont_break_me</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>AUCTF 2020</h1>
+    </header>
+
+    <div class="content">
+        <p><a href="https://ctf.auburn.edu/">AUCTF 2020</a> was put on Auburn University in April 2020.  I've included my writeups for the reversing challenges I did below.</p>
+<span id="continue-reading"></span><h1 id="cracker-barrel">Cracker Barrel</h1>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>I found a USB drive under the checkers board at cracker barrel. My friends told me not to plug it in but surely nothing bad is on it?
+</span><span>
+</span><span>I found this file, but I can&#39;t seem to unlock it&#39;s secrets. Can you help me out?
+</span><span>
+</span><span>Also.. once you think you&#39;ve got it I think you should try to connect to challenges.auctf.com at port 30000 not sure what that means, but it written on the flash drive..
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>...
+</span><span>│           0x0000137b      e8a0fdffff     call sym.imp.fgets          ; char *fgets(char *s, int size, FILE *stream)
+</span><span>│           0x00001380      488d85f0dfff.  lea rax, [var_2010h]
+</span><span>│           0x00001387      4889c7         mov rdi, rax
+</span><span>│           0x0000138a      e8dafeffff     call sym.remove_newline
+</span><span>│           0x0000138f      488b85e8dfff.  mov rax, qword [var_2018h]
+</span><span>│           0x00001396      4889c7         mov rdi, rax
+</span><span>│           0x00001399      e8c8000000     call sym.check_1
+</span><span>│           0x0000139e      85c0           test eax, eax
+</span><span>│       ┌─&lt; 0x000013a0      0f84a5000000   je 0x144b
+</span><span>│       │   0x000013a6      488d3d7b0c00.  lea rdi, str.You_have_passed_the_first_test__Now_I_need_another_key ; 0x2028 ; &quot;You have passed the first test! Now I need another key!&quot; ; const char *s
+</span><span>│       │   0x000013ad      e82efdffff     call sym.imp.puts           ; int puts(const char *s)
+</span><span>│       │   0x000013b2      488b15672c00.  mov rdx, qword [obj.stdin]  ; obj.stdin__GLIBC_2.2.5
+</span><span>│       │                                                              ; [0x4020:8]=0 ; FILE *stream
+</span><span>│       │   0x000013b9      488b85e8dfff.  mov rax, qword [var_2018h]
+</span><span>│       │   0x000013c0      be00200000     mov esi, obj._IO_stdin_used ; 0x2000 ; int size
+</span><span>│       │   0x000013c5      4889c7         mov rdi, rax                ; char *s
+</span><span>│       │   0x000013c8      e853fdffff     call sym.imp.fgets          ; char *fgets(char *s, int size, FILE *stream)
+</span><span>│       │   0x000013cd      488b85e8dfff.  mov rax, qword [var_2018h]
+</span><span>│       │   0x000013d4      4889c7         mov rdi, rax
+</span><span>│       │   0x000013d7      e88dfeffff     call sym.remove_newline
+</span><span>│       │   0x000013dc      488b85e8dfff.  mov rax, qword [var_2018h]
+</span><span>│       │   0x000013e3      4889c7         mov rdi, rax
+</span><span>│       │   0x000013e6      e8e4000000     call sym.check_2
+</span><span>│       │   0x000013eb      85c0           test eax, eax
+</span><span>│      ┌──&lt; 0x000013ed      745c           je 0x144b
+</span><span>│      ││   0x000013ef      488d3d6a0c00.  lea rdi, str.Nice_work__You_ve_passes_the_second_test__we_aren_t_done_yet ; 0x2060 ; &quot;Nice work! You&#39;ve passes the second test, we aren&#39;t done yet!&quot; ; const char *s
+</span><span>│      ││   0x000013f6      e8e5fcffff     call sym.imp.puts           ; int puts(const char *s)
+</span><span>│      ││   0x000013fb      488b151e2c00.  mov rdx, qword [obj.stdin]  ; obj.stdin__GLIBC_2.2.5
+</span><span>│      ││                                                              ; [0x4020:8]=0 ; FILE *stream
+</span><span>│      ││   0x00001402      488b85e8dfff.  mov rax, qword [var_2018h]
+</span><span>│      ││   0x00001409      be00200000     mov esi, obj._IO_stdin_used ; 0x2000 ; int size
+</span><span>│      ││   0x0000140e      4889c7         mov rdi, rax                ; char *s
+</span><span>│      ││   0x00001411      e80afdffff     call sym.imp.fgets          ; char *fgets(char *s, int size, FILE *stream)
+</span><span>│      ││   0x00001416      488b85e8dfff.  mov rax, qword [var_2018h]
+</span><span>│      ││   0x0000141d      4889c7         mov rdi, rax
+</span><span>│      ││   0x00001420      e844feffff     call sym.remove_newline
+</span><span>│      ││   0x00001425      488b85e8dfff.  mov rax, qword [var_2018h]
+</span><span>│      ││   0x0000142c      4889c7         mov rdi, rax                ; char *arg1
+</span><span>│      ││   0x0000142f      e83c010000     call sym.check_3
+</span><span>│      ││   0x00001434      85c0           test eax, eax
+</span><span>│     ┌───&lt; 0x00001436      7413           je 0x144b
+</span><span>│     │││   0x00001438      488d3d610c00.  lea rdi, str.Congrats_you_finished__Here_is_your_flag ; 0x20a0 ; &quot;Congrats you finished! Here is your flag!&quot; ; const char *s
+</span><span>│     │││   0x0000143f      e89cfcffff     call sym.imp.puts           ; int puts(const char *s)
+</span><span>...
+</span></code></pre>
+<p>As can be seen from this excerpt of the check function, the binary will ask for three strings and give us the flag if they are all correct.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>[0x00001180]&gt; pdf@sym.check_1
+</span><span>            ; CALL XREF from sym.check @ 0x1399
+</span><span>┌ 105: sym.check_1 (char *arg1);
+</span><span>│           ; var char *s1 @ rbp-0x18
+</span><span>│           ; var char *s2 @ rbp-0x10
+</span><span>│           ; var char *var_8h @ rbp-0x8
+</span><span>│           ; arg char *arg1 @ rdi
+</span><span>│           0x00001466      f30f1efa       endbr64
+</span><span>│           0x0000146a      55             push rbp
+</span><span>│           0x0000146b      4889e5         mov rbp, rsp
+</span><span>│           0x0000146e      4883ec20       sub rsp, 0x20
+</span><span>│           0x00001472      48897de8       mov qword [s1], rdi         ; arg1
+</span><span>│           0x00001476      488d054d0c00.  lea rax, str.starwars       ; 0x20ca ; &quot;starwars&quot;
+</span><span>│           0x0000147d      488945f0       mov qword [s2], rax
+</span><span>│           0x00001481      488d054b0c00.  lea rax, str.startrek       ; 0x20d3 ; &quot;startrek&quot;
+</span><span>│           0x00001488      488945f8       mov qword [var_8h], rax
+</span><span>│           0x0000148c      488b55f0       mov rdx, qword [s2]
+</span><span>│           0x00001490      488b45e8       mov rax, qword [s1]
+</span><span>│           0x00001494      4889d6         mov rsi, rdx                ; const char *s2
+</span><span>│           0x00001497      4889c7         mov rdi, rax                ; const char *s1
+</span><span>│           0x0000149a      e891fcffff     call sym.imp.strcmp         ; int strcmp(const char *s1, const char *s2)
+</span><span>│           0x0000149f      85c0           test eax, eax
+</span><span>│       ┌─&lt; 0x000014a1      7525           jne 0x14c8
+</span><span>│       │   0x000014a3      488b55f8       mov rdx, qword [var_8h]
+</span><span>│       │   0x000014a7      488b45e8       mov rax, qword [s1]
+</span><span>│       │   0x000014ab      4889d6         mov rsi, rdx                ; const char *s2
+</span><span>│       │   0x000014ae      4889c7         mov rdi, rax                ; const char *s1
+</span><span>│       │   0x000014b1      e87afcffff     call sym.imp.strcmp         ; int strcmp(const char *s1, const char *s2)
+</span><span>│       │   0x000014b6      85c0           test eax, eax
+</span><span>│      ┌──&lt; 0x000014b8      7507           jne 0x14c1
+</span><span>│      ││   0x000014ba      b800000000     mov eax, 0
+</span><span>│     ┌───&lt; 0x000014bf      eb0c           jmp 0x14cd
+</span><span>│     │││   ; CODE XREF from sym.check_1 @ 0x14b8
+</span><span>│     │└──&gt; 0x000014c1      b801000000     mov eax, 1
+</span><span>│     │┌──&lt; 0x000014c6      eb05           jmp 0x14cd
+</span><span>│     │││   ; CODE XREF from sym.check_1 @ 0x14a1
+</span><span>│     ││└─&gt; 0x000014c8      b800000000     mov eax, 0
+</span><span>│     ││    ; CODE XREFS from sym.check_1 @ 0x14bf, 0x14c6
+</span><span>│     └└──&gt; 0x000014cd      c9             leave
+</span><span>└           0x000014ce      c3             ret
+</span></code></pre>
+<p>The function check_1 will jump to 0x14c8 (aka return false) if your input is not equal to the string "starwars" and then return true if your input is not equal to the string "startrek".  The input "starwars" passes both of these constraints and will pass the first checking function.  I didn't actually reverse check_2 and check_3 because I bumped my keyboard and noticed that an empty string would pass both of them.</p>
+<p>flag: auctf{w3lc0m3_to_R3_1021}</p>
+<h1 id="mobile0">mobile0</h1>
+<p><code>Hey, look its an android file. Can you find the flag?</code></p>
+<p>We are provided with an android apk file <code>mobile0.apk</code> and told to find the flag.  The flag can be found with <code>strings mobile0.apk | grep auctf</code>.</p>
+<p>flag: auctf{m0b1le_r3v3rs1ng!!}</p>
+<h1 id="mobile1">mobile1</h1>
+<p><code>My friend sent this file to me and said that there was a flag in it. Can you help me?</code></p>
+<p>We are provided with an ipa file - which is an iOS app store package.  These are compressed, rather like java jars, so you need to unzip it first.  I was pretty invested in not actually reversing the code for this so I ran strings on a few files inside and found the flag in the root info.plist file.</p>
+<p>flag: auctf{i0s_r3v3rs1ng_1s_1nt3r3st1ng}</p>
+<h1 id="sora">sora</h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>This obnoxious kid with spiky hair keeps telling me his key can open all doors.
+</span><span>
+</span><span>Can you generate a key to open this program before he does?
+</span><span>
+</span><span>Connect to challenges.auctf.com 30004
+</span></code></pre>
+<p>I opened up the binary with radare2 to determine the key length and target location and then solved it with angr.  We can see from this excerpt of the main function that it reads in 0x1e bytes from stdin and the program calls print_flag at 0x12aa</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>...
+</span><span>│           0x0000126d      488945c8       mov qword [var_38h], rax
+</span><span>│           0x00001271      488d3da10d00.  lea rdi, str.Give_me_a_key  ; 0x2019 ; &quot;Give me a key!&quot; ; const char *s
+</span><span>│           0x00001278      e843feffff     call sym.imp.puts           ; int puts(const char *s)
+</span><span>│           0x0000127d      488b15ac2d00.  mov rdx, qword [obj.stdin]  ; obj.stdin__GLIBC_2.2.5
+</span><span>│                                                                      ; [0x4030:8]=0 ; FILE *stream
+</span><span>│           0x00001284      488d45d0       lea rax, [s]
+</span><span>│           0x00001288      be1e000000     mov esi, 0x1e               ; int size
+</span><span>│           0x0000128d      4889c7         mov rdi, rax                ; char *s
+</span><span>│           0x00001290      e86bfeffff     call sym.imp.fgets          ; char *fgets(char *s, int size, FILE *stream)
+</span><span>│           0x00001295      488b45c8       mov rax, qword [var_38h]
+</span><span>│           0x00001299      4889c7         mov rdi, rax
+</span><span>│           0x0000129c      e83c000000     call sym.encrypt
+</span><span>│           0x000012a1      85c0           test eax, eax
+</span><span>│       ┌─&lt; 0x000012a3      7411           je 0x12b6
+</span><span>│       │   0x000012a5      b800000000     mov eax, 0
+</span><span>│       │   0x000012aa      e8d9000000     call sym.print_flag
+</span><span>│       │   0x000012af      b800000000     mov eax, 0
+</span><span>│      ┌──&lt; 0x000012b4      eb11           jmp 0x12c7
+</span><span>│      ││   ; CODE XREF from main @ 0x12a3
+</span><span>│      │└─&gt; 0x000012b6      488d3d6b0d00.  lea rdi, str.That_s_not_it  ; 0x2028 ; &quot;That&#39;s not it!&quot; ; const char *s
+</span><span>│      │    0x000012bd      e8fefdffff     call sym.imp.puts           ; int puts(const char *s)
+</span><span>...
+</span></code></pre>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">import </span><span>angr
+</span><span style="color:#ffa759;">import </span><span>sys
+</span><span style="color:#ffa759;">from </span><span>claripy </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffcc66;">argv</span><span>):
+</span><span>
+</span><span>    path_to_binary </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;sora&quot;
+</span><span>    project </span><span style="color:#f29e74;">= </span><span>angr</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">Project</span><span>(path_to_binary</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">load_options</span><span style="color:#f29e74;">=</span><span>{</span><span style="color:#bae67e;">&#39;main_opts&#39;</span><span style="color:#ccc9c2cc;">: </span><span>{</span><span style="color:#bae67e;">&#39;base_addr&#39;</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffcc66;">0x0</span><span>}})
+</span><span>
+</span><span>    x </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">BVS</span><span>(</span><span style="color:#bae67e;">&#39;x&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0x1e </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">8</span><span>)
+</span><span>
+</span><span>
+</span><span>    initial_state </span><span style="color:#f29e74;">= </span><span>project</span><span style="color:#f29e74;">.</span><span>factory</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">entry_state</span><span>(</span><span style="color:#ffcc66;">stdin</span><span style="color:#f29e74;">=</span><span>x)
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># constrain to printable characters
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">char</span><span>(</span><span style="color:#ffcc66;">state</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">byte</span><span>):
+</span><span>        </span><span style="color:#ffa759;">return </span><span>initial_state</span><span style="color:#f29e74;">.</span><span>solver</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">And</span><span>(byte </span><span style="color:#f29e74;">&lt;= </span><span style="color:#bae67e;">&#39;~&#39;</span><span style="color:#ccc9c2cc;">, </span><span>byte </span><span style="color:#f29e74;">&gt;= </span><span style="color:#bae67e;">&#39; &#39;</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">for </span><span>c </span><span style="color:#ffa759;">in </span><span>x</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">chop</span><span>(</span><span style="color:#ffcc66;">8</span><span>):
+</span><span>        initial_state</span><span style="color:#f29e74;">.</span><span>solver</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add</span><span>(</span><span style="color:#ffd580;">char</span><span>(initial_state</span><span style="color:#ccc9c2cc;">, </span><span>c))
+</span><span>
+</span><span>    simulation </span><span style="color:#f29e74;">= </span><span>project</span><span style="color:#f29e74;">.</span><span>factory</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">simgr</span><span>(initial_state)
+</span><span>
+</span><span>
+</span><span>    simulation</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">explore</span><span>(</span><span style="color:#ffcc66;">find</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">0x000012aa</span><span>)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>simulation</span><span style="color:#f29e74;">.</span><span>found:
+</span><span>        solution_state </span><span style="color:#f29e74;">= </span><span>simulation</span><span style="color:#f29e74;">.</span><span>found[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&#39;challenges.auctf.com&#39;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">30004</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(solution_state</span><span style="color:#f29e74;">.</span><span>solver</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">eval</span><span>(x</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">cast_to</span><span style="color:#f29e74;">=</span><span style="font-style:italic;color:#5ccfe6;">bytes</span><span>))
+</span><span>        </span><span style="color:#f28779;">print</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>())
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#f28779;">print</span><span>(simulation</span><span style="color:#f29e74;">.</span><span>stashes)
+</span><span>        </span><span style="color:#ffa759;">raise </span><span style="font-style:italic;color:#5ccfe6;">Exception</span><span>(</span><span style="color:#bae67e;">&#39;Could not find the solution&#39;</span><span>)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&#39;__main__&#39;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>(sys</span><span style="color:#f29e74;">.</span><span>argv)
+</span></code></pre>
+<p>flag: auctf{that_w@s_2_ezy_29302}</p>
+<h1 id="dont-break-me">dont_break_me</h1>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>key </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;MDULCTKBSJARIZQHYPGXOFWNEV&quot;
+</span><span>
+</span><span>comp </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;SASRRWSXBIEBCMPX&quot;
+</span><span>password </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;&quot;
+</span><span>
+</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">16</span><span>):
+</span><span>    password </span><span style="color:#f29e74;">+= </span><span style="color:#f28779;">chr</span><span>(</span><span style="color:#ffcc66;">0x41 </span><span style="color:#f29e74;">+ </span><span>key</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">find</span><span>(comp[i]))
+</span><span>r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&#39;challenges.auctf.com&#39;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">30005</span><span>)
+</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(password)
+</span><span style="color:#f28779;">print</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>())
+</span></code></pre>
+<p>this challenge encrypts your input and then compares it against a constant, failing if it detects any CC bytes. The encryption function is a simple polyalphabetic cipher that can be leaked with ltrace.</p>
+<p>flag: auctf{static_or_dyn@mIc?_12923}</p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date"> 5 April 2020</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

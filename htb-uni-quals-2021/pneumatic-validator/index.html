@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>Pneumatic Validator</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/htb-uni-quals-2021/pneumatic-validator/#reversing">reversing</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/htb-uni-quals-2021/pneumatic-validator/#solve">solve</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>Pneumatic Validator</h1>
+    </header>
+
+    <div class="content">
+        <pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>In some alternate reality, computers are not electronics-based but instead use air pressure. No electrons are zipping by and instead, a large pneumatic circuit takes care of all the math. In that world, we reverse engineers are not staring countless hours into debuggers and disassemblers but are inspecting the circuits on a valve level, trying to figure out how the particles will behave in weird components and how they are connected. Thinking about it, that doesn&#39;t sound too different, does it? 
+</span></code></pre>
+<p><a href="/htb-uni-quals-2021/bins/pneumaticvalidator">pneumaticvalidator</a></p>
+<h1 id="reversing">reversing</h1>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span>undefined8 </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffa759;">int </span><span style="color:#ffcc66;">argc</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">**</span><span style="color:#ffcc66;">argv</span><span>)
+</span><span>{
+</span><span>  undefined8 uVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="font-style:italic;color:#5ccfe6;">size_t </span><span>sVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">float</span><span> fVar3</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">int</span><span> local_10</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Starting the Pneumatic Flag Validation Machine...&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(argc </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">2</span><span>) {
+</span><span>    sVar2 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strlen</span><span>(argv[</span><span style="color:#ffcc66;">1</span><span>])</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(sVar2 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0x14</span><span>) {
+</span><span>      </span><span style="color:#ffd580;">FUN_00105498</span><span>(argv[</span><span style="color:#ffcc66;">1</span><span>]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x14</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Initializing Simulation...&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffd580;">init_heap</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffd580;">FUN_001012bf</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffd580;">FUN_0010149a</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Simulating...&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">for </span><span>(local_10 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;</span><span> local_10 </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">0x400</span><span style="color:#ccc9c2cc;">;</span><span> local_10 </span><span style="color:#f29e74;">=</span><span> local_10 </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>) {
+</span><span>        </span><span style="color:#ffd580;">simulate</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>      fVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">find_max</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#ffcc66;">15</span><span style="color:#ccc9c2cc;">.</span><span style="color:#ffcc66;">0 </span><span style="color:#f29e74;">&lt;=</span><span> fVar3) {
+</span><span>        </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Wrong </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">o</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>      </span><span style="color:#ffa759;">else </span><span>{
+</span><span>        </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Correct /o/&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      }
+</span><span>      </span><span style="color:#ffd580;">FUN_0010125a</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>      uVar1 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#ffa759;">else </span><span>{
+</span><span>      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Wrong length&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      uVar1 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">else </span><span>{
+</span><span>    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Please provide the flag to verify&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    uVar1 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>  }
+</span><span>  </span><span style="color:#ffa759;">return</span><span> uVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>It takes a flag provided in argv[1] and asserts the length is 20. It'll run a few setup functions to populate global variables and then run a simulator function 0x400 times. This is honestly pretty big and gross and I didn't want to reverse it so I decided to poke around with GDB.</p>
+<p><img src="/htb-uni-quals-2021/pneumatic_validator_dynamic.png" alt="=" /></p>
+<p>Ah, yes, I can actually just do that lmao. ✨ dynamic analysis ✨.</p>
+<h1 id="solve">solve</h1>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>subprocess </span><span style="color:#ffa759;">import </span><span>run</span><span style="color:#ccc9c2cc;">, </span><span>PIPE
+</span><span style="color:#ffa759;">from </span><span>string </span><span style="color:#ffa759;">import </span><span>ascii_letters</span><span style="color:#ccc9c2cc;">, </span><span>digits</span><span style="color:#ccc9c2cc;">, </span><span>punctuation
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">check_pw</span><span>(</span><span style="color:#ffcc66;">pw</span><span>):
+</span><span>    proc </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">run</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&#39;gdb ./pneumaticvalidator --nx --ex &quot;b *0x0000555555554000+0x5640&quot; --ex &quot;r </span><span>{pw}</span><span style="color:#bae67e;">&quot; --ex </span><span style="color:#95e6cb;">\&#39;</span><span style="color:#bae67e;">x/f $rbp-4</span><span style="color:#95e6cb;">\&#39;</span><span style="color:#bae67e;"> --batch&#39;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">stdout</span><span style="color:#f29e74;">=</span><span>PIPE</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">shell</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">True</span><span>)
+</span><span>    lines </span><span style="color:#f29e74;">= </span><span>proc</span><span style="color:#f29e74;">.</span><span>stdout</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">decode</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="font-style:italic;color:#5ccfe6;">float</span><span>(lines[</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">2</span><span>]</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">split</span><span>(</span><span style="color:#bae67e;">&quot;:</span><span style="color:#95e6cb;">\t</span><span style="color:#bae67e;">&quot;</span><span>)[</span><span style="color:#ffcc66;">1</span><span>])
+</span><span style="font-style:italic;color:#5c6773;"># known = &quot;&quot;
+</span><span>known </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;HTB</span><span style="color:#ffcc66;">{PN7Um4t1C_l0g1C}</span><span style="color:#bae67e;">&quot;
+</span><span style="font-style:italic;color:#5c6773;"># initial pass; not fully accurate but it&#39;s enough to get the gist and we can try individual characters again later
+</span><span style="color:#ffa759;">while </span><span style="color:#f28779;">len</span><span>(known) </span><span style="color:#f29e74;">&lt; </span><span style="color:#ffcc66;">20</span><span>:
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;trying with known </span><span style="color:#95e6cb;">\&quot;</span><span>{known}</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    pressures </span><span style="color:#f29e74;">= </span><span>{}
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span>ascii_letters </span><span style="color:#f29e74;">+ </span><span>digits </span><span style="color:#f29e74;">+ </span><span style="color:#bae67e;">&quot;_</span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">&quot;</span><span>:
+</span><span>        pw </span><span style="color:#f29e74;">= </span><span>(known </span><span style="color:#f29e74;">+ </span><span>i)</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">ljust</span><span>(</span><span style="color:#ffcc66;">20</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;A&quot;</span><span>)
+</span><span>        pressures[i] </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">check_pw</span><span>(pw)
+</span><span>    </span><span style="color:#f28779;">next </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">min</span><span>(pressures</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">items</span><span>()</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">key</span><span style="color:#f29e74;">=</span><span style="color:#ffa759;">lambda </span><span style="color:#ffcc66;">x</span><span>: x[</span><span style="color:#ffcc66;">1</span><span>])
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;guessing next letter to be </span><span style="color:#95e6cb;">\&quot;</span><span>{</span><span style="color:#f28779;">next</span><span>[</span><span style="color:#ffcc66;">0</span><span>]}</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;"> with pressure of </span><span>{</span><span style="color:#f28779;">next</span><span>[</span><span style="color:#ffcc66;">1</span><span>]}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    known </span><span style="color:#f29e74;">+= </span><span style="color:#f28779;">next</span><span>[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">vary_index</span><span>(</span><span style="color:#ffcc66;">idx</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">pw</span><span>):
+</span><span>    pressures </span><span style="color:#f29e74;">= </span><span>{}
+</span><span>    log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;varying idx = </span><span>{idx}</span><span style="color:#bae67e;">, char = </span><span>{known[idx]}</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>    </span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span>ascii_letters </span><span style="color:#f29e74;">+ </span><span>digits:
+</span><span>        pw[idx] </span><span style="color:#f29e74;">= </span><span>i
+</span><span>        pressure </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">check_pw</span><span>(</span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(pw))
+</span><span>        pressures[i] </span><span style="color:#f29e74;">= </span><span>pressure
+</span><span>    </span><span style="color:#f28779;">print</span><span>(</span><span style="color:#f28779;">sorted</span><span>(pressures</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">items</span><span>()</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">key</span><span style="color:#f29e74;">=</span><span style="color:#ffa759;">lambda </span><span style="color:#ffcc66;">x</span><span>: x[</span><span style="color:#ffcc66;">1</span><span>]))
+</span><span>    </span><span style="color:#ffa759;">return </span><span style="color:#f28779;">min</span><span>(pressures</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">items</span><span>()</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">key</span><span style="color:#f29e74;">=</span><span style="color:#ffa759;">lambda </span><span style="color:#ffcc66;">x</span><span>: x[</span><span style="color:#ffcc66;">1</span><span>])
+</span><span>pw </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">list</span><span>(known)
+</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">20</span><span>): </span><span style="font-style:italic;color:#5c6773;"># we know HTB{ is correct
+</span><span>    old_pw </span><span style="color:#f29e74;">= </span><span>[x </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span>pw]
+</span><span>    pw[i] </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">vary_index</span><span>(i</span><span style="color:#ccc9c2cc;">, </span><span>pw)[</span><span style="color:#ffcc66;">0</span><span>]
+</span><span>    </span><span style="color:#ffa759;">if </span><span>pw </span><span style="color:#f29e74;">!= </span><span>old_pw:
+</span><span>        log</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">info</span><span>(</span><span style="color:#ffa759;">f</span><span style="color:#bae67e;">&quot;found better flag </span><span style="color:#95e6cb;">\&quot;</span><span>{</span><span style="color:#bae67e;">&#39;&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(pw)}</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;"> -&gt; </span><span style="color:#95e6cb;">\&quot;</span><span>{</span><span style="color:#bae67e;">&#39;&#39;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(old_pw)}</span><span style="color:#95e6cb;">\&quot;</span><span style="color:#bae67e;">&quot;</span><span>)
+</span></code></pre>
+<p>lmao i don't deserve this HTB{pN3Um4t1C_l0g1C}</p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">22 November 2021</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/reversing/">#reversing</a></li>
+                    
+                    <li><a href="https://tsheinen.github.io/tags/smart-brute-force/">#smart-brute-force</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

